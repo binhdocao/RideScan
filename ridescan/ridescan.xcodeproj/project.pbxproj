@@ -3,17 +3,18 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9B03D9052AD50EC00053E849 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B03D9042AD50EC00053E849 /* LoginView.swift */; };
+		9B03D9072AD50F6E0053E849 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B03D9062AD50F6E0053E849 /* Utilities.swift */; };
+		9B03D9312AD5A4750053E849 /* SwiftBSON in Frameworks */ = {isa = PBXBuildFile; productRef = 9B03D9302AD5A4750053E849 /* SwiftBSON */; };
+		9B03D9372AD5A6230053E849 /* Models in Frameworks */ = {isa = PBXBuildFile; productRef = 9B03D9362AD5A6230053E849 /* Models */; };
 		9BEF96472AD45A0300B40FFE /* ridescanApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BEF96462AD45A0300B40FFE /* ridescanApp.swift */; };
 		9BEF96492AD45A0300B40FFE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BEF96482AD45A0300B40FFE /* ContentView.swift */; };
 		9BEF964B2AD45A0600B40FFE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9BEF964A2AD45A0600B40FFE /* Assets.xcassets */; };
 		9BEF964E2AD45A0600B40FFE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9BEF964D2AD45A0600B40FFE /* Preview Assets.xcassets */; };
-		9BEF96582AD45A0600B40FFE /* ridescanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BEF96572AD45A0600B40FFE /* ridescanTests.swift */; };
-		9BEF96622AD45A0600B40FFE /* ridescanUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BEF96612AD45A0600B40FFE /* ridescanUITests.swift */; };
-		9BEF96642AD45A0600B40FFE /* ridescanUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BEF96632AD45A0600B40FFE /* ridescanUITestsLaunchTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,16 +35,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9B03D9042AD50EC00053E849 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		9B03D9062AD50F6E0053E849 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		9BEF96432AD45A0300B40FFE /* ridescan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ridescan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BEF96462AD45A0300B40FFE /* ridescanApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ridescanApp.swift; sourceTree = "<group>"; };
 		9BEF96482AD45A0300B40FFE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		9BEF964A2AD45A0600B40FFE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9BEF964D2AD45A0600B40FFE /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		9BEF96532AD45A0600B40FFE /* ridescanTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ridescanTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		9BEF96572AD45A0600B40FFE /* ridescanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ridescanTests.swift; sourceTree = "<group>"; };
 		9BEF965D2AD45A0600B40FFE /* ridescanUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ridescanUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		9BEF96612AD45A0600B40FFE /* ridescanUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ridescanUITests.swift; sourceTree = "<group>"; };
-		9BEF96632AD45A0600B40FFE /* ridescanUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ridescanUITestsLaunchTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +51,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9B03D9372AD5A6230053E849 /* Models in Frameworks */,
+				9B03D9312AD5A4750053E849 /* SwiftBSON in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,12 +73,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9B03D9022AD50E970053E849 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				9B03D9042AD50EC00053E849 /* LoginView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		9B03D9032AD50EA10053E849 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
 		9BEF963A2AD45A0300B40FFE = {
 			isa = PBXGroup;
 			children = (
 				9BEF96452AD45A0300B40FFE /* ridescan */,
-				9BEF96562AD45A0600B40FFE /* ridescanTests */,
-				9BEF96602AD45A0600B40FFE /* ridescanUITests */,
 				9BEF96442AD45A0300B40FFE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -94,10 +109,13 @@
 		9BEF96452AD45A0300B40FFE /* ridescan */ = {
 			isa = PBXGroup;
 			children = (
+				9B03D9032AD50EA10053E849 /* ViewModels */,
+				9B03D9022AD50E970053E849 /* Views */,
 				9BEF96462AD45A0300B40FFE /* ridescanApp.swift */,
 				9BEF96482AD45A0300B40FFE /* ContentView.swift */,
 				9BEF964A2AD45A0600B40FFE /* Assets.xcassets */,
 				9BEF964C2AD45A0600B40FFE /* Preview Content */,
+				9B03D9062AD50F6E0053E849 /* Utilities.swift */,
 			);
 			path = ridescan;
 			sourceTree = "<group>";
@@ -108,23 +126,6 @@
 				9BEF964D2AD45A0600B40FFE /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		9BEF96562AD45A0600B40FFE /* ridescanTests */ = {
-			isa = PBXGroup;
-			children = (
-				9BEF96572AD45A0600B40FFE /* ridescanTests.swift */,
-			);
-			path = ridescanTests;
-			sourceTree = "<group>";
-		};
-		9BEF96602AD45A0600B40FFE /* ridescanUITests */ = {
-			isa = PBXGroup;
-			children = (
-				9BEF96612AD45A0600B40FFE /* ridescanUITests.swift */,
-				9BEF96632AD45A0600B40FFE /* ridescanUITestsLaunchTests.swift */,
-			);
-			path = ridescanUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -143,6 +144,10 @@
 			dependencies = (
 			);
 			name = ridescan;
+			packageProductDependencies = (
+				9B03D9302AD5A4750053E849 /* SwiftBSON */,
+				9B03D9362AD5A6230053E849 /* Models */,
+			);
 			productName = ridescan;
 			productReference = 9BEF96432AD45A0300B40FFE /* ridescan.app */;
 			productType = "com.apple.product-type.application";
@@ -215,6 +220,10 @@
 				Base,
 			);
 			mainGroup = 9BEF963A2AD45A0300B40FFE;
+			packageReferences = (
+				9B03D9082AD50FF70053E849 /* XCRemoteSwiftPackageReference "swift-bson" */,
+				9B03D9352AD5A6230053E849 /* XCLocalSwiftPackageReference "../Models" */,
+			);
 			productRefGroup = 9BEF96442AD45A0300B40FFE /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -257,7 +266,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9B03D9052AD50EC00053E849 /* LoginView.swift in Sources */,
 				9BEF96492AD45A0300B40FFE /* ContentView.swift in Sources */,
+				9B03D9072AD50F6E0053E849 /* Utilities.swift in Sources */,
 				9BEF96472AD45A0300B40FFE /* ridescanApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -266,7 +277,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9BEF96582AD45A0600B40FFE /* ridescanTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,8 +284,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9BEF96642AD45A0600B40FFE /* ridescanUITestsLaunchTests.swift in Sources */,
-				9BEF96622AD45A0600B40FFE /* ridescanUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -588,6 +596,36 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		9B03D9352AD5A6230053E849 /* XCLocalSwiftPackageReference "../Models" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Models;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		9B03D9082AD50FF70053E849 /* XCRemoteSwiftPackageReference "swift-bson" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mongodb/swift-bson";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9B03D9302AD5A4750053E849 /* SwiftBSON */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9B03D9082AD50FF70053E849 /* XCRemoteSwiftPackageReference "swift-bson" */;
+			productName = SwiftBSON;
+		};
+		9B03D9362AD5A6230053E849 /* Models */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Models;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9BEF963B2AD45A0300B40FFE /* Project object */;
 }
