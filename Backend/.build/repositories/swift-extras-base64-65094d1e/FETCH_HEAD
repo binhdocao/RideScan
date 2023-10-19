@@ -1,0 +1,42 @@
+606c8d5cfbc978947a237cf1a3d8864ada5261bd	not-for-merge	branch 'feature/copy-if-not-array' of https://github.com/swift-extras/swift-extras-base64
+4d87c37a586701be69bd1b09d3c33a2ec04a3978	not-for-merge	branch 'feature/switch-faster-than-lookup' of https://github.com/swift-extras/swift-extras-base64
+24eefb3ab56c804299f97f633a06785d7f0c8be8	not-for-merge	branch 'feature/test-swift-5.2-nightly' of https://github.com/swift-extras/swift-extras-base64
+0107926319c9e26e54ca2ecc5343e46552ab1cf2	not-for-merge	branch 'feature/utf8view-lookup-table' of https://github.com/swift-extras/swift-extras-base64
+31e286916d09cf1aa4cdad34a7169ca84b0a7d55	not-for-merge	branch 'ff-prepare-move' of https://github.com/swift-extras/swift-extras-base64
+97237cf1bc1feebaeb0febec91c1e1b9e4d839b3	not-for-merge	branch 'main' of https://github.com/swift-extras/swift-extras-base64
+b8af49699d59ad065b801715a5009619100245ca	not-for-merge	branch 'master' of https://github.com/swift-extras/swift-extras-base64
+e4103e34b685c33d6230c1ea49dec5d4a297a5e8	not-for-merge	branch 'prepare-base32' of https://github.com/swift-extras/swift-extras-base64
+b6df9697b3130def78e941f8617ea0efa3163a57	not-for-merge	branch 'swift-5.2' of https://github.com/swift-extras/swift-extras-base64
+22bc2349da2191535633b0cfb96657dd9a3787d1	not-for-merge	branch 'swift-5.3' of https://github.com/swift-extras/swift-extras-base64
+acd128b318239de76e49bbfc3855c2c8aaf4ae9f	not-for-merge	branch 'swiftformat' of https://github.com/swift-extras/swift-extras-base64
+f5eece4d1dcdff8f04b3f93db74aac19400429ba	not-for-merge	'refs/pull/1/head' of https://github.com/swift-extras/swift-extras-base64
+24eefb3ab56c804299f97f633a06785d7f0c8be8	not-for-merge	'refs/pull/10/head' of https://github.com/swift-extras/swift-extras-base64
+0dbd37e1524b9c3dfb6e9e9da48b343a87fc900e	not-for-merge	'refs/pull/11/head' of https://github.com/swift-extras/swift-extras-base64
+b6df9697b3130def78e941f8617ea0efa3163a57	not-for-merge	'refs/pull/12/head' of https://github.com/swift-extras/swift-extras-base64
+5bb9e0a77afb2b5016edd99862cbeb0487ae6541	not-for-merge	'refs/pull/13/head' of https://github.com/swift-extras/swift-extras-base64
+acd128b318239de76e49bbfc3855c2c8aaf4ae9f	not-for-merge	'refs/pull/14/head' of https://github.com/swift-extras/swift-extras-base64
+e4103e34b685c33d6230c1ea49dec5d4a297a5e8	not-for-merge	'refs/pull/15/head' of https://github.com/swift-extras/swift-extras-base64
+95616c3c45bf34a617e5e204fbc07e2b0b9ecfa4	not-for-merge	'refs/pull/16/head' of https://github.com/swift-extras/swift-extras-base64
+22bc2349da2191535633b0cfb96657dd9a3787d1	not-for-merge	'refs/pull/17/head' of https://github.com/swift-extras/swift-extras-base64
+8568cf4497a77e7ec04c2be147bfdcab2e37b951	not-for-merge	'refs/pull/18/head' of https://github.com/swift-extras/swift-extras-base64
+50183a7335681e7d6272653f43b403c05fae1512	not-for-merge	'refs/pull/19/head' of https://github.com/swift-extras/swift-extras-base64
+21bb72508571a26597e8d5013352ad17d3697515	not-for-merge	'refs/pull/2/head' of https://github.com/swift-extras/swift-extras-base64
+8babeddf0c46dead764f4029af110772406e2e55	not-for-merge	'refs/pull/20/head' of https://github.com/swift-extras/swift-extras-base64
+31e286916d09cf1aa4cdad34a7169ca84b0a7d55	not-for-merge	'refs/pull/21/head' of https://github.com/swift-extras/swift-extras-base64
+b499376fe65f70eeb172666db81b88c6edf9d339	not-for-merge	'refs/pull/23/head' of https://github.com/swift-extras/swift-extras-base64
+74668816dda520abcd8361e87e9fec60a60c91d2	not-for-merge	'refs/pull/25/head' of https://github.com/swift-extras/swift-extras-base64
+85ed8b023eec6baa99c2372f103fec5f899f1d9a	not-for-merge	'refs/pull/27/head' of https://github.com/swift-extras/swift-extras-base64
+2b97bca52146d22052c229c0e44229bf8e3230bf	not-for-merge	'refs/pull/28/head' of https://github.com/swift-extras/swift-extras-base64
+7208165d05da31de4d3bbdf2d78d643aac5cde89	not-for-merge	'refs/pull/29/head' of https://github.com/swift-extras/swift-extras-base64
+4d87c37a586701be69bd1b09d3c33a2ec04a3978	not-for-merge	'refs/pull/3/head' of https://github.com/swift-extras/swift-extras-base64
+b448b8bf921ab6102a5385c19686f014ff8f72f8	not-for-merge	'refs/pull/4/head' of https://github.com/swift-extras/swift-extras-base64
+a92bcc00420095d563240fba0b3ac93045b7a4e8	not-for-merge	'refs/pull/7/head' of https://github.com/swift-extras/swift-extras-base64
+0107926319c9e26e54ca2ecc5343e46552ab1cf2	not-for-merge	'refs/pull/8/head' of https://github.com/swift-extras/swift-extras-base64
+eea18d5a7b683739fe096856ba4a03475d64cba4	not-for-merge	'refs/pull/9/head' of https://github.com/swift-extras/swift-extras-base64
+97237cf1bc1feebaeb0febec91c1e1b9e4d839b3	not-for-merge	tag '0.7.0' of https://github.com/swift-extras/swift-extras-base64
+e4d037127f8aaa473dfa0d58d1d1f15fcc597e4b	not-for-merge	tag 'v0.1.0' of https://github.com/swift-extras/swift-extras-base64
+3ffa48a7047fc9ac6581cd53ab1df29466d8f13b	not-for-merge	tag 'v0.2.0' of https://github.com/swift-extras/swift-extras-base64
+737c152c8f0ba565a0d3dbb7eb2f57ba153b29cc	not-for-merge	tag 'v0.3.0' of https://github.com/swift-extras/swift-extras-base64
+bf6706e1811e746cb204deaa921d8c7b4d0509e2	not-for-merge	tag 'v0.4.0' of https://github.com/swift-extras/swift-extras-base64
+778e00dd7cc2b7970742f061cffc87dd570e6bfa	not-for-merge	tag 'v0.5.0' of https://github.com/swift-extras/swift-extras-base64
+9c7648cd380d55462b6b9bae1f0a69a9a574a13e	not-for-merge	tag 'v0.6.0' of https://github.com/swift-extras/swift-extras-base64

@@ -1,0 +1,1 @@
+export MONGODB_URI="mongodb+srv://rideuser:rideuser123@ridescan.zvz8zbl.mongodb.net/?retryWrites=true&w=majority"
