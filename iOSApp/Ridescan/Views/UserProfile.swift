@@ -17,14 +17,17 @@ struct UserProfile: View {
     @State private var isEditing = false // State to track if the user is in edit mode
     @State private var editedFirstName = ""
     @State private var editedEmail = ""
+	
+	let maroonColor = Color(red: 0.5, green: 0, blue: 0)
 
     var body: some View {
+		
         VStack {
             Image(systemName: "person.circle.fill") // You can use an actual user profile image here
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 100, height: 100)
-                .foregroundColor(.blue)
+                .foregroundColor(maroonColor)
                 .padding(.bottom, 20)
 
             Text("User Profile")
@@ -75,9 +78,10 @@ struct UserProfile: View {
                         .font(.headline)
                         .padding(.vertical, 10)
                         .padding(.horizontal, 20)
-                        .background(Color.blue)
+                        .background(maroonColor)
                         .foregroundColor(.white)
                         .cornerRadius(10)
+						.padding(.horizontal, 50)
                 }
             }
             .padding(.bottom, 10)
