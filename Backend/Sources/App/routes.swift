@@ -15,8 +15,8 @@ func routes(_ app: Application) throws {
     }
 
     /// Handles a request to load info about a particular kitten.
-    app.get(":_id") { req async throws -> Kitten in
-        try await req.findKitten()
+    app.get(":_id") { req async throws -> User in
+        try await req.findUser()
     }
 
     app.delete(":_id") { req async throws -> Response in
@@ -31,11 +31,16 @@ func routes(_ app: Application) throws {
 /// Extend the `Kitten` model type to conform to Vapor's `Content` protocol so that it may be converted to and
 /// initialized from HTTP data.
 extension Kitten: Content {}
+extension User: Content {}
 
 extension Request {
     /// Convenience extension for obtaining a collection.
     var kittenCollection: MongoCollection<Kitten> {
         self.application.mongoDB.client.db("home").collection("kittens", withType: Kitten.self)
+    }
+
+    var userCollection: MongoCollection<User> {
+        self.application.mongoDB.client.db("ridescan").collection("users", withType: User.self)
     }
 
     /// Constructs a document using the _id from this request which can be used a filter for MongoDB
@@ -66,6 +71,14 @@ extension Request {
             throw Abort(.notFound, reason: "No kitten with matching _id")
         }
         return kitten
+    }
+
+    func findUser() async throws -> User {
+        let idFilter = try self.getIDFilter()
+        guard let user = try await self.userCollection.findOne(idFilter) else {
+            throw Abort(.notFound, reason: "No user with matching _id")
+        }
+        return user
     }
 
     func addKitten() async throws -> Response {
