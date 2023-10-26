@@ -11,17 +11,15 @@
 		15CB3D6A2AE1759900000F7C /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15CB3D692AE1759900000F7C /* Map.swift */; };
 		15E9C00E2AE0C5BA00F4C18D /* HomeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15E9C00D2AE0C5BA00F4C18D /* HomeScreen.swift */; };
 		8B20583227BEFFDF00A9E2A1 /* RideScanApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B20583127BEFFDF00A9E2A1 /* RideScanApp.swift */; };
-		8B20583427BEFFDF00A9E2A1 /* KittenList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B20583327BEFFDF00A9E2A1 /* KittenList.swift */; };
-		8B20586227BF025100A9E2A1 /* KittenListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B20586127BF025100A9E2A1 /* KittenListViewModel.swift */; };
 		8B9649EE27E3B4FF00CB9DC1 /* SwiftBSON in Frameworks */ = {isa = PBXBuildFile; productRef = 8B9649ED27E3B4FF00CB9DC1 /* SwiftBSON */; };
 		8BC62A4727CEF38B0015343B /* Models in Frameworks */ = {isa = PBXBuildFile; productRef = 8BC62A4627CEF38B0015343B /* Models */; };
-		8BE0610A27C58DD300D5E981 /* AddKitten.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE0610927C58DD300D5E981 /* AddKitten.swift */; };
-		8BE0610C27C58E0E00D5E981 /* AddKittenViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE0610B27C58E0E00D5E981 /* AddKittenViewModel.swift */; };
-		8BE0610E27C6E03D00D5E981 /* ViewUpdateDeleteKittenViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE0610D27C6E03D00D5E981 /* ViewUpdateDeleteKittenViewModel.swift */; };
-		8BE0611027C6E41300D5E981 /* ViewUpdateDeleteKitten.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE0610F27C6E41300D5E981 /* ViewUpdateDeleteKitten.swift */; };
 		8BE0611227C7119200D5E981 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE0611127C7119200D5E981 /* Utilities.swift */; };
 		9B7ABBE42AD5B78400A822BA /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7ABBE32AD5B78400A822BA /* UserProfile.swift */; };
 		9B7ABBE62AD5B9D100A822BA /* UserProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7ABBE52AD5B9D100A822BA /* UserProfileViewModel.swift */; };
+		9B9EC7122AE86E5D007DDADB /* SignUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9EC7112AE86E5D007DDADB /* SignUp.swift */; };
+		9B9EC7142AE8798C007DDADB /* LogIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9EC7132AE8798C007DDADB /* LogIn.swift */; };
+		9B9EC7182AE9C881007DDADB /* SideMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9EC7172AE9C881007DDADB /* SideMenu.swift */; };
+		9B9EC71A2AEA0A94007DDADB /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9EC7192AEA0A94007DDADB /* KeychainService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,16 +28,15 @@
 		15E9C00D2AE0C5BA00F4C18D /* HomeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreen.swift; sourceTree = "<group>"; };
 		8B20582E27BEFFDF00A9E2A1 /* Ridescan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ridescan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B20583127BEFFDF00A9E2A1 /* RideScanApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RideScanApp.swift; sourceTree = "<group>"; };
-		8B20583327BEFFDF00A9E2A1 /* KittenList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KittenList.swift; sourceTree = "<group>"; };
-		8B20586127BF025100A9E2A1 /* KittenListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KittenListViewModel.swift; sourceTree = "<group>"; };
-		8BE0610927C58DD300D5E981 /* AddKitten.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddKitten.swift; sourceTree = "<group>"; };
-		8BE0610B27C58E0E00D5E981 /* AddKittenViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddKittenViewModel.swift; sourceTree = "<group>"; };
-		8BE0610D27C6E03D00D5E981 /* ViewUpdateDeleteKittenViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewUpdateDeleteKittenViewModel.swift; sourceTree = "<group>"; };
-		8BE0610F27C6E41300D5E981 /* ViewUpdateDeleteKitten.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewUpdateDeleteKitten.swift; sourceTree = "<group>"; };
 		8BE0611127C7119200D5E981 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		8BE0611A27CEF13500D5E981 /* Models */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Models; path = ../Models; sourceTree = "<group>"; };
 		9B7ABBE32AD5B78400A822BA /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		9B7ABBE52AD5B9D100A822BA /* UserProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileViewModel.swift; sourceTree = "<group>"; };
+		9B9EC7112AE86E5D007DDADB /* SignUp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUp.swift; sourceTree = "<group>"; };
+		9B9EC7132AE8798C007DDADB /* LogIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogIn.swift; sourceTree = "<group>"; };
+		9B9EC7172AE9C881007DDADB /* SideMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenu.swift; sourceTree = "<group>"; };
+		9B9EC7192AEA0A94007DDADB /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
+		9BCC6B222AEAC000000BEF81 /* Ridescan.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Ridescan.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,8 +73,10 @@
 		8B20583027BEFFDF00A9E2A1 /* Ridescan */ = {
 			isa = PBXGroup;
 			children = (
+				9BCC6B222AEAC000000BEF81 /* Ridescan.entitlements */,
 				15CB3D672AE1740300000F7C /* Assets.xcassets */,
 				8BE0611127C7119200D5E981 /* Utilities.swift */,
+				9B9EC7192AEA0A94007DDADB /* KeychainService.swift */,
 				8B20583127BEFFDF00A9E2A1 /* RideScanApp.swift */,
 				8B20585D27BEFFF700A9E2A1 /* Views */,
 				8B20585E27BF015700A9E2A1 /* ViewModels */,
@@ -88,12 +87,12 @@
 		8B20585D27BEFFF700A9E2A1 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				8BE0610927C58DD300D5E981 /* AddKitten.swift */,
-				8B20583327BEFFDF00A9E2A1 /* KittenList.swift */,
-				8BE0610F27C6E41300D5E981 /* ViewUpdateDeleteKitten.swift */,
 				9B7ABBE32AD5B78400A822BA /* UserProfile.swift */,
+				9B9EC7172AE9C881007DDADB /* SideMenu.swift */,
 				15E9C00D2AE0C5BA00F4C18D /* HomeScreen.swift */,
 				15CB3D692AE1759900000F7C /* Map.swift */,
+				9B9EC7112AE86E5D007DDADB /* SignUp.swift */,
+				9B9EC7132AE8798C007DDADB /* LogIn.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -101,9 +100,6 @@
 		8B20585E27BF015700A9E2A1 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				8BE0610B27C58E0E00D5E981 /* AddKittenViewModel.swift */,
-				8B20586127BF025100A9E2A1 /* KittenListViewModel.swift */,
-				8BE0610D27C6E03D00D5E981 /* ViewUpdateDeleteKittenViewModel.swift */,
 				9B7ABBE52AD5B9D100A822BA /* UserProfileViewModel.swift */,
 			);
 			path = ViewModels;
@@ -200,18 +196,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8BE0611027C6E41300D5E981 /* ViewUpdateDeleteKitten.swift in Sources */,
-				8B20583427BEFFDF00A9E2A1 /* KittenList.swift in Sources */,
-				8BE0610A27C58DD300D5E981 /* AddKitten.swift in Sources */,
-				8BE0610E27C6E03D00D5E981 /* ViewUpdateDeleteKittenViewModel.swift in Sources */,
 				15E9C00E2AE0C5BA00F4C18D /* HomeScreen.swift in Sources */,
 				8BE0611227C7119200D5E981 /* Utilities.swift in Sources */,
 				8B20583227BEFFDF00A9E2A1 /* RideScanApp.swift in Sources */,
-				8BE0610C27C58E0E00D5E981 /* AddKittenViewModel.swift in Sources */,
+				9B9EC71A2AEA0A94007DDADB /* KeychainService.swift in Sources */,
 				9B7ABBE62AD5B9D100A822BA /* UserProfileViewModel.swift in Sources */,
-				8B20586227BF025100A9E2A1 /* KittenListViewModel.swift in Sources */,
+				9B9EC7122AE86E5D007DDADB /* SignUp.swift in Sources */,
 				15CB3D6A2AE1759900000F7C /* Map.swift in Sources */,
+				9B9EC7182AE9C881007DDADB /* SideMenu.swift in Sources */,
 				9B7ABBE42AD5B78400A822BA /* UserProfile.swift in Sources */,
+				9B9EC7142AE8798C007DDADB /* LogIn.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -341,12 +335,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Ridescan/Ridescan.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PZWB43AU2U;
+				DEVELOPMENT_TEAM = UPSTGQWLJ5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "<string>We need your location to show it on the map.</string>\n";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to show it on the map.\n";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -359,7 +354,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = MongoDB.Kittens;
+				PRODUCT_BUNDLE_IDENTIFIER = ridescan.ridescan;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -372,12 +367,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Ridescan/Ridescan.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PZWB43AU2U;
+				DEVELOPMENT_TEAM = UPSTGQWLJ5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "<string>We need your location to show it on the map.</string>\n";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to show it on the map.\n";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -390,7 +386,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = MongoDB.Kittens;
+				PRODUCT_BUNDLE_IDENTIFIER = ridescan.ridescan;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
