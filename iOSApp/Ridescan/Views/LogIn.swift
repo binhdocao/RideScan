@@ -51,7 +51,7 @@ struct LogInView: View {
             Button(action: {
                 Task {
                     do {
-//                        try await viewModel.login(emailOrPhone: emailOrPhone, password: password)
+                        try await viewModel.login(emailOrPhone: emailOrPhone, password: password)
                         loginSuccess = true
                     } catch {
                         // Handle errors here (loginSuccess will be set in the ViewModel)
