@@ -49,7 +49,7 @@ struct UserProfile: View {
                 } else {
                     Text("First Name:")
                         .font(.headline)
-                    Text(viewModel.user.firstName)
+                    Text(viewModel.user.firstname)
                         .font(.body)
                         .padding(.bottom, 10)
 
@@ -65,7 +65,7 @@ struct UserProfile: View {
                         if isEditing {
                             // Call the async function using Task
                             do {
-                                try await viewModel.updateUserInfo(firstName: editedFirstName, email: editedEmail)
+                                try await viewModel.updateUserInfo(firstname: editedFirstName, email: editedEmail)
                             } catch {
                                 // Handle errors here
                                 print("Error updating user info: \(error)")
@@ -90,24 +90,24 @@ struct UserProfile: View {
         }
         .padding()
         // When the view appears, retrieve an updated list of kittens.
-        .onAppear(perform: fetchUserInfo)
+//        .onAppear(perform: fetchUserInfo)
     }
     
-    private func fetchUserInfo() {
-        self.busy = true
-        self.errorMessage = nil
-        Task {
-            do {
-                try await viewModel.fetchUserInfo()
-                editedFirstName = viewModel.user.firstName // Initialize editedFirstName with the current first name
-                editedEmail = viewModel.user.email // Initialize editedEmail with the current email
-                busy = false
-            } catch {
-                busy = false
-                errorMessage = "Failed to fetch user info: \(error.localizedDescription)"
-            }
-        }
-    }
+//    private func fetchUserInfo() {
+//        self.busy = true
+//        self.errorMessage = nil
+//        Task {
+//            do {
+//                try await viewModel.fetchUserInfo()
+//                editedFirstName = viewModel.user.firstname // Initialize editedFirstName with the current first name
+//                editedEmail = viewModel.user.email // Initialize editedEmail with the current email
+//                busy = false
+//            } catch {
+//                busy = false
+//                errorMessage = "Failed to fetch user info: \(error.localizedDescription)"
+//            }
+//        }
+//    }
 }
 
 
