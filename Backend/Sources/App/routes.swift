@@ -5,8 +5,8 @@ import Vapor
 // Adds API routes to the application.
 func routes(_ app: Application) throws {
     /// Handles a request to load the list of kittens.
-    app.get { req async throws -> [Kitten] in
-        try await req.findKittens()
+    app.get { req async throws -> [User] in
+        try await req.findUsers()
     }
 
     /// Handles a request to add a new kitten.
@@ -25,6 +25,14 @@ func routes(_ app: Application) throws {
 
     app.patch(":_id") { req async throws -> Response in
         try await req.updateKitten()
+    }
+
+    app.get("api", "user", "login", ":emailOrPhone", ":password") { req async throws -> User in
+        try await req.userExists()
+    }
+
+    app.post("api", "user", "create") { req async throws -> Response in
+        try await req.addUser()
     }
 }
 
@@ -49,7 +57,7 @@ extension Request {
         // We only call this method from request handlers that have _id parameters so the value
         // should always be available.
         guard let idString = self.parameters.get("_id", as: String.self) else {
-            throw Abort(.badRequest, reason: "Request missing _id for kitten")
+            throw Abort(.badRequest, reason: "Request missing _id for user")
         }
         guard let _id = try? BSONObjectID(idString) else {
             throw Abort(.badRequest, reason: "Invalid _id string \(idString)")
@@ -57,12 +65,35 @@ extension Request {
         return ["_id": .objectID(_id)]
     }
 
-    func findKittens() async throws -> [Kitten] {
+    func findUsers() async throws -> [User] {
         do {
-            return try await self.kittenCollection.find().toArray()
+            return try await self.userCollection.find().toArray()
         } catch {
-            throw Abort(.internalServerError, reason: "Failed to load kittens: \(error)")
+            throw Abort(.internalServerError, reason: "Failed to load users: \(error)")
         }
+    }
+
+    func userExists() async throws -> User {
+
+        guard let emailOrPhone = self.parameters.get("emailOrPhone", as: String.self), 
+              let password = self.parameters.get("password", as: String.self) else {
+            throw Abort(.badRequest)
+        }
+
+        // Use the `$or` operator to match either email or phone
+        let filter: BSONDocument = [
+            "$or": [
+                ["email": .string(emailOrPhone)],
+                ["phone": .string(emailOrPhone)]
+            ],
+            "password": .string(password) // Match the password as well
+        ]
+
+        // Perform the query to find a user with matching email/phone and password
+        guard let user = try await self.userCollection.findOne(filter) else {
+            throw Abort(.notFound, reason: "No user with matching credentials")
+        }
+        return user
     }
 
     func findKitten() async throws -> Kitten {
@@ -88,6 +119,17 @@ extension Request {
             return Response(status: .created)
         } catch {
             throw Abort(.internalServerError, reason: "Failed to save new kitten: \(error)")
+        }
+    }
+
+    func addUser() async throws -> Response {
+        let newUser = try self.content.decode(User.self)
+        print(newUser)
+        do {
+            try await self.userCollection.insertOne(newUser)
+            return Response(status: .created)
+        } catch {
+            throw Abort(.internalServerError, reason: "Failed to save new user: \(error)")
         }
     }
 

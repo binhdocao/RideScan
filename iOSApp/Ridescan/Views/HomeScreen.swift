@@ -39,22 +39,32 @@ struct HomeScreen: View {
 				Spacer().frame(height: 50)
 				
 				VStack(spacing: 20) {
-					NavigationLink(destination: UserProfile()) {
-						Text("Create an account")
-							.foregroundColor(.white)
-							.padding()
-							.background(maroonColor)
-							.cornerRadius(8)
+					NavigationLink(destination: SignUpView()) {
+						Text("Sign Up")
+                            .foregroundColor(maroonColor)
+                            .background(Color.white)
+                            .frame(maxWidth: .infinity, maxHeight: 50)
+                            .overlay(
+                                // Border with maroon color
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(maroonColor, lineWidth: 2)
+                            )
 					}
 					
-					NavigationLink(destination: MapView()) {
-						Text("Log In")
-							.foregroundColor(.white)
-							.padding()
-							.background(Color.black)
-							.cornerRadius(8)
+					NavigationLink(destination: LogInView()) {
+                        Text("Log In")
+                            .foregroundColor(.white)
+                            .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, maxHeight: 50)
+                            .background(maroonColor)
+                            .cornerRadius(8)
+                            .overlay(
+                                // Border with maroon color
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(maroonColor, lineWidth: 2)
+                            )
 					}
 				}
+                Spacer()
 			}
 			.padding(.horizontal, 50)
 		}

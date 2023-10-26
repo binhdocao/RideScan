@@ -18,32 +18,35 @@ public struct User: Identifiable, Codable {
     
     /// Unique identifier.
     public let id: BSONObjectID
-    public let firstName: String
-    public let lastName: String
+    public let firstname: String
+    public let lastname: String
     public let email: String
     public let phone: String
+    public let password: String
 
     private enum CodingKeys: String, CodingKey {
         // We store the identifier under the name `id` on the struct to satisfy the requirements of the `Identifiable`
         // protocol, which this type conforms to in order to allow usage with certain SwiftUI features. However,
         // MongoDB uses the name `_id` for unique identifiers, so we need to use `_id` in the extended JSON
         // representation of this type.
-        case id = "_id", firstName, lastName, email, phone
+        case id = "_id", firstname, lastname, email, phone, password
     }
 
     /// Initializes a new `User` instance. If an `id` is not provided, a new one will be generated automatically.
     public init(
         id: BSONObjectID = BSONObjectID(),
-        firstName: String,
-        lastName: String,
+        firstname: String,
+        lastname: String,
         email: String,
-        phone: String
+        phone: String,
+        password: String
     ) {
         self.id = id
-        self.firstName = firstName
-        self.lastName = lastName
+        self.firstname = firstname
+        self.lastname = lastname
         self.email = email
         self.phone = phone
+        self.password = password
     }
         
 }
@@ -138,14 +141,14 @@ public struct KittenUpdate: Codable {
  */
 public struct UserUpdate: Codable {
     /// The new first name.
-    public let firstName: String
+    public let firstname: String
 
     /// The new email.
     public let email: String
 
     /// Initializes a new `UserUpdate` instance.
-    public init(firstName: String, email: String) {
-        self.firstName = firstName
+    public init(firstname: String, email: String) {
+        self.firstname = firstname
         self.email = email
     }
 }

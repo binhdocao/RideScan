@@ -11,8 +11,9 @@ import SwiftUI
 struct RideScanApp: App {
     var body: some Scene {
         WindowGroup {
-            HomeScreen()
-			
+            NavigationView {
+                HomeScreen()
+            }
         }
     }
 }
