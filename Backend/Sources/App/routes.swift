@@ -34,12 +34,22 @@ func routes(_ app: Application) throws {
     app.post("api", "user", "create") { req async throws -> Response in
         try await req.addUser()
     }
+
+    app.post("api", "fetii", "find") { req async throws -> FindFetiiResponse in
+        try await req.findFetii()
+    }
+
+    app.post("api", "fetii", "locate") { req async throws -> LocateFetiiResponse in
+        try await req.locateFetii()
+    }
 }
 
 /// Extend the `Kitten` model type to conform to Vapor's `Content` protocol so that it may be converted to and
 /// initialized from HTTP data.
 extension Kitten: Content {}
 extension User: Content {}
+extension FindFetiiResponse: Content {}
+extension LocateFetiiResponse: Content {}
 
 extension Request {
     /// Convenience extension for obtaining a collection.
@@ -124,7 +134,6 @@ extension Request {
 
     func addUser() async throws -> Response {
         let newUser = try self.content.decode(User.self)
-        print(newUser)
         do {
             try await self.userCollection.insertOne(newUser)
             return Response(status: .created)
@@ -170,6 +179,104 @@ extension Request {
             return Response(status: .ok)
         } catch {
             throw Abort(.internalServerError, reason: "Failed to update kitten: \(error)")
+        }
+    }
+
+    func findFetii() async throws -> FindFetiiResponse {
+        
+        let findFetii = try self.content.decode(FindFetiiRequest.self)
+        print(findFetii)
+
+        // Replace with your endpoint
+        let baseURL = "https://www.fetii.com/api/v29/vehicle-types-list"
+        var responseData = "No response data"
+
+        guard var urlComponents = URLComponents(string: baseURL) else {
+            throw Abort(.internalServerError, reason: "Invalid URL")
+        }
+
+        // Add query parameters
+        urlComponents.queryItems = [
+            URLQueryItem(name: "pickup_latitude", value: "\(findFetii.userLatitude)"),
+            URLQueryItem(name: "pickup_longitude", value: "\(findFetii.userLongitude)"),
+            URLQueryItem(name: "dropoff_latitude", value: "\(findFetii.destLatitude)"),
+            URLQueryItem(name: "dropoff_longitude", value: "\(findFetii.destLongitude)"),
+            URLQueryItem(name: "dropoff_long_address", value: "\(findFetii.dropoff_long_address)"),
+            URLQueryItem(name: "dropoff_short_address", value: "\(findFetii.dropoff_short_address)"),
+            URLQueryItem(name: "pickup_long_address", value: "\(findFetii.pickup_long_address)"),
+            URLQueryItem(name: "pickup_short_address", value: "\(findFetii.pickup_short_address)"),
+            URLQueryItem(name: "radius_id", value: "1"),
+            URLQueryItem(name: "ride_type", value: "normal")
+        ]
+
+        guard let url = urlComponents.url else {
+            throw Abort(.internalServerError, reason: "Failed to compose url with parameters")
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        // Replace with your bearer token
+        request.addValue("Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImNlNjA5MDY2ZDZjZTc3OTkyZDgxYjZhZDEwNWQyZDBkN2Q0NGQ1MjIxNDQyMTU1NThlZTc2ZmVmMTJjYjQwMzcwOTIzODNlOWIxMWM4MTI1In0.eyJhdWQiOiIzIiwianRpIjoiY2U2MDkwNjZkNmNlNzc5OTJkODFiNmFkMTA1ZDJkMGQ3ZDQ0ZDUyMjE0NDIxNTU1OGVlNzZmZWYxMmNiNDAzNzA5MjM4M2U5YjExYzgxMjUiLCJpYXQiOjE2OTQ3Mzg5MzYsIm5iZiI6MTY5NDczODkzNiwiZXhwIjoxNzI2MzYxMzM2LCJzdWIiOiIxOTY0NjIiLCJzY29wZXMiOltdfQ.cfLhUNZr95dy_QxDAb82AXvE2XtgVqwrQK0EOg_Uaa3NgiMqDV-F0z14ecSXWkm9ALYobzmZqpp68uXzoEsIsQW6yNrqcCYulrIBGFy0tZtObuaeOpmzKV8rEqq2lXWxzxFDpvNd678QIOH2LIpE_Gr1VlrAWGeA6rj9JV6boAaqfpPpDddeT-ThbXecNehsSyUeS_lbmkKSzFMjbeFiX6WP4TbR7ozeJokv47GHJkhJyZoQodpoWPlOCFmy9U7l1JHH4PvQxmvrdYscetPp-d_bQgNn59W9QN-EZUaiSQ5E-mUsTp6ZP320vgG5eOKpTgvANjiUd9bZ17eyQ8160LzDOmnDdynBvjBYLUmIJaRQ2xVnR5TL7XsFkdak0xfIYYWQNpIM4cEsvXyey9Hya7yRf06ZdIDeWnxT5YcIi4PDOMU8JQ38RLRSDCNUTS1x5_qQvcPGuirIbPStNlnIPfoNdAg_GpKuBH931LpzEtD7I6AX-p8DtIuXx1CkKHHTkbviK0CSgkLM2mxVPpCNMGxP5rUVIDL3KRzUvYqyGjFJilWX4fL8Fv5rXWXF8F5T0YWbWLAO5TEn6IMqawaFzzAjAcQnopbG1Tiq9gBF0ZPZCmoOgS54af2IBW_XC9NQyDFqNp_wV_XgKH9GD89ANXElaedhmB5yDtnwGQ0oWW0", forHTTPHeaderField: "Authorization")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(FindFetiiResponse.self, from: data)
+            print(decodedData)
+            if decodedData.status == 200 {
+                return decodedData
+            } else {
+                throw Abort(.notFound, reason: "No drivers found")
+            }
+        } catch {
+            throw Abort(.internalServerError, reason: "Error decoding JSON: \(error)")
+        }
+    }
+
+    func locateFetii() async throws -> LocateFetiiResponse {
+        
+        // Replace with your endpoint
+        let baseURL = "https://www.fetii.com/api/v29/nearest-drivers-list"
+        let userLocation = try self.content.decode(UserLoc.self)
+
+        guard var urlComponents = URLComponents(string: baseURL) else {
+            throw Abort(.internalServerError, reason: "Invalid URL")        
+        }
+
+        // Add query parameters
+        urlComponents.queryItems = [
+            URLQueryItem(name: "latitude", value: "\(userLocation.lat)"),
+            URLQueryItem(name: "longitude", value: "\(userLocation.lng)"),
+            URLQueryItem(name: "radius_id", value: "1")
+        ]
+
+        guard let url = urlComponents.url else {
+            throw Abort(.internalServerError, reason: "Failed to compose url with parameters")
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        // Replace with your bearer token
+        request.addValue("Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImNlNjA5MDY2ZDZjZTc3OTkyZDgxYjZhZDEwNWQyZDBkN2Q0NGQ1MjIxNDQyMTU1NThlZTc2ZmVmMTJjYjQwMzcwOTIzODNlOWIxMWM4MTI1In0.eyJhdWQiOiIzIiwianRpIjoiY2U2MDkwNjZkNmNlNzc5OTJkODFiNmFkMTA1ZDJkMGQ3ZDQ0ZDUyMjE0NDIxNTU1OGVlNzZmZWYxMmNiNDAzNzA5MjM4M2U5YjExYzgxMjUiLCJpYXQiOjE2OTQ3Mzg5MzYsIm5iZiI6MTY5NDczODkzNiwiZXhwIjoxNzI2MzYxMzM2LCJzdWIiOiIxOTY0NjIiLCJzY29wZXMiOltdfQ.cfLhUNZr95dy_QxDAb82AXvE2XtgVqwrQK0EOg_Uaa3NgiMqDV-F0z14ecSXWkm9ALYobzmZqpp68uXzoEsIsQW6yNrqcCYulrIBGFy0tZtObuaeOpmzKV8rEqq2lXWxzxFDpvNd678QIOH2LIpE_Gr1VlrAWGeA6rj9JV6boAaqfpPpDddeT-ThbXecNehsSyUeS_lbmkKSzFMjbeFiX6WP4TbR7ozeJokv47GHJkhJyZoQodpoWPlOCFmy9U7l1JHH4PvQxmvrdYscetPp-d_bQgNn59W9QN-EZUaiSQ5E-mUsTp6ZP320vgG5eOKpTgvANjiUd9bZ17eyQ8160LzDOmnDdynBvjBYLUmIJaRQ2xVnR5TL7XsFkdak0xfIYYWQNpIM4cEsvXyey9Hya7yRf06ZdIDeWnxT5YcIi4PDOMU8JQ38RLRSDCNUTS1x5_qQvcPGuirIbPStNlnIPfoNdAg_GpKuBH931LpzEtD7I6AX-p8DtIuXx1CkKHHTkbviK0CSgkLM2mxVPpCNMGxP5rUVIDL3KRzUvYqyGjFJilWX4fL8Fv5rXWXF8F5T0YWbWLAO5TEn6IMqawaFzzAjAcQnopbG1Tiq9gBF0ZPZCmoOgS54af2IBW_XC9NQyDFqNp_wV_XgKH9GD89ANXElaedhmB5yDtnwGQ0oWW0", forHTTPHeaderField: "Authorization")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(LocateFetiiResponse.self, from: data)
+            print(decodedData)
+            if decodedData.status == 200 {
+                return decodedData
+            } else {
+                throw Abort(.notFound, reason: "No drivers found")
+            }
+        } catch {
+            throw Abort(.internalServerError, reason: "Error decoding JSON: \(error)")
         }
     }
 }

@@ -96,8 +96,10 @@ enum HTTP {
 
     /// Sends a POST request to the provided URL. If `body` is provided it will be encoded to extended JSON and sent
     /// as the body of the request.
-    static func post<T: Codable>(url: URL, body: T?) async throws {
-        try await self.sendRequest(to: url, body: body, method: .POST)
+    static func post<T: Codable, R: Codable>(url: URL, body: T?) async throws -> R {
+        let data = try await self.sendRequest(to: url, body: body, method: .POST)
+        let decodedResponse = try JSONDecoder().decode(R.self, from: data)
+        return decodedResponse
     }
 
     /// Sends a PATCH request to the provided URL. If `body` is provided it will be encoded to extended JSON and sent

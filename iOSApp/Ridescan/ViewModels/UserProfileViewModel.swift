@@ -9,7 +9,6 @@ import Models
 import SwiftUI
 import Security
 
-/// Models the data used in the `KittenList` view.
 class UserProfileViewModel: ObservableObject {
     
     /// The current user.
@@ -49,7 +48,7 @@ class UserProfileViewModel: ObservableObject {
         let newUser = User(firstname: firstname, lastname: lastname, email: email, phone: phone, password: password)
         
         // Add user to the database.
-        try await HTTP.post(url: userURL, body: newUser)
+        let _: User = try await HTTP.post(url: userURL, body: newUser)
         
         // set the new properties for the user
         DispatchQueue.main.async {
