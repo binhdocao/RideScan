@@ -152,3 +152,92 @@ public struct UserUpdate: Codable {
         self.email = email
     }
 }
+
+/// User location
+public struct FindFetiiRequest: Codable {
+    public let userLatitude: String
+    public let userLongitude: String
+    public let pickup_long_address: String
+    public let pickup_short_address: String
+    
+    public let destLatitude: String
+    public let destLongitude: String
+    public let dropoff_long_address: String
+    public let dropoff_short_address: String
+    
+    /// Initializes a new `UserLoc` instance.
+    public init(userLatitude: String, userLongitude: String, pickup_long_address: String, pickup_short_address: String, destLatitude: String, destLongitude: String, dropoff_long_address: String, dropoff_short_address: String) {
+        self.userLatitude = userLatitude
+        self.userLongitude = userLongitude
+        self.pickup_long_address = pickup_long_address
+        self.pickup_short_address = pickup_long_address
+        
+        self.destLatitude = destLatitude
+        self.destLongitude = destLongitude
+        self.dropoff_long_address = dropoff_long_address
+        self.dropoff_short_address = dropoff_short_address
+    }
+}
+
+public struct UserLoc: Codable {
+    public let lat: String
+    public let lng: String
+    
+    /// Initializes a new `UserUpdate` instance.
+    public init(lat: String, lng: String) {
+        self.lat = lat
+        self.lng = lng
+    }
+}
+///
+
+/// Fetii Models
+public struct FindFetiiResponse: Codable {
+    public let status: Int
+    public let message: String
+    public let msg: String
+    public let data: [Ride]
+    public let booking_data_collection_id: Int
+    public let no_vehicles_available: Bool
+    public let max_schedule_days: Int
+}
+
+public struct Ride: Codable {
+    public let id: Int
+    public let radius_id: Int
+    public let name: String
+    public let image: String
+    public let status: String
+    public let display_order: Int
+    public let direct_max_passengers: Int
+    public let min_charge_per_person: Double
+    public let direct_min_passengers: Int
+    public let radius_surge_rate: Int
+    public let vehicles_count: Int
+    public let running_vehicles_count: Int
+    public let km: Double
+    public let age_surge_charge: Int
+   
+}
+
+public struct LocateFetiiResponse: Codable {
+    public let status: Int
+    public let message: String
+    public let msg: String
+    public let data: [Driver]
+}
+
+public struct Driver: Codable {
+    public let id: Int
+    public let lat: Double
+    public let lng: Double
+    public let angle: String
+    public let distance: Double
+    public let vehicle_type: Vehicletype
+}
+
+public struct Vehicletype: Codable {
+    public let id: Int
+    public let top_image: String
+}
+///
