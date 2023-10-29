@@ -31,7 +31,7 @@ func routes(_ app: Application) throws {
         try await req.userExists()
     }
 
-    app.post("api", "user", "create") { req async throws -> Response in
+    app.post("api", "user", "create") { req async throws -> AddUserResponse in
         try await req.addUser()
     }
 
@@ -50,6 +50,7 @@ extension Kitten: Content {}
 extension User: Content {}
 extension FindFetiiResponse: Content {}
 extension LocateFetiiResponse: Content {}
+extension AddUserResponse: Content {}
 
 extension Request {
     /// Convenience extension for obtaining a collection.
@@ -132,14 +133,28 @@ extension Request {
         }
     }
 
-    func addUser() async throws -> Response {
-        let newUser = try self.content.decode(User.self)
+    func addUser() async throws -> AddUserResponse {
+        let userToInsert = try self.content.decode(User.self)
         do {
-            try await self.userCollection.insertOne(newUser)
-            return Response(status: .created)
+            // Insert the user into MongoDB
+            if let insertResult: InsertOneResult = try await self.userCollection.insertOne(userToInsert) {
+                let insertedID = insertResult.insertedID
+                let stringID = extractStringInParentheses(string: String(describing: insertedID))
+                return AddUserResponse(id: stringID)
+            } else {
+                throw Abort(.internalServerError, reason: "Inserted ID is not an ObjectId.")
+            }
         } catch {
             throw Abort(.internalServerError, reason: "Failed to save new user: \(error)")
         }
+    }
+
+    func extractStringInParentheses(string: String) -> String {
+        let startIndex = string.firstIndex(of: "(")
+        let endIndex = string.firstIndex(of: ")")
+
+        let extractionStart = string.index(after: startIndex!)
+        return String(string[extractionStart..<endIndex!])
     }
 
     func deleteKitten() async throws -> Response {
@@ -189,7 +204,6 @@ extension Request {
 
         // Replace with your endpoint
         let baseURL = "https://www.fetii.com/api/v29/vehicle-types-list"
-        var responseData = "No response data"
 
         guard var urlComponents = URLComponents(string: baseURL) else {
             throw Abort(.internalServerError, reason: "Invalid URL")
