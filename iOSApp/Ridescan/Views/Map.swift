@@ -103,19 +103,29 @@ struct MapView: View {
                         .font(.title)
                         .fontWeight(.bold)
                 }
-                TextField("Enter destination...", text: $destination, onEditingChanged: { isEditing in
-                    self.showResults = isEditing
-                })
-                .padding()
-                .background(Color.white)
-                .cornerRadius(8)
-                .padding(.horizontal, 16)
-                .background(Color.white)
-                .cornerRadius(8)
-                .padding(.horizontal, 16)
-                .onChange(of: destination) { newValue in
-                    searchCompleter.search(query: newValue)
-                }
+				
+				HStack {
+					TextField("Enter destination...", text: $destination, onEditingChanged: { isEditing in
+						self.showResults = isEditing
+					})
+					.padding(.horizontal)
+					
+					Button(action: {
+						// Implement search action here
+						searchCompleter.search(query: destination)
+					}) {
+						Image(systemName: "magnifyingglass")
+							.padding()
+							.foregroundColor(maroonColor)
+							.background(Circle().fill(Color.white))
+					}
+				}
+				.background(Color.white)
+				.cornerRadius(8)
+				.padding(.horizontal, 16)
+				.onChange(of: destination) { newValue in
+					searchCompleter.search(query: newValue)
+				}
             }
             
             SideMenu(isSidebarVisible: $isSideMenuOpened)
