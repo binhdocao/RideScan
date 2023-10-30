@@ -48,6 +48,24 @@ public struct User: Identifiable, Codable {
         self.phone = phone
         self.password = password
     }
+
+    /// Initializes a new `User` instance. If an `id` is not provided, a new one will be generated automatically.
+    public init?(
+        id: String,
+        firstname: String,
+        lastname: String,
+        email: String,
+        phone: String,
+        password: String
+    ) {
+        guard let objectId = try? BSONObjectID(id) else { return nil }
+        self.id = objectId
+        self.firstname = firstname
+        self.lastname = lastname
+        self.email = email
+        self.phone = phone
+        self.password = password
+    }
         
 }
 
@@ -132,6 +150,14 @@ public struct KittenUpdate: Codable {
     public init(newFavoriteFood: CatFood, lastUpdateTime: Date = Date()) {
         self.favoriteFood = newFavoriteFood
         self.lastUpdateTime = lastUpdateTime
+    }
+}
+
+public struct AddUserResponse: Codable {
+    public let id: String
+
+    public init(id: String) {
+        self.id = id
     }
 }
 

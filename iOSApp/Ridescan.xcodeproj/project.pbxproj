@@ -11,7 +11,6 @@
 		15CB3D6A2AE1759900000F7C /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15CB3D692AE1759900000F7C /* Map.swift */; };
 		15E9C00E2AE0C5BA00F4C18D /* HomeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15E9C00D2AE0C5BA00F4C18D /* HomeScreen.swift */; };
 		8B20583227BEFFDF00A9E2A1 /* RideScanApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B20583127BEFFDF00A9E2A1 /* RideScanApp.swift */; };
-		8B9649EE27E3B4FF00CB9DC1 /* SwiftBSON in Frameworks */ = {isa = PBXBuildFile; productRef = 8B9649ED27E3B4FF00CB9DC1 /* SwiftBSON */; };
 		8BC62A4727CEF38B0015343B /* Models in Frameworks */ = {isa = PBXBuildFile; productRef = 8BC62A4627CEF38B0015343B /* Models */; };
 		8BE0611227C7119200D5E981 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE0611127C7119200D5E981 /* Utilities.swift */; };
 		9B281C572AEDE6040004D677 /* URLImage in Frameworks */ = {isa = PBXBuildFile; productRef = 9B281C562AEDE6040004D677 /* URLImage */; };
@@ -51,7 +50,6 @@
 				9B281C592AEDE6040004D677 /* URLImageStore in Frameworks */,
 				8BC62A4727CEF38B0015343B /* Models in Frameworks */,
 				9B281C572AEDE6040004D677 /* URLImage in Frameworks */,
-				8B9649EE27E3B4FF00CB9DC1 /* SwiftBSON in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,7 +143,6 @@
 			name = Ridescan;
 			packageProductDependencies = (
 				8BC62A4627CEF38B0015343B /* Models */,
-				8B9649ED27E3B4FF00CB9DC1 /* SwiftBSON */,
 				9B281C562AEDE6040004D677 /* URLImage */,
 				9B281C582AEDE6040004D677 /* URLImageStore */,
 			);
@@ -178,7 +175,6 @@
 			);
 			mainGroup = 8B20582527BEFFDF00A9E2A1;
 			packageReferences = (
-				8B9649EC27E3B4FF00CB9DC1 /* XCRemoteSwiftPackageReference "swift-bson" */,
 				9B281C552AEDE6040004D677 /* XCRemoteSwiftPackageReference "url-image" */,
 			);
 			productRefGroup = 8B20582F27BEFFDF00A9E2A1 /* Products */;
@@ -429,14 +425,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		8B9649EC27E3B4FF00CB9DC1 /* XCRemoteSwiftPackageReference "swift-bson" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/mongodb/swift-bson";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.1.0;
-			};
-		};
 		9B281C552AEDE6040004D677 /* XCRemoteSwiftPackageReference "url-image" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/dmytro-anokhin/url-image";
@@ -448,11 +436,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		8B9649ED27E3B4FF00CB9DC1 /* SwiftBSON */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8B9649EC27E3B4FF00CB9DC1 /* XCRemoteSwiftPackageReference "swift-bson" */;
-			productName = SwiftBSON;
-		};
 		8BC62A4627CEF38B0015343B /* Models */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Models;

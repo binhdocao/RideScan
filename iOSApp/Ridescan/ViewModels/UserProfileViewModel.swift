@@ -24,7 +24,6 @@ class UserProfileViewModel: ObservableObject {
         let user = try await HTTP.get(url: userURL, dataType: User.self)
         
         // save user data to UserDefaults
-        let userDefaults = UserDefaults.standard
         do {
             let userData = try JSONEncoder().encode(user)
             try KeychainService.save(key: "userInfo", data: userData)
@@ -48,11 +47,22 @@ class UserProfileViewModel: ObservableObject {
         let newUser = User(firstname: firstname, lastname: lastname, email: email, phone: phone, password: password)
         
         // Add user to the database.
-        let _: User = try await HTTP.post(url: userURL, body: newUser)
+        let userId: AddUserResponse = try await HTTP.post(url: userURL, body: newUser)
+        
+        print(userId.id)
         
         // set the new properties for the user
         DispatchQueue.main.async {
-            self.user = User(firstname: firstname, lastname: lastname, email: email, phone: phone, password: password)
+            self.user = User(id: userId.id, firstname: firstname, lastname: lastname, email: email, phone: phone, password: password) ?? self.user
+            
+            // save user data to UserDefaults
+            do {
+                let userData = try JSONEncoder().encode(self.user)
+                try KeychainService.save(key: "userInfo", data: userData)
+            } catch {
+                print("Failed to encode and save user data: \(error)")
+            }
+            
         }
     }
     
