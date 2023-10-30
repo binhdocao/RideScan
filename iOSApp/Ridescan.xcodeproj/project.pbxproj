@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1502D2D02AF02F5000FC8FFD /* MyAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1502D2CF2AF02F5000FC8FFD /* MyAccount.swift */; };
+		1502D2D22AF02F6100FC8FFD /* RecentTrips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1502D2D12AF02F6100FC8FFD /* RecentTrips.swift */; };
+		1502D2D42AF02F6F00FC8FFD /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1502D2D32AF02F6F00FC8FFD /* Settings.swift */; };
 		15CB3D682AE1740300000F7C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 15CB3D672AE1740300000F7C /* Assets.xcassets */; };
 		15CB3D6A2AE1759900000F7C /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15CB3D692AE1759900000F7C /* Map.swift */; };
 		15E9C00E2AE0C5BA00F4C18D /* HomeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15E9C00D2AE0C5BA00F4C18D /* HomeScreen.swift */; };
@@ -25,6 +28,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1502D2CF2AF02F5000FC8FFD /* MyAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyAccount.swift; sourceTree = "<group>"; };
+		1502D2D12AF02F6100FC8FFD /* RecentTrips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentTrips.swift; sourceTree = "<group>"; };
+		1502D2D32AF02F6F00FC8FFD /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		15CB3D672AE1740300000F7C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		15CB3D692AE1759900000F7C /* Map.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map.swift; sourceTree = "<group>"; };
 		15E9C00D2AE0C5BA00F4C18D /* HomeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreen.swift; sourceTree = "<group>"; };
@@ -97,6 +103,9 @@
 				15CB3D692AE1759900000F7C /* Map.swift */,
 				9B9EC7112AE86E5D007DDADB /* SignUp.swift */,
 				9B9EC7132AE8798C007DDADB /* LogIn.swift */,
+				1502D2CF2AF02F5000FC8FFD /* MyAccount.swift */,
+				1502D2D12AF02F6100FC8FFD /* RecentTrips.swift */,
+				1502D2D32AF02F6F00FC8FFD /* Settings.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -204,13 +213,16 @@
 			files = (
 				15E9C00E2AE0C5BA00F4C18D /* HomeScreen.swift in Sources */,
 				8BE0611227C7119200D5E981 /* Utilities.swift in Sources */,
+				1502D2D22AF02F6100FC8FFD /* RecentTrips.swift in Sources */,
 				8B20583227BEFFDF00A9E2A1 /* RideScanApp.swift in Sources */,
+				1502D2D42AF02F6F00FC8FFD /* Settings.swift in Sources */,
 				9B9EC71A2AEA0A94007DDADB /* KeychainService.swift in Sources */,
 				9B7ABBE62AD5B9D100A822BA /* UserProfileViewModel.swift in Sources */,
 				9B9EC7122AE86E5D007DDADB /* SignUp.swift in Sources */,
 				15CB3D6A2AE1759900000F7C /* Map.swift in Sources */,
 				9B9EC7182AE9C881007DDADB /* SideMenu.swift in Sources */,
 				9B7ABBE42AD5B78400A822BA /* UserProfile.swift in Sources */,
+				1502D2D02AF02F5000FC8FFD /* MyAccount.swift in Sources */,
 				9B9EC7142AE8798C007DDADB /* LogIn.swift in Sources */,
 				9BCC6B242AEAE4EB000BEF81 /* TransportViewModel.swift in Sources */,
 			);

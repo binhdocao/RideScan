@@ -173,7 +173,9 @@ struct SideMenu: View {
 
 struct MenuLinks: View {
     @ObservedObject var viewModel: UserProfileViewModel
+	
     var items: [MenuItem]
+	
     @Binding var shouldShowHomeScreen: Bool
     @Binding var showingLogoutConfirmation: Bool
 
@@ -192,31 +194,48 @@ struct menuLink: View {
     var viewModel: UserProfileViewModel
     var icon: String
     var text: String
+	
     @Binding var shouldShowHomeScreen: Bool
     @Binding var showingLogoutConfirmation: Bool
+	
+	@State private var isActive: Bool = false
+	
+	var destinationView: some View {
+		switch text {
+		case "Settings":
+			return AnyView(SettingsView())
+		case "Recent trips":
+			return AnyView(RecentTripsView())
+		case "My Account":
+			return AnyView(MyAccountView())
+		default:
+			return AnyView(Text("Unknown"))
+		}
+	}
 
-    var body: some View {
-        HStack {
-            Image(systemName: icon)
-                .resizable()
-                .frame(width: 20, height: 20)
-                .foregroundColor(secondaryColor)
-                .padding(.trailing, 18)
-            Text(text)
-                .foregroundColor(.white)
-                .font(.body)
-        }
-        .onTapGesture {
-            switch text {
-            case "Settings":
-                print("Tapped on \(text)")
-            case "Logout":
-                showingLogoutConfirmation = true // Show the confirmation alert
-            default:
-                print("Tapped on \(text)")
-            }
-            
-        }
-    }
+	var body: some View {
+		HStack {
+			Image(systemName: icon)
+				.resizable()
+				.frame(width: 20, height: 20)
+				.foregroundColor(secondaryColor)
+				.padding(.trailing, 18)
+			Text(text)
+				.foregroundColor(.white)
+				.font(.body)
+			NavigationLink("", destination: destinationView, isActive: $isActive)
+				.opacity(0) // Hide the default NavigationLink arrow
+		}
+		.onTapGesture {
+			switch text {
+			case "Settings", "Recent trips", "My Account":
+				isActive = true // Activate the NavigationLink
+			case "Logout":
+				showingLogoutConfirmation = true
+			default:
+				print("Tapped on \(text)")
+			}
+		}
+	}
 }
 

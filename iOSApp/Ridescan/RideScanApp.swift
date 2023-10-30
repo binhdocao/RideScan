@@ -18,9 +18,11 @@ struct RideScanApp: App {
 					.environmentObject(userSettings)
 			} else {
 				NavigationView {
-					HomeScreen()
+//					HomeScreen()
+					MapView()
 				}
 				.environmentObject(userSettings)
+				.accentColor(Color(red: 0.5, green: 0, blue: 0)) //All back buttons are now maroon
 			}
 		}
 	}
