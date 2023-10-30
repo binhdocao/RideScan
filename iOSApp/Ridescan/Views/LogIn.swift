@@ -22,6 +22,9 @@ struct LogInView: View {
 	@State private var loginSuccess = false
 	@State private var isNavigationActive = false
 	
+	@EnvironmentObject var userSettings: UserSettings
+
+	
 	var body: some View {
 		VStack(spacing: 20) {
 			Text("Sign in with your email or phone number")
@@ -52,6 +55,7 @@ struct LogInView: View {
 				Task {
 					do {
 						try await viewModel.login(emailOrPhone: emailOrPhone, password: password)
+						userSettings.isAuthenticated = true
 						loginSuccess = true
 					} catch {
 						// Handle errors here (loginSuccess will be set in the ViewModel)

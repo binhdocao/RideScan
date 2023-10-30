@@ -60,12 +60,12 @@
         "packageRef" : {
           "identity" : "models",
           "kind" : "fileSystem",
-          "location" : "/Users/binhdocao/Desktop/Test photography code/RideScan/Models",
+          "location" : "/Users/binhdocao/Documents/RideScan/Models",
           "name" : "models"
         },
         "state" : {
           "name" : "fileSystem",
-          "path" : "/Users/binhdocao/Desktop/Test photography code/RideScan/Models"
+          "path" : "/Users/binhdocao/Documents/RideScan/Models"
         },
         "subpath" : "models"
       },

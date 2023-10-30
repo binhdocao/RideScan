@@ -32,6 +32,9 @@ struct SignUpView: View {
     @State private var validPhone = true
     @State private var validPassword = true
 	
+	@EnvironmentObject var userSettings: UserSettings
+
+	
 	private func checkPasswordsMatch() {
 		passwordsMatch = password == confirmPassword
 	}
@@ -110,6 +113,7 @@ struct SignUpView: View {
                     Task {
                         do {
                             try await viewModel.createUser(firstname: firstname, lastname: lastname, email: email, phone: phone, password: password)
+							userSettings.isAuthenticated = true
                             createAccountSuccess = true
                         } catch {
                             // Handle errors here

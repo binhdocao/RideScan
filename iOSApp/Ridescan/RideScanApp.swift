@@ -9,11 +9,23 @@ import SwiftUI
 
 @main
 struct RideScanApp: App {
-    var body: some Scene {
-        WindowGroup {
-            NavigationView {
-                HomeScreen()
-            }
-        }
-    }
+	@StateObject var userSettings = UserSettings()
+
+	var body: some Scene {
+		WindowGroup {
+			if userSettings.isAuthenticated {
+				MapView()
+					.environmentObject(userSettings)
+			} else {
+				NavigationView {
+//					HomeScreen()
+					MapView()
+				}
+				.environmentObject(userSettings)
+				.accentColor(Color(red: 0.5, green: 0, blue: 0)) //All back buttons are now maroon
+			}
+		}
+	}
 }
+
+

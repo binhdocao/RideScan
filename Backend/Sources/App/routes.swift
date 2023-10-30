@@ -9,22 +9,9 @@ func routes(_ app: Application) throws {
         try await req.findUsers()
     }
 
-    /// Handles a request to add a new kitten.
-    app.post { req async throws -> Response in
-        try await req.addKitten()
-    }
-
     /// Handles a request to load info about a particular kitten.
     app.get(":_id") { req async throws -> User in
         try await req.findUser()
-    }
-
-    app.delete(":_id") { req async throws -> Response in
-        try await req.deleteKitten()
-    }
-
-    app.patch(":_id") { req async throws -> Response in
-        try await req.updateKitten()
     }
 
     app.get("api", "user", "login", ":emailOrPhone", ":password") { req async throws -> User in
@@ -46,7 +33,6 @@ func routes(_ app: Application) throws {
 
 /// Extend the `Kitten` model type to conform to Vapor's `Content` protocol so that it may be converted to and
 /// initialized from HTTP data.
-extension Kitten: Content {}
 extension User: Content {}
 extension FindFetiiResponse: Content {}
 extension LocateFetiiResponse: Content {}
@@ -54,9 +40,6 @@ extension AddUserResponse: Content {}
 
 extension Request {
     /// Convenience extension for obtaining a collection.
-    var kittenCollection: MongoCollection<Kitten> {
-        self.application.mongoDB.client.db("home").collection("kittens", withType: Kitten.self)
-    }
 
     var userCollection: MongoCollection<User> {
         self.application.mongoDB.client.db("ridescan").collection("users", withType: User.self)
@@ -107,30 +90,12 @@ extension Request {
         return user
     }
 
-    func findKitten() async throws -> Kitten {
-        let idFilter = try self.getIDFilter()
-        guard let kitten = try await self.kittenCollection.findOne(idFilter) else {
-            throw Abort(.notFound, reason: "No kitten with matching _id")
-        }
-        return kitten
-    }
-
     func findUser() async throws -> User {
         let idFilter = try self.getIDFilter()
         guard let user = try await self.userCollection.findOne(idFilter) else {
             throw Abort(.notFound, reason: "No user with matching _id")
         }
         return user
-    }
-
-    func addKitten() async throws -> Response {
-        let newKitten = try self.content.decode(Kitten.self)
-        do {
-            try await self.kittenCollection.insertOne(newKitten)
-            return Response(status: .created)
-        } catch {
-            throw Abort(.internalServerError, reason: "Failed to save new kitten: \(error)")
-        }
     }
 
     func addUser() async throws -> AddUserResponse {
@@ -155,46 +120,6 @@ extension Request {
 
         let extractionStart = string.index(after: startIndex!)
         return String(string[extractionStart..<endIndex!])
-    }
-
-    func deleteKitten() async throws -> Response {
-        let idFilter = try self.getIDFilter()
-        do {
-            // since we aren't using an unacknowledged write concern we can expect deleteOne to return a non-nil result.
-            guard let result = try await self.kittenCollection.deleteOne(idFilter) else {
-                throw Abort(.internalServerError, reason: "Unexpectedly nil response from database")
-            }
-            guard result.deletedCount == 1 else {
-                throw Abort(.notFound, reason: "No kitten with matching _id")
-            }
-            return Response(status: .ok)
-        } catch {
-            throw Abort(.internalServerError, reason: "Failed to delete kitten: \(error)")
-        }
-    }
-
-    func updateKitten() async throws -> Response {
-        let idFilter = try self.getIDFilter()
-        // Parse the update data from the request.
-        let update = try self.content.decode(KittenUpdate.self)
-        /// Create a document using MongoDB update syntax that specifies we want to set a field.
-        let updateDocument: BSONDocument = ["$set": .document(try BSONEncoder().encode(update))]
-
-        do {
-            // since we aren't using an unacknowledged write concern we can expect updateOne to return a non-nil result.
-            guard let result = try await self.kittenCollection.updateOne(
-                filter: idFilter,
-                update: updateDocument
-            ) else {
-                throw Abort(.internalServerError, reason: "Unexpectedly nil response from database")
-            }
-            guard result.matchedCount == 1 else {
-                throw Abort(.notFound, reason: "No kitten with matching _id")
-            }
-            return Response(status: .ok)
-        } catch {
-            throw Abort(.internalServerError, reason: "Failed to update kitten: \(error)")
-        }
     }
 
     func findFetii() async throws -> FindFetiiResponse {

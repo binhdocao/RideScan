@@ -4,8 +4,6 @@
 	bare = true
 	ignorecase = true
 	precomposeunicode = true
-	symlinks = true
-	usebuiltinfsmonitor = false
 [remote "origin"]
 	url = https://github.com/apple/swift-atomics
 	fetch = +refs/*:refs/*

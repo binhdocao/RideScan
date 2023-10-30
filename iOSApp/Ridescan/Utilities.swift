@@ -41,13 +41,6 @@ extension URLResponse {
     }
 }
 
-extension Kitten {
-    /// Corresponding URL for this kitten on the server.
-    var resourceURL: URL {
-        // Use the hexademical string representation of the `BSONObjectID`.
-        HTTP.baseURL.appendingPathComponent(self.id.hex)
-    }
-}
 
 extension User {
     /// Corresponding URL for this kitten on the server.
