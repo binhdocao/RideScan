@@ -37,6 +37,10 @@ struct SideMenu: View {
     
     // show screens
     @State private var shouldShowHomeScreen = false
+	
+	@Environment(\.presentationMode) var presentationMode
+	@EnvironmentObject var userSettings: UserSettings
+
     
     @Binding var isSidebarVisible: Bool
     var sideBarWidth = UIScreen.main.bounds.size.width * 0.6
@@ -70,13 +74,12 @@ struct SideMenu: View {
                 message: Text("Are you sure you want to logout?"),
                 primaryButton: .default(Text("Logout")) {
                     // Perform logout action here
-                    do {
-                        try KeychainService.delete(key: "userInfo")
-                        shouldShowHomeScreen = true
-                    } catch {
-                        // Handle the error, e.g., display an alert or log the error
-                        print("Error logging user out")
-                    }
+					do {
+						try KeychainService.delete(key: "userInfo")
+						userSettings.isAuthenticated = false // This will trigger the root view to change.
+					} catch {
+						print("Error logging user out")
+					}
                 },
                 secondaryButton: .cancel()
             )

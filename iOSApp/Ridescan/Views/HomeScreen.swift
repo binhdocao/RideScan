@@ -1,5 +1,11 @@
 import SwiftUI
 
+class UserSettings: ObservableObject {
+	@Published var isAuthenticated: Bool = false
+}
+
+
+
 struct HomeScreen: View {
 	
 	let maroonColor = Color(red: 0.5, green: 0, blue: 0)

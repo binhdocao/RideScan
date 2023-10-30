@@ -9,11 +9,21 @@ import SwiftUI
 
 @main
 struct RideScanApp: App {
-    var body: some Scene {
-        WindowGroup {
-            NavigationView {
-                HomeScreen()
-            }
-        }
-    }
+	@StateObject var userSettings = UserSettings()
+
+	var body: some Scene {
+		WindowGroup {
+			if userSettings.isAuthenticated {
+				MapView()
+					.environmentObject(userSettings)
+			} else {
+				NavigationView {
+					HomeScreen()
+				}
+				.environmentObject(userSettings)
+			}
+		}
+	}
 }
+
+
