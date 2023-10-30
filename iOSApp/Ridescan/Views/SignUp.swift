@@ -23,11 +23,18 @@ struct SignUpView: View {
     
     @State private var createAccountSuccess = false
     @State private var isNavigationActive = false
+	
+	@State private var confirmPassword = ""
+	@State private var passwordsMatch = true
     
     // validation states
     @State private var validEmail = true
     @State private var validPhone = true
     @State private var validPassword = true
+	
+	private func checkPasswordsMatch() {
+		passwordsMatch = password == confirmPassword
+	}
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -74,21 +81,29 @@ struct SignUpView: View {
                 }
             }
             
-            VStack(alignment: .center) {
-                SecureField("Password", text: $password)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .autocapitalization(.none)
-                    .border(validPassword ? Color.clear : Color.red)
-                    .onChange(of: password) { _ in
-                        validPassword = true
-                    }
-                
-                if !validPassword {
-                    Text("Password must contain a minimum of eight characters, at least one letter and one number")
-                        .foregroundColor(.red)
-                        .font(.caption)
-                }
-            }
+			VStack(alignment: .center) {
+				SecureField("Password", text: $password)
+					.textFieldStyle(RoundedBorderTextFieldStyle())
+					.autocapitalization(.none)
+					.border(validPassword ? Color.clear : Color.red)
+				
+				if !validPassword {
+					Text("Password must contain a minimum of eight characters, at least one letter and one number")
+						.foregroundColor(.red)
+						.font(.caption)
+				}
+				
+				SecureField("Confirm Password", text: $confirmPassword)
+					.textFieldStyle(RoundedBorderTextFieldStyle())
+					.autocapitalization(.none)
+					.border(passwordsMatch ? Color.clear : Color.red)
+				
+				if !passwordsMatch {
+					Text("Passwords don't match")
+						.foregroundColor(.red)
+						.font(.caption)
+				}
+			}
             
             Button(action: {
                 if validate() {
@@ -120,12 +135,14 @@ struct SignUpView: View {
         .padding(.horizontal, 20)
     }
     
-    private func validate() -> Bool {
-        validEmail = email.isValidEmail
-        validPhone = phone.isValidPhone
-        validPassword = password.isValidPassword
-        return validEmail && validPhone && validPassword
-    }
+	private func validate() -> Bool {
+		validEmail = email.isValidEmail
+		validPhone = phone.isValidPhone
+		validPassword = password.isValidPassword
+		checkPasswordsMatch()
+		
+		return validEmail && validPhone && validPassword && passwordsMatch
+	}
     
     
 }
