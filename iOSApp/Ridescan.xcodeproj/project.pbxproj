@@ -345,7 +345,7 @@
 				CODE_SIGN_ENTITLEMENTS = Ridescan/Ridescan.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = UPSTGQWLJ5;
+				DEVELOPMENT_TEAM = PZWB43AU2U;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to show it on the map.\n";
@@ -377,7 +377,7 @@
 				CODE_SIGN_ENTITLEMENTS = Ridescan/Ridescan.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = UPSTGQWLJ5;
+				DEVELOPMENT_TEAM = PZWB43AU2U;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to show it on the map.\n";
