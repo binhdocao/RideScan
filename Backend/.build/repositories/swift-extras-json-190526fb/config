@@ -4,6 +4,8 @@
 	bare = true
 	ignorecase = true
 	precomposeunicode = true
+	symlinks = true
+	usebuiltinfsmonitor = false
 [remote "origin"]
 	url = https://github.com/swift-extras/swift-extras-json
 	fetch = +refs/*:refs/*
