@@ -14,7 +14,10 @@ struct HomeScreen: View {
 	var body: some View {
 		NavigationView{
 			VStack(spacing: 40) {
-				// Logo + "RideScan" are grouped together
+				
+				// Spacing between the top of the phone and the car
+				Spacer().frame(height: 50)
+				
 				VStack(spacing: 15) {
 					Image(systemName: "car.fill")
 						.resizable()
@@ -73,6 +76,7 @@ struct HomeScreen: View {
                 Spacer()
 			}
 			.padding(.horizontal, 50)
+			
 		}
 	}
 }
