@@ -7,42 +7,46 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1502D2D02AF02F5000FC8FFD /* MyAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1502D2CF2AF02F5000FC8FFD /* MyAccount.swift */; };
-		1502D2D22AF02F6100FC8FFD /* RecentTrips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1502D2D12AF02F6100FC8FFD /* RecentTrips.swift */; };
-		1502D2D42AF02F6F00FC8FFD /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1502D2D32AF02F6F00FC8FFD /* Settings.swift */; };
+		15718CB92AF28687003B2B5B /* Comparison.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15718CB22AF28687003B2B5B /* Comparison.swift */; };
+		15718CBA2AF28687003B2B5B /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15718CB32AF28687003B2B5B /* UserProfile.swift */; };
+		15718CBB2AF28687003B2B5B /* RecentTrips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15718CB42AF28687003B2B5B /* RecentTrips.swift */; };
+		15718CBC2AF28687003B2B5B /* MyAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15718CB52AF28687003B2B5B /* MyAccount.swift */; };
+		15718CBD2AF28687003B2B5B /* SideMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15718CB62AF28687003B2B5B /* SideMenu.swift */; };
+		15718CBE2AF28687003B2B5B /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15718CB72AF28687003B2B5B /* Settings.swift */; };
+		15718CBF2AF28687003B2B5B /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15718CB82AF28687003B2B5B /* Map.swift */; };
+		15718CC32AF2868B003B2B5B /* LogIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15718CC22AF2868B003B2B5B /* LogIn.swift */; };
+		15718CC42AF2868B003B2B5B /* SignUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15718CC12AF2868B003B2B5B /* SignUp.swift */; };
+		15718CC52AF2868B003B2B5B /* HomeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15718CC02AF2868B003B2B5B /* HomeScreen.swift */; };
+		15718CC72AF28723003B2B5B /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15718CC62AF28723003B2B5B /* Search.swift */; };
 		15CB3D682AE1740300000F7C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 15CB3D672AE1740300000F7C /* Assets.xcassets */; };
-		15CB3D6A2AE1759900000F7C /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15CB3D692AE1759900000F7C /* Map.swift */; };
-		15E9C00E2AE0C5BA00F4C18D /* HomeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15E9C00D2AE0C5BA00F4C18D /* HomeScreen.swift */; };
 		8B20583227BEFFDF00A9E2A1 /* RideScanApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B20583127BEFFDF00A9E2A1 /* RideScanApp.swift */; };
 		8BC62A4727CEF38B0015343B /* Models in Frameworks */ = {isa = PBXBuildFile; productRef = 8BC62A4627CEF38B0015343B /* Models */; };
 		8BE0611227C7119200D5E981 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE0611127C7119200D5E981 /* Utilities.swift */; };
 		9B281C572AEDE6040004D677 /* URLImage in Frameworks */ = {isa = PBXBuildFile; productRef = 9B281C562AEDE6040004D677 /* URLImage */; };
 		9B281C592AEDE6040004D677 /* URLImageStore in Frameworks */ = {isa = PBXBuildFile; productRef = 9B281C582AEDE6040004D677 /* URLImageStore */; };
-		9B7ABBE42AD5B78400A822BA /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7ABBE32AD5B78400A822BA /* UserProfile.swift */; };
 		9B7ABBE62AD5B9D100A822BA /* UserProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7ABBE52AD5B9D100A822BA /* UserProfileViewModel.swift */; };
-		9B9EC7122AE86E5D007DDADB /* SignUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9EC7112AE86E5D007DDADB /* SignUp.swift */; };
-		9B9EC7142AE8798C007DDADB /* LogIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9EC7132AE8798C007DDADB /* LogIn.swift */; };
-		9B9EC7182AE9C881007DDADB /* SideMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9EC7172AE9C881007DDADB /* SideMenu.swift */; };
 		9B9EC71A2AEA0A94007DDADB /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9EC7192AEA0A94007DDADB /* KeychainService.swift */; };
 		9BCC6B242AEAE4EB000BEF81 /* TransportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BCC6B232AEAE4EB000BEF81 /* TransportViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1502D2CF2AF02F5000FC8FFD /* MyAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyAccount.swift; sourceTree = "<group>"; };
-		1502D2D12AF02F6100FC8FFD /* RecentTrips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentTrips.swift; sourceTree = "<group>"; };
-		1502D2D32AF02F6F00FC8FFD /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		15718CB22AF28687003B2B5B /* Comparison.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Comparison.swift; sourceTree = "<group>"; };
+		15718CB32AF28687003B2B5B /* UserProfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
+		15718CB42AF28687003B2B5B /* RecentTrips.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecentTrips.swift; sourceTree = "<group>"; };
+		15718CB52AF28687003B2B5B /* MyAccount.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyAccount.swift; sourceTree = "<group>"; };
+		15718CB62AF28687003B2B5B /* SideMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SideMenu.swift; sourceTree = "<group>"; };
+		15718CB72AF28687003B2B5B /* Settings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		15718CB82AF28687003B2B5B /* Map.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Map.swift; sourceTree = "<group>"; };
+		15718CC02AF2868B003B2B5B /* HomeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreen.swift; sourceTree = "<group>"; };
+		15718CC12AF2868B003B2B5B /* SignUp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUp.swift; sourceTree = "<group>"; };
+		15718CC22AF2868B003B2B5B /* LogIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogIn.swift; sourceTree = "<group>"; };
+		15718CC62AF28723003B2B5B /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
 		15CB3D672AE1740300000F7C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		15CB3D692AE1759900000F7C /* Map.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map.swift; sourceTree = "<group>"; };
-		15E9C00D2AE0C5BA00F4C18D /* HomeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreen.swift; sourceTree = "<group>"; };
 		8B20582E27BEFFDF00A9E2A1 /* Ridescan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ridescan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B20583127BEFFDF00A9E2A1 /* RideScanApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RideScanApp.swift; sourceTree = "<group>"; };
 		8BE0611127C7119200D5E981 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		8BE0611A27CEF13500D5E981 /* Models */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Models; path = ../Models; sourceTree = "<group>"; };
-		9B7ABBE32AD5B78400A822BA /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		9B7ABBE52AD5B9D100A822BA /* UserProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileViewModel.swift; sourceTree = "<group>"; };
-		9B9EC7112AE86E5D007DDADB /* SignUp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUp.swift; sourceTree = "<group>"; };
-		9B9EC7132AE8798C007DDADB /* LogIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogIn.swift; sourceTree = "<group>"; };
-		9B9EC7172AE9C881007DDADB /* SideMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenu.swift; sourceTree = "<group>"; };
 		9B9EC7192AEA0A94007DDADB /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
 		9BCC6B222AEAC000000BEF81 /* Ridescan.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Ridescan.entitlements; sourceTree = "<group>"; };
 		9BCC6B232AEAE4EB000BEF81 /* TransportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransportViewModel.swift; sourceTree = "<group>"; };
@@ -87,7 +91,6 @@
 				15CB3D672AE1740300000F7C /* Assets.xcassets */,
 				8BE0611127C7119200D5E981 /* Utilities.swift */,
 				9B9EC7192AEA0A94007DDADB /* KeychainService.swift */,
-				8B20583127BEFFDF00A9E2A1 /* RideScanApp.swift */,
 				8B20585D27BEFFF700A9E2A1 /* Views */,
 				8B20585E27BF015700A9E2A1 /* ViewModels */,
 			);
@@ -97,15 +100,18 @@
 		8B20585D27BEFFF700A9E2A1 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				9B7ABBE32AD5B78400A822BA /* UserProfile.swift */,
-				9B9EC7172AE9C881007DDADB /* SideMenu.swift */,
-				15E9C00D2AE0C5BA00F4C18D /* HomeScreen.swift */,
-				15CB3D692AE1759900000F7C /* Map.swift */,
-				9B9EC7112AE86E5D007DDADB /* SignUp.swift */,
-				9B9EC7132AE8798C007DDADB /* LogIn.swift */,
-				1502D2CF2AF02F5000FC8FFD /* MyAccount.swift */,
-				1502D2D12AF02F6100FC8FFD /* RecentTrips.swift */,
-				1502D2D32AF02F6F00FC8FFD /* Settings.swift */,
+				8B20583127BEFFDF00A9E2A1 /* RideScanApp.swift */,
+				15718CC02AF2868B003B2B5B /* HomeScreen.swift */,
+				15718CC22AF2868B003B2B5B /* LogIn.swift */,
+				15718CC12AF2868B003B2B5B /* SignUp.swift */,
+				15718CB22AF28687003B2B5B /* Comparison.swift */,
+				15718CB82AF28687003B2B5B /* Map.swift */,
+				15718CB52AF28687003B2B5B /* MyAccount.swift */,
+				15718CB42AF28687003B2B5B /* RecentTrips.swift */,
+				15718CB72AF28687003B2B5B /* Settings.swift */,
+				15718CB62AF28687003B2B5B /* SideMenu.swift */,
+				15718CB32AF28687003B2B5B /* UserProfile.swift */,
+				15718CC62AF28723003B2B5B /* Search.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -211,20 +217,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				15E9C00E2AE0C5BA00F4C18D /* HomeScreen.swift in Sources */,
+				15718CBC2AF28687003B2B5B /* MyAccount.swift in Sources */,
 				8BE0611227C7119200D5E981 /* Utilities.swift in Sources */,
-				1502D2D22AF02F6100FC8FFD /* RecentTrips.swift in Sources */,
 				8B20583227BEFFDF00A9E2A1 /* RideScanApp.swift in Sources */,
-				1502D2D42AF02F6F00FC8FFD /* Settings.swift in Sources */,
+				15718CBA2AF28687003B2B5B /* UserProfile.swift in Sources */,
 				9B9EC71A2AEA0A94007DDADB /* KeychainService.swift in Sources */,
 				9B7ABBE62AD5B9D100A822BA /* UserProfileViewModel.swift in Sources */,
-				9B9EC7122AE86E5D007DDADB /* SignUp.swift in Sources */,
-				15CB3D6A2AE1759900000F7C /* Map.swift in Sources */,
-				9B9EC7182AE9C881007DDADB /* SideMenu.swift in Sources */,
-				9B7ABBE42AD5B78400A822BA /* UserProfile.swift in Sources */,
-				1502D2D02AF02F5000FC8FFD /* MyAccount.swift in Sources */,
-				9B9EC7142AE8798C007DDADB /* LogIn.swift in Sources */,
+				15718CB92AF28687003B2B5B /* Comparison.swift in Sources */,
+				15718CC42AF2868B003B2B5B /* SignUp.swift in Sources */,
+				15718CBD2AF28687003B2B5B /* SideMenu.swift in Sources */,
 				9BCC6B242AEAE4EB000BEF81 /* TransportViewModel.swift in Sources */,
+				15718CBE2AF28687003B2B5B /* Settings.swift in Sources */,
+				15718CC52AF2868B003B2B5B /* HomeScreen.swift in Sources */,
+				15718CBF2AF28687003B2B5B /* Map.swift in Sources */,
+				15718CC72AF28723003B2B5B /* Search.swift in Sources */,
+				15718CBB2AF28687003B2B5B /* RecentTrips.swift in Sources */,
+				15718CC32AF2868B003B2B5B /* LogIn.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -368,6 +376,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -400,6 +409,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
