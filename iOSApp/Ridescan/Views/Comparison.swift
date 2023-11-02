@@ -12,6 +12,7 @@ import Models
 enum SortingOption: String, CaseIterable {
 	case name = "Name"
 	case price = "Price"
+	case time = "Time"
 }
 
 enum TransportationMode: String, CaseIterable {
@@ -20,6 +21,7 @@ enum TransportationMode: String, CaseIterable {
 	case uber = "Uber"
 	case lyft = "Lyft"
 	case bike = "Rideshare Bike"
+	case allS = "All"
 	// ... Add more modes as needed
 }
 
@@ -27,8 +29,8 @@ struct ComparisonView: View {
     
     @ObservedObject var transportViewModel = TransportViewModel()
     @State var current_fetii_price = 15.0
-    @State var current_fetii_min_people = 1
-    @State var current_fetii_max_people = 1
+    @State var current_fetii_min_people = 5
+    @State var current_fetii_max_people = 15
     
     // BTD Bus
     @State var has_bus_data = "No data"
@@ -40,14 +42,15 @@ struct ComparisonView: View {
 		let price: Double
         let min_people: Int
         let max_people: Int
+		let iconName: String
+		let timeEstimate: Int
 	}
 	
     var rideServices: [RideService] {
         [
             RideService(name: "Uber", price: 10.0, min_people: 1, max_people: 4),
             RideService(name: "Lyft", price: 12.0, min_people: 1, max_people: 4),
-            RideService(name: "Fetii", price: current_fetii_price, min_people: current_fetii_min_people, max_people: current_fetii_max_people),
-            RideService(name: "Brazos Transit Bus", price: 10.0, min_people: 1, max_people: 4)
+            RideService(name: "Fetii", price: current_fetii_price, min_people: current_fetii_min_people, max_people: current_fetii_max_people)
             // ... Add more services as needed
         ]
     }
@@ -57,6 +60,8 @@ struct ComparisonView: View {
 	
 	var sortedRideServices: [RideService] {
 		switch selectedSortOption {
+		case .time:
+			return rideServices.sorted { $0.timeEstimate < $1.timeEstimate }
 		case .name:
 			return rideServices.sorted { $0.name < $1.name }
 		case .price:
@@ -64,8 +69,8 @@ struct ComparisonView: View {
 		}
 	}
 	
-	@State private var selectedSortOption: SortingOption = .name
-	@State private var selectedTransportation: TransportationMode = .walking
+	@State private var selectedSortOption: SortingOption = .time
+	@State private var selectedTransportation: TransportationMode = .allS
 	@State private var showTransportationPicker: Bool = false
 	@State private var showSortingPicker: Bool = false
 
@@ -126,7 +131,7 @@ struct ComparisonView: View {
                     ForEach(sortedRideServices) { service in
                         HStack {
                             // Image on the left
-                            Image(systemName: "bus")
+							Image(systemName: service.iconName)
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 50, height: 50) // Set the image size as needed
@@ -146,6 +151,8 @@ struct ComparisonView: View {
                             VStack(alignment: .trailing) {
                                 Text(String(format: "$%.2f /person", service.price))
                                     .font(.body)
+                                Text("Min Passengers: \(service.min_people)")
+                                    .font(.subheadline)
                             }
                         }
                         .padding()
@@ -164,7 +171,9 @@ struct ComparisonView: View {
 		}
 		.background(maroonColor.opacity(0.8))
 		.cornerRadius(20, corners: [.topLeft, .topRight])
-		.frame(maxHeight: UIScreen.main.bounds.height / 3)
+
+		.frame(maxWidth: .infinity, maxHeight:(UIScreen.main.bounds.height / 3))
+		
 		.edgesIgnoringSafeArea(.all)
         .task {
             do {

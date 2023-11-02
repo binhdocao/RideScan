@@ -31,6 +31,9 @@ struct MapView: View {
 	@State private var isRouteDisplayed: Bool = false
 	@State private var isRouteConfirmed: Bool = false
 	
+	@State private var isRouteCalculationComplete = false
+
+	
 	func confirmRoute() {
 		isRouteConfirmed = true
 		showComparisonSheet = true
@@ -56,6 +59,7 @@ struct MapView: View {
 			}
 			
 			self.route = newRoute
+			self.updateRouteDistance(with: newRoute)
 			
 			let startAnnotation = IdentifiablePointAnnotation()
 			startAnnotation.coordinate = locationManager.region.center
@@ -70,9 +74,19 @@ struct MapView: View {
 			self.shouldAdjustZoom = true
 		}
 		
+		self.isRouteCalculationComplete = true
+		
 		isRouteDisplayed = true
+
+		
 	}
 
+	@State private var routeDistance: String = ""
+
+	func updateRouteDistance(with route: MKRoute) {
+		let distanceInMiles = route.distance / 1609.344 // Convert meters to miles
+		routeDistance = String(format: "%.2f miles", distanceInMiles)
+	}
 
 	
 	var body: some View {
@@ -90,8 +104,13 @@ struct MapView: View {
 				if showComparisonSheet {
 					ComparisonView(transportViewModel: transportViewModel)
 				} else {
-					if isRouteDisplayed {
+					if isRouteDisplayed && isRouteCalculationComplete {
 						HStack(spacing: 50) {
+							Text("Distance: \(routeDistance)")
+								.padding(25)
+								.background(Color.white)
+								.cornerRadius(15)
+								.shadow(radius: 5)
 							VStack {
 								Button(action: {
 									confirmRoute()
