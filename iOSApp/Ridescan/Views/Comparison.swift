@@ -48,9 +48,12 @@ struct ComparisonView: View {
 	
     var rideServices: [RideService] {
         [
-            RideService(name: "Uber", price: 10.0, min_people: 1, max_people: 4),
-            RideService(name: "Lyft", price: 12.0, min_people: 1, max_people: 4),
-            RideService(name: "Fetii", price: current_fetii_price, min_people: current_fetii_min_people, max_people: current_fetii_max_people)
+            RideService(name: "Uber", price: 10.0, min_people: 1, max_people: 4,iconName: "car",timeEstimate: 6),
+            RideService(name: "Lyft", price: 12.0, min_people: 1, max_people: 4,iconName: "car.fill",timeEstimate: 8),
+            RideService(name: "Walking", price: 0.0, min_people: 0, max_people: 0, iconName: "figure.walk", timeEstimate: 30),
+            RideService(name: "Piggyback", price: Double.random(in: 5...20), min_people: 1, max_people: 1,iconName: "person.fill",timeEstimate: 23),
+            RideService(name: "Fetii", price: current_fetii_price, min_people: current_fetii_min_people, max_people: current_fetii_max_people, iconName: "bus", timeEstimate: 26),
+            RideService(name: "Brazos Bus Service", price: 1.0, min_people: 1, max_people: 1, iconName: "bus", timeEstimate: 20)
             // ... Add more services as needed
         ]
     }
@@ -141,7 +144,7 @@ struct ComparisonView: View {
                             VStack(alignment: .leading) {
                                 Text(service.name)
                                     .font(.headline)
-                                Text("\(service.min_people) - \(service.max_people) people")
+                                Text("Time:\(service.timeEstimate)")
                                     .font(.subheadline)
                             }
 

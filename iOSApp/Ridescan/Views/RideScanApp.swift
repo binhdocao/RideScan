@@ -15,12 +15,14 @@ struct RideScanApp: App {
 	var body: some Scene {
 		WindowGroup {
 			if userSettings.isAuthenticated {
+                NavigationView {
 				MapView()
 					.environmentObject(userSettings)
+                }
 			} else {
 				NavigationView {
-//					HomeScreen()
-					MapView()
+					HomeScreen()
+//					MapView()
 				}
 				.environmentObject(userSettings)
 				.accentColor(Color(red: 0.5, green: 0, blue: 0)) //All back buttons are now maroon
