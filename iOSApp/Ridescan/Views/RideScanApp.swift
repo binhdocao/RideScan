@@ -8,6 +8,7 @@
 import SwiftUI
 
 @main
+
 struct RideScanApp: App {
 	@StateObject var userSettings = UserSettings()
 
