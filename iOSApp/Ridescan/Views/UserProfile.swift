@@ -65,7 +65,7 @@ struct UserProfile: View {
                         if isEditing {
                             // Call the async function using Task
                             do {
-                                try await viewModel.updateUserInfo(firstname: editedFirstName, email: editedEmail)
+                                try await viewModel.updateUserInfo()
                             } catch {
                                 // Handle errors here
                                 print("Error updating user info: \(error)")

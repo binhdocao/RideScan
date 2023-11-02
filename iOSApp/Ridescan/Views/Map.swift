@@ -38,7 +38,7 @@ struct MapView: View {
 
 	func denyRoute() {
 		isRouteConfirmed = false
-		showComparisonSheet = true
+		showComparisonSheet = false
 	}
 	
 
@@ -88,7 +88,7 @@ struct MapView: View {
 						.fontWeight(.bold)
 				}
 				if showComparisonSheet {
-					ComparisonView()
+					ComparisonView(transportViewModel: transportViewModel)
 				} else {
 					if isRouteDisplayed {
 						HStack(spacing: 50) {
@@ -171,10 +171,8 @@ struct MapView: View {
 							.animation(.spring())
 							.edgesIgnoringSafeArea(.all)
 					}
-					}
-					}
-					
-
+                }
+            }
 		}
 	
 		.gesture(

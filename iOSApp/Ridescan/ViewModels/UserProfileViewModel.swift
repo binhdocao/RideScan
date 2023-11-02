@@ -67,26 +67,16 @@ class UserProfileViewModel: ObservableObject {
     }
     
     /// Update user info on the backend server.
-    func updateUserInfo(firstname: String, email: String) async throws {
-        let userID = "6524674ca26a5ad3e29b2960"
-        let userURL = HTTP.baseURL.appendingPathComponent(userID)
+    func updateUserInfo() async throws {
+        
+        let route = "api/user/update"
+        let userURL = HTTP.baseURL.appendingPathComponent(route)
         
         // Create a dictionary with the updated user data.
-        let updatedUserData = UserUpdate(firstname: firstname, email: email)
+        let updatedUserData = self.user
         
-        do {
-            // Send a PUT or PATCH request to update the user data.
-            try await HTTP.patch(url: userURL, body: updatedUserData)
-            
-            // set the new properties for the user
-            DispatchQueue.main.async {
-                self.user = User(id: self.user.id, firstname: self.user.firstname, lastname: self.user.lastname, email: email, phone: self.user.phone, password: self.user.password)
-            }
-            
-        } catch {
-            // Handle errors here
-            print("Error updating user info: \(error)")
-        }
+        // Send a PUT or PATCH request to update the user data.
+        try await HTTP.patch(url: userURL, body: updatedUserData)
     }
 
     
