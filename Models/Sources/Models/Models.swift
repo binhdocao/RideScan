@@ -18,11 +18,11 @@ public struct User: Identifiable, Codable {
     
     /// Unique identifier.
     public let id: BSONObjectID
-    public let firstname: String
-    public let lastname: String
-    public let email: String
-    public let phone: String
-    public let password: String
+    public var firstname: String
+    public var lastname: String
+    public var email: String
+    public var phone: String
+    public var password: String
 
     private enum CodingKeys: String, CodingKey {
         // We store the identifier under the name `id` on the struct to satisfy the requirements of the `Identifiable`
@@ -69,7 +69,6 @@ public struct User: Identifiable, Codable {
         
 }
 
-
 public struct AddUserResponse: Codable {
     public let id: String
 
@@ -82,17 +81,14 @@ public struct AddUserResponse: Codable {
  * Models the information set in a PATCH request by the frontend and an `updateOne` query by the backend to update user first and email.
  * This type conforms to `Codable` to allow us to serialize it to and deserialize it from extended JSON and BSON.
  */
-public struct UserUpdate: Codable {
-    /// The new first name.
-    public let firstname: String
-
-    /// The new email.
-    public let email: String
+public struct UpdateUserResponse: Codable {
+    public let id: BSONObjectID
+    public let message: String
 
     /// Initializes a new `UserUpdate` instance.
-    public init(firstname: String, email: String) {
-        self.firstname = firstname
-        self.email = email
+    public init(id: BSONObjectID, message: String) {
+        self.id = id
+        self.message = message
     }
 }
 

@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import Models
 
 enum SortingOption: String, CaseIterable {
 	case name = "Name"
@@ -23,19 +24,29 @@ enum TransportationMode: String, CaseIterable {
 }
 
 struct ComparisonView: View {
-	
+    
+    @ObservedObject var transportViewModel = TransportViewModel()
+    @State var current_fetii_price = 15.0
+    @State var current_fetii_min_people = 1
+    @State var current_fetii_max_people = 1
+
+
 	struct RideService: Identifiable {
 		var id = UUID()
 		let name: String
-		let price: String
+		let price: Double
+        let min_people: Int
+        let max_people: Int
 	}
 	
-	let rideServices: [RideService] = [
-		RideService(name: "Uber", price: "$10"),
-		RideService(name: "Lyft", price: "$12"),
-		RideService(name: "Fetii", price: "$15")
-		// ... Add more services as needed
-	]
+    var rideServices: [RideService] {
+        [
+            RideService(name: "Uber", price: 10.0, min_people: 1, max_people: 4),
+            RideService(name: "Lyft", price: 12.0, min_people: 1, max_people: 4),
+            RideService(name: "Fetii", price: current_fetii_price, min_people: current_fetii_min_people, max_people: current_fetii_max_people)
+            // ... Add more services as needed
+        ]
+    }
 	
 	@State private var refreshView: Bool = false
 
@@ -105,33 +116,69 @@ struct ComparisonView: View {
 			}
 			.padding(.horizontal)
 
-			// Service List
-			ScrollView {
-				VStack(spacing: 10) {
-					ForEach(sortedRideServices) { service in
-						HStack {
-							Text("\(service.name): $\(service.price)")
-								.font(.body)
-							Spacer()
-						}
-						.padding()
-						.background(Color.white)
-						.cornerRadius(8)
-						.shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-					}
-				}
-				.padding(.horizontal)
-				.padding(20)
-				.onChange(of: selectedSortOption) { _ in
-					refreshView.toggle() // Force a view refresh
-				}
-			}
+            // Service List
+            ScrollView {
+                VStack(spacing: 10) {
+                    ForEach(sortedRideServices) { service in
+                        HStack {
+                            // Image on the left
+                            Image(systemName: "bus")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 50, height: 50) // Set the image size as needed
+                                .padding(.trailing, 10)
+
+                            // Name in the middle with min and max person counts
+                            VStack(alignment: .leading) {
+                                Text(service.name)
+                                    .font(.headline)
+                                Text("Min - Max: \(service.min_people) - \(service.max_people)")
+                                    .font(.subheadline)
+                            }
+
+                            Spacer() // This will push the following elements to the right
+
+                            // Cost per person and minimum number of passengers on the right
+                            VStack(alignment: .trailing) {
+                                Text(String(format: "$%.2f /person", service.price))
+                                    .font(.body)
+                                Text("Min Passengers: \(service.min_people)")
+                                    .font(.subheadline)
+                            }
+                        }
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(8)
+                        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                    }
+                }
+                .padding(.horizontal)
+                .padding(20)
+                .onChange(of: selectedSortOption) { _ in
+                    refreshView.toggle() // Force a view refresh
+                }
+            }
 			Spacer() // Push content to the top
 		}
 		.background(maroonColor.opacity(0.8))
 		.cornerRadius(20, corners: [.topLeft, .topRight])
 		.frame(maxHeight: UIScreen.main.bounds.height / 3)
 		.edgesIgnoringSafeArea(.all)
+        .task {
+            do {
+                let result = try await transportViewModel.findFetii()
+                print(result.data.first)
+                current_fetii_price = result.data.first?.min_charge_per_person ?? 15.0
+                current_fetii_min_people = result.data.first?.direct_min_passengers ?? 1
+                current_fetii_max_people = result.data.first?.direct_max_passengers ?? 4
+
+//                let result = try await transportViewModel.locateFetii()
+                // Handle the result here, possibly setting it to another @State or @Published property
+            } catch {
+                // Handle the error here. Perhaps by showing an alert to the user or logging the error.
+                print("Error fetching data: \(error)")
+            }
+        }
 	}
 }
 

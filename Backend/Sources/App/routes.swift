@@ -22,6 +22,10 @@ func routes(_ app: Application) throws {
         try await req.addUser()
     }
 
+    app.patch("api", "user", "update") { req async throws -> UpdateUserResponse in
+        try await req.updateUser()
+    }
+
     app.post("api", "fetii", "find") { req async throws -> FindFetiiResponse in
         try await req.findFetii()
     }
@@ -37,6 +41,7 @@ extension User: Content {}
 extension FindFetiiResponse: Content {}
 extension LocateFetiiResponse: Content {}
 extension AddUserResponse: Content {}
+extension UpdateUserResponse: Content {}
 
 extension Request {
     /// Convenience extension for obtaining a collection.
@@ -111,6 +116,38 @@ extension Request {
             }
         } catch {
             throw Abort(.internalServerError, reason: "Failed to save new user: \(error)")
+        }
+    }
+
+    func updateUser() async throws -> UpdateUserResponse {
+        // Decode the User from the request's JSON body
+        let userToUpdate = try self.content.decode(User.self)
+
+        print(userToUpdate.id)
+
+        // Create a filter to find the document with the matching _id
+        let filter: BSONDocument = ["_id": .objectID(userToUpdate.id)]
+        
+        // Create an update document with the fields you want to update
+        let updateDocument: BSONDocument = [
+            "$set": .document(try BSONEncoder().encode(userToUpdate))
+        ]
+        
+        do {
+            // Update the user in MongoDB
+            let result = try await self.userCollection.updateOne(filter: filter, update: updateDocument)
+            
+            // Check if a document was actually updated
+            guard let matchedCount = result?.matchedCount, matchedCount > 0 else {
+                throw Abort(.notFound, reason: "No user with matching _id")
+            }
+            
+            // You can create a custom response or return a success message
+            // For simplicity, let's just return a success message with the updated user's ID
+            return UpdateUserResponse(id: userToUpdate.id, message: "User updated successfully")
+        } catch {
+            // If something goes wrong, throw an internal server error
+            throw Abort(.internalServerError, reason: "Failed to update user: \(error)")
         }
     }
 
