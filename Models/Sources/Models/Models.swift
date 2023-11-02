@@ -180,3 +180,28 @@ public struct Vehicletype: Codable {
     public let top_image: String
 }
 ///
+///
+public struct BrazosAPIResponse: Codable {
+    public let status: Int
+    public let message: String
+    public let msg: String
+    public var data: [BrazosDriver]
+}
+//
+public struct BrazosDriver: Codable {
+    public let RouteId: Int
+    public let lat: Double
+    public let lng: Double
+    
+    public init(RouteId: Int, lat: Double, lng: Double) {
+        self.RouteId = RouteId
+        self.lat = lat
+        self.lng = lng
+    }
+}
+//
+public struct BrazosVehicleType: Codable {
+    public let id: Int
+    public let top_image: String
+}
+///

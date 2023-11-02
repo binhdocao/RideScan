@@ -31,7 +31,10 @@ struct ComparisonView: View {
     @State var current_fetii_price = 15.0
     @State var current_fetii_min_people = 5
     @State var current_fetii_max_people = 15
-
+    
+    // BTD Bus
+    @State var has_bus_data = "No data"
+    @State private var buses: [BrazosDriver] = []
 
 	struct RideService: Identifiable {
 		var id = UUID()
@@ -45,11 +48,9 @@ struct ComparisonView: View {
 	
     var rideServices: [RideService] {
         [
-            RideService(name: "Uber", price: 10.0, min_people: 1, max_people: 4,iconName: "car",timeEstimate: 6),
-            RideService(name: "Lyft", price: 12.0, min_people: 1, max_people: 4,iconName: "car.fill",timeEstimate: 8),
-			RideService(name: "Walking", price: 0.0, min_people: 0, max_people: 0, iconName: "figure.walk", timeEstimate: 30),
-			RideService(name: "Piggyback", price: Double.random(in: 5...20), min_people: 1, max_people: 1,iconName: "person.fill",timeEstimate: 23),
-            RideService(name: "Fetii", price: current_fetii_price, min_people: current_fetii_min_people, max_people: current_fetii_max_people,iconName: "bus", timeEstimate: 26)
+            RideService(name: "Uber", price: 10.0, min_people: 1, max_people: 4),
+            RideService(name: "Lyft", price: 12.0, min_people: 1, max_people: 4),
+            RideService(name: "Fetii", price: current_fetii_price, min_people: current_fetii_min_people, max_people: current_fetii_max_people)
             // ... Add more services as needed
         ]
     }
@@ -140,7 +141,7 @@ struct ComparisonView: View {
                             VStack(alignment: .leading) {
                                 Text(service.name)
                                     .font(.headline)
-                                Text("Min - Max: \(service.min_people) - \(service.max_people)")
+                                Text("\(service.min_people) - \(service.max_people) people")
                                     .font(.subheadline)
                             }
 
@@ -150,8 +151,8 @@ struct ComparisonView: View {
                             VStack(alignment: .trailing) {
                                 Text(String(format: "$%.2f /person", service.price))
                                     .font(.body)
-								Text("Time: \(service.timeEstimate) mins")
-									.font(.subheadline)
+                                Text("Min Passengers: \(service.min_people)")
+                                    .font(.subheadline)
                             }
                         }
                         .padding()
@@ -177,7 +178,6 @@ struct ComparisonView: View {
         .task {
             do {
                 let result = try await transportViewModel.findFetii()
-                print(result.data.first)
                 current_fetii_price = result.data.first?.min_charge_per_person ?? 15.0
                 current_fetii_min_people = result.data.first?.direct_min_passengers ?? 1
                 current_fetii_max_people = result.data.first?.direct_max_passengers ?? 4
@@ -190,6 +190,64 @@ struct ComparisonView: View {
             }
         }
 	}
+    
+    func fetchBusData() {
+        // Replace with your endpoint
+        let baseURL = "https://www.ridebtd.org/Services/JSONPRelay.svc/GetMapVehiclePoints?apiKey=8882812681"
+        guard let url = URL(string: baseURL) else {
+            has_bus_data = "Invalid URL"
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        // Add your authorization header if needed
+        // request.addValue("Bearer YOUR_BEARER_TOKEN", forHTTPHeaderField: "Authorization")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                DispatchQueue.main.async {
+                    has_bus_data = "Network error: \(error.localizedDescription)"
+                }
+                return
+            }
+            
+            guard let data = data else {
+                DispatchQueue.main.async {
+                    has_bus_data = "No data received from the server"
+                }
+                return
+            }
+            
+            do {
+                // Parse the JSON response as an array of dictionaries
+                if let jsonArray = try JSONSerialization.jsonObject(with: data, options: []) as? [[String: Any]] {
+                    var newBuses = [BrazosDriver]()
+                    for dict in jsonArray {
+                        if let lat = dict["Latitude"] as? Double,
+                           let lon = dict["Longitude"] as? Double,
+                           let id = dict["RouteID"] as? Int {
+                            let driver = BrazosDriver(RouteId: id, lat: lat, lng: lon)
+                            newBuses.append(driver)
+                        }
+                    }
+                    
+                    DispatchQueue.main.async {
+                        buses = newBuses
+                        has_bus_data = "Data fetched successfully"
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        has_bus_data = "Failed to decode the response data"
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    has_bus_data = "Error: \(error.localizedDescription)"
+                }
+            }
+        }.resume()
+    }
 }
 
 
