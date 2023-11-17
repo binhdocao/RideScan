@@ -199,6 +199,8 @@ struct menuLink: View {
     @Binding var showingLogoutConfirmation: Bool
 	
 	@State private var isActive: Bool = false
+    
+    @EnvironmentObject var userSettings: UserSettings
 	
 	var destinationView: some View {
 		switch text {
@@ -207,7 +209,10 @@ struct menuLink: View {
 		case "Recent trips":
 			return AnyView(RecentTripsView())
 		case "My Account":
-			return AnyView(MyAccountView())
+            return AnyView(NavigationView {
+                MyAccountView()
+                    .environmentObject(userSettings) // Pass the environment object here
+            })
 		default:
 			return AnyView(Text("Unknown"))
 		}
@@ -223,7 +228,7 @@ struct menuLink: View {
 			Text(text)
 				.foregroundColor(.white)
 				.font(.body)
-			NavigationLink("", destination: destinationView, isActive: $isActive)
+            NavigationLink("", destination: destinationView, isActive: $isActive)
 				.opacity(0) // Hide the default NavigationLink arrow
 		}
 		.onTapGesture {

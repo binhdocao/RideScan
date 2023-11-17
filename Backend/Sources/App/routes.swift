@@ -14,6 +14,10 @@ func routes(_ app: Application) throws {
         try await req.findUser()
     }
 
+    app.delete(":_id") { req async throws -> Response in
+        try await req.delUser()
+    }
+
     app.get("api", "user", "login", ":emailOrPhone", ":password") { req async throws -> User in
         try await req.userExists()
     }
@@ -116,6 +120,22 @@ extension Request {
             }
         } catch {
             throw Abort(.internalServerError, reason: "Failed to save new user: \(error)")
+        }
+    }
+
+    func delUser() async throws -> Response {
+        let idFilter = try self.getIDFilter()
+        do {
+            // since we aren't using an unacknowledged write concern we can expect deleteOne to return a non-nil result.
+            guard let result = try await self.userCollection.deleteOne(idFilter) else {
+                throw Abort(.internalServerError, reason: "Unexpectedly nil response from database")
+            }
+            guard result.deletedCount == 1 else {
+                throw Abort(.notFound, reason: "No user with matching _id")
+            }
+            return Response(status: .ok)
+        } catch {
+            throw Abort(.internalServerError, reason: "Failed to delete user: \(error)")
         }
     }
 
