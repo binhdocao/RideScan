@@ -14,6 +14,9 @@ struct MyAccountView: View {
     @State private var showAlert = false
     @State private var alertTitle = ""
     @State private var alertMessage = ""
+    @State private var showingDeleteAlert = false
+    @EnvironmentObject var userSettings: UserSettings
+    @Environment(\.presentationMode) var presentationMode // Access the presentation mode
 
     var body: some View {
         Form {
@@ -33,6 +36,26 @@ struct MyAccountView: View {
                         await saveUser()
                     }
                 }
+                Button("Delete Account") {
+                    showingDeleteAlert = true
+                }
+                .foregroundColor(.red)
+                .alert(isPresented: $showingDeleteAlert) {
+                        Alert(
+                            title: Text("Delete Account"),
+                            message: Text("Are you sure you want to delete your account? This action is irreversible."),
+                            primaryButton: .destructive(Text("Delete")) {
+                                // Perform the delete action here
+                                Task {
+                                    await deleteUser()
+                                    
+                                    // send the user back to the root view
+                                    userSettings.isAuthenticated = false
+                                }
+                            },
+                            secondaryButton: .cancel()
+                        )
+                    }
             }
         }
         .navigationTitle("My Account")
@@ -68,6 +91,24 @@ struct MyAccountView: View {
             // If an error occurs, set the alert to show an error message
             alertTitle = "Error"
             alertMessage = "Error updating user info."
+            showAlert = true
+        }
+    }
+    
+    private func deleteUser() async {
+        do {
+            try await viewModel.deleteUser()
+            
+            // If the save is successful, set the alert to show a success message and save to Keychain
+            try KeychainService.delete(key: "userInfo")
+
+            alertTitle = "Success"
+            alertMessage = "Successfully deleted user!"
+            showAlert = true
+        } catch {
+            // If an error occurs, set the alert to show an error message
+            alertTitle = "Error"
+            alertMessage = "Error deleting user."
             showAlert = true
         }
     }

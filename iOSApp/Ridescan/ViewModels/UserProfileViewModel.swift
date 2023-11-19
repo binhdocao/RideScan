@@ -79,5 +79,10 @@ class UserProfileViewModel: ObservableObject {
         try await HTTP.patch(url: userURL, body: updatedUserData)
     }
 
+    func deleteUser() async throws {
+
+        try await HTTP.delete(url: self.user.resourceURL)
+        
+    }
     
 }
