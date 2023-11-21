@@ -37,6 +37,50 @@ func routes(_ app: Application) throws {
     app.post("api", "fetii", "locate") { req async throws -> LocateFetiiResponse in
         try await req.locateFetii()
     }
+	
+	//	Apple Login Stuff
+		app.get("api", "user", "check-exists", ":appleIdentifier") { req async throws -> Bool in
+			guard let appleIdentifier = req.parameters.get("appleIdentifier", as: String.self) else {
+				throw Abort(.badRequest, reason: "Missing appleIdentifier")
+			}
+
+			let filter: BSONDocument = ["appleIdentifier": .string(appleIdentifier)]
+			let userExists = try await req.userCollection.findOne(filter) != nil
+			return userExists
+		}
+
+		app.get("api", "user", "login-with-apple", ":appleIdentifier") { req async throws -> User in
+			guard let appleIdentifier = req.parameters.get("appleIdentifier", as: String.self) else {
+				throw Abort(.badRequest, reason: "Missing appleIdentifier")
+			}
+
+			let filter: BSONDocument = ["appleIdentifier": .string(appleIdentifier)]
+			guard let user = try await req.userCollection.findOne(filter) else {
+				throw Abort(.notFound, reason: "User not found with provided appleIdentifier")
+			}
+			return user
+		}
+
+		app.post("api", "user", "create-with-apple") { req async throws -> AddUserResponse in
+			let newUser = try req.content.decode(User.self)
+
+			// Ensure the user has an Apple identifier
+			guard newUser.appleIdentifier != nil else {
+				throw Abort(.badRequest, reason: "Missing appleIdentifier for Apple login")
+			}
+
+			do {
+				if let insertResult = try await req.userCollection.insertOne(newUser) {
+					let insertedID = insertResult.insertedID
+					let stringID = req.extractStringInParentheses(string: String(describing: insertedID))
+					return AddUserResponse(id: stringID)
+				} else {
+					throw Abort(.internalServerError, reason: "Inserted ID is not an ObjectId.")
+				}
+			} catch {
+				throw Abort(.internalServerError, reason: "Failed to save new user: \(error)")
+			}
+		}
 }
 
 /// Extend the `Kitten` model type to conform to Vapor's `Content` protocol so that it may be converted to and
@@ -275,4 +319,7 @@ extension Request {
             throw Abort(.internalServerError, reason: "Error decoding JSON: \(error)")
         }
     }
+	
+
+
 }

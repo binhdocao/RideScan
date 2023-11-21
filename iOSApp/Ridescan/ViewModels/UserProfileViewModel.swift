@@ -85,4 +85,98 @@ class UserProfileViewModel: ObservableObject {
         
     }
     
+	
+
+	
+	//Code for Apple Login
+	func handleAppleLogin(userIdentifier: String, fullName: PersonNameComponents?, email: String?) async throws {
+		// Check if user exists in your backend
+		let userExists = await checkIfUserExists(userIdentifier: userIdentifier)
+		
+		if userExists {
+			// Log in existing user
+			try await loginWithApple(userIdentifier: userIdentifier)
+		} else {
+			// Create new user with Apple credentials
+			let firstname = fullName?.givenName ?? "Unknown"
+			let lastname = fullName?.familyName ?? "Unknown"
+			let email = email ?? "no-email@apple.com"
+			try await createUserWithApple(userIdentifier: userIdentifier, firstname: firstname, lastname: lastname, email: email)
+		}
+	}
+
+	// Method to check if user exists in backend
+	private func checkIfUserExists(userIdentifier: String) async -> Bool {
+		let route = "api/user/check-exists/\(userIdentifier)"
+		let userURL = HTTP.baseURL.appendingPathComponent(route)
+
+		do {
+			let exists: Bool = try await HTTP.get(url: userURL, dataType: Bool.self)
+			return exists
+		} catch {
+			print("Error checking user existence: \(error)")
+			return false
+		}
+	}
+
+
+	// Method to log in user with Apple credentials
+	private func loginWithApple(userIdentifier: String) async throws {
+		let route = "api/user/login-with-apple/\(userIdentifier)"
+		let userURL = HTTP.baseURL.appendingPathComponent(route)
+
+		do {
+			let user: User = try await HTTP.get(url: userURL, dataType: User.self)
+			DispatchQueue.main.async {
+				self.user = user
+			}
+
+			let userData = try JSONEncoder().encode(user)
+			try KeychainService.save(key: "userInfo", data: userData)
+		} catch {
+			print("Error logging in with Apple: \(error)")
+			throw error
+		}
+	}
+
+
+	// Method to create a new user with Apple credentials
+	private func createUserWithApple(userIdentifier: String, firstname: String, lastname: String, email: String) async throws {
+		let route = "api/user/create-with-apple"
+		let userURL = HTTP.baseURL.appendingPathComponent(route)
+
+		let defaultPhone = "0000000000" // Default phone number placeholder
+		let defaultPassword = "defaultPassword" // Default password placeholder
+
+		let newUser = User(firstname: firstname, lastname: lastname, email: email, phone: defaultPhone, password: defaultPassword, appleIdentifier: userIdentifier)
+
+		do {
+			let userId: AddUserResponse = try await HTTP.post(url: userURL, body: newUser)
+
+			// Safely unwrap the optional User instance
+			DispatchQueue.main.async {
+				if let createdUser = User(id: userId.id, firstname: firstname, lastname: lastname, email: email, phone: defaultPhone, password: defaultPassword, appleIdentifier: userIdentifier) {
+					self.user = createdUser
+				} else {
+					print("Failed to initialize User")
+					// Handle the failure to create a User instance appropriately
+				}
+			}
+
+
+			
+			// If user creation is successful, save the user data
+			if let userData = try? JSONEncoder().encode(self.user) {
+				try KeychainService.save(key: "userInfo", data: userData)
+			}
+		} catch {
+			print("Error creating user with Apple: \(error)")
+			throw error
+		}
+	}
+
+
+
+
+
 }
