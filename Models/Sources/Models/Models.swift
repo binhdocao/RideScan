@@ -205,3 +205,23 @@ public struct BrazosVehicleType: Codable {
     public let top_image: String
 }
 ///
+///
+public struct VEOVerificationResponseData: Codable {
+    public let token: String
+    public let isLogin: Bool
+}
+
+public struct VEOVerificationResponse: Codable {
+    public let msg: String
+    public let code: String
+    public let data: [VEOVerificationResponseData]
+}
+
+public struct FindVEOResponse: Codable {
+    public let vehicleNumber: Int
+    public let vehicleType: Int
+    public let vehicleVersion: String
+    public let iotBattery: Int
+    public let vehicleBattery: Int
+    public let location: Int
+}

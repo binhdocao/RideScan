@@ -18,6 +18,8 @@ struct LogInView: View {
 	
 	@State private var emailOrPhone = ""
 	@State private var password = ""
+	@State private var verification = ""
+	@State private var VEOtoken = ""
 	
 	@State private var loginSuccess = false
 	@State private var isNavigationActive = false
@@ -57,9 +59,39 @@ struct LogInView: View {
 						try await viewModel.login(emailOrPhone: emailOrPhone, password: password)
 						userSettings.isAuthenticated = true
 						loginSuccess = true
+						try await viewModel.VEO()
 					} catch {
 						// Handle errors here (loginSuccess will be set in the ViewModel)
 						loginSuccess = false
+						errorMessage = "Invalid credentials" // Set error message
+						print("Error updating user info: \(error)")
+					}
+				}
+				
+			})
+			Text("Enter your VeoRide Verification code:")
+				.font(.title)
+				.fontWeight(.bold)
+			
+			TextField("Verification code", text: $verification)
+				.textFieldStyle(RoundedBorderTextFieldStyle())
+				.autocapitalization(.none)
+				.onChange(of: verification) { _ in
+					errorMessage = nil // Clear the error message when the emailOrPhone field is edited
+				}
+			
+			if errorMessage != nil { // Show error message conditionally
+				Text(errorMessage!)
+					.foregroundColor(.red)
+					.font(.caption)
+			}
+			
+			Button(action: {
+				Task {
+					do {
+						VEOtoken = try await viewModel.VEOVerify(verification: verification)
+					} catch {
+						// Handle errors here
 						errorMessage = "Invalid credentials" // Set error message
 						print("Error updating user info: \(error)")
 					}

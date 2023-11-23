@@ -83,6 +83,40 @@ class UserProfileViewModel: ObservableObject {
 
         try await HTTP.delete(url: self.user.resourceURL)
         
-    }
-    
+    }   
+
+    /// Starts VEO authentication process
+    func VEO() async throws {
+        
+        let authURL = "https://cluster-prod.veoride.com/api/customers/auth/auth-code?phone=\(user.phone)"
+        
+        try await HTTP.get(url: authURL)
+    }   
+
+    /// Finish VEO verification process
+    func VEOVerify(verification: String) async throws {
+        
+        let verifyURL = "https://cluster-prod.veoride.com/api/customers/auth/auth-code/verification"
+        var request = URLRequest(url: verifyURL)
+        request.httpMethod = "POST"
+        
+        // Add values for verification request
+        request.addValue("\(user.phone)", forHTTPHeaderField: "phone")
+        request.addValue("iPhone 12", forHTTPHeaderField: "phoneModel")
+        request.addValue("4.1.5", forHTTPHeaderField: "appVersion")
+        request.addValue(verification, forHTTPHeaderField: "code")
+
+        let response = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
+        }
+        
+        do {
+            let decodedData = try JSONDecoder().decode(VEOVerificationResponse.self, from: response)
+            print(decodedData)
+            return decodedData.data.token
+        } catch {
+            throw Abort(.internalServerError, reason: "Error decoding JSON: \(error)")
+        }
+    }    
 }

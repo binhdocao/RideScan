@@ -20,7 +20,7 @@ enum TransportationMode: String, CaseIterable {
 	case driving = "Driving"
 	case uber = "Uber"
 	case lyft = "Lyft"
-	case bike = "Rideshare Bike"
+	case bike = "VEO"
 	case allS = "All"
 	// ... Add more modes as needed
 }
@@ -54,6 +54,7 @@ struct ComparisonView: View {
             RideService(name: "Piggyback", price: Double.random(in: 5...20), min_people: 1, max_people: 1,iconName: "person.fill",timeEstimate: 23),
             RideService(name: "Fetii", price: current_fetii_price, min_people: current_fetii_min_people, max_people: current_fetii_max_people, iconName: "bus", timeEstimate: 26),
             RideService(name: "Brazos Bus Service", price: 1.0, min_people: 1, max_people: 1, iconName: "bus", timeEstimate: 20)
+            RideService(name: "VeoRide", price: 0.5, min_people: 1, max_people: 1, iconName: "figure.walk", timeEstimate: 30),
             // ... Add more services as needed
         ]
     }

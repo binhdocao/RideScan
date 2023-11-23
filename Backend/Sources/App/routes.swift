@@ -37,6 +37,10 @@ func routes(_ app: Application) throws {
     app.post("api", "fetii", "locate") { req async throws -> LocateFetiiResponse in
         try await req.locateFetii()
     }
+
+    app.post("api", "Veoride", "find") { req async throws -> FindVEOResponse in
+        try await req.findVEO()
+    }
 }
 
 /// Extend the `Kitten` model type to conform to Vapor's `Content` protocol so that it may be converted to and
@@ -276,3 +280,34 @@ extension Request {
         }
     }
 }
+
+func findVEO() async throws -> FindVEOResponse {
+        
+        print("FindVEO() Started...")
+        let user = try self.content.decode(User.self)
+        let userLocation = try self.content.decode(UserLoc.self)
+        print(userLocation)
+
+        // Replace with your bearer token
+        request.addValue("Bearer \(LogIn.VEOtoken)", forHTTPHeaderField: "Authorization")
+
+        let baseURL = "https://cluster-prod.veoride.com/api/customers/vehicles?lat=\(userLocation.lat)&lng=\(userLocation.lng)"
+
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(FindVEOResponse.self, from: data)
+            print(decodedData)
+            if decodedData.status == 200 {
+                return decodedData
+            } else {
+                throw Abort(.notFound, reason: "No bikes found")
+            }
+        } catch {
+            throw Abort(.internalServerError, reason: "Error decoding JSON: \(error)")
+        }
+    }
