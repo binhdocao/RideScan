@@ -8,6 +8,7 @@ class UserSettings: ObservableObject {
 
 	init() {
 		isAuthenticated = isAuthenticatedUser()
+		print("UserSettings initialized. isAuthenticated: \(isAuthenticated)")
 	}
 
 	private func isAuthenticatedUser() -> Bool {
@@ -96,6 +97,7 @@ struct HomeScreen: View {
 
 struct SignInWithAppleButton: UIViewRepresentable {
 	@EnvironmentObject var userSettings: UserSettings
+	@EnvironmentObject var userProfileVM: UserProfileViewModel
 
 	func makeUIView(context: Context) -> ASAuthorizationAppleIDButton {
 		let button = ASAuthorizationAppleIDButton()
@@ -127,32 +129,27 @@ struct SignInWithAppleButton: UIViewRepresentable {
 		}
 
 		func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-			if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
-				let userIdentifier = appleIDCredential.user
-				let fullName = appleIDCredential.fullName
-				let email = appleIDCredential.email
-				
-				// Store user identifier in Keychain
-				do {
-					if let identifierData = userIdentifier.data(using: .utf8) {
-						try KeychainService.save(key: "userIdentifier", data: identifierData)
-						DispatchQueue.main.async {
-							self.parent.userSettings.isAuthenticated = true
+					if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
+						let userIdentifier = appleIDCredential.user
+						let fullName = appleIDCredential.fullName
+						let email = appleIDCredential.email
+
+						// Handle Apple sign in with existing UserProfileViewModel method
+						Task {
+							do {
+								try await parent.userProfileVM.handleAppleLogin(userIdentifier: userIdentifier, fullName: fullName, email: email)
+								DispatchQueue.main.async {
+									self.parent.userSettings.isAuthenticated = true
+								}
+							} catch {
+								print("Error handling Apple login: \(error)")
+							}
 						}
 					}
-				} catch {
-					print("Error saving to keychain: \(error)")
 				}
-				
-				// Handle the authentication
-				print("User id is \(userIdentifier) \n Full Name is \(String(describing: fullName)) \n Email id is \(String(describing: email))")
-				DispatchQueue.main.async {
-					self.parent.userSettings.isAuthenticated = true
-				}
-			}
-		}
 
 		func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+			print("Authorization error: \(error)")
 			// Handle error.
 		}
 	}

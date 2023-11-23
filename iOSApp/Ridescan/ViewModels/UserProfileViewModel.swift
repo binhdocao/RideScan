@@ -6,6 +6,8 @@
 //
 
 import Models
+import Foundation
+import SwiftBSON
 import SwiftUI
 import Security
 
@@ -39,32 +41,31 @@ class UserProfileViewModel: ObservableObject {
 
     
     /// Create user on the backend server.
-    func createUser(firstname: String, lastname: String, email: String, phone: String, password: String) async throws {
-        
-        let route = "api/user/create"
-        let userURL = HTTP.baseURL.appendingPathComponent(route)
-        
-        let newUser = User(firstname: firstname, lastname: lastname, email: email, phone: phone, password: password)
-        
-        // Add user to the database.
-        let userId: AddUserResponse = try await HTTP.post(url: userURL, body: newUser)
-        
-        print(userId.id)
-        
-        // set the new properties for the user
-        DispatchQueue.main.async {
-            self.user = User(id: userId.id, firstname: firstname, lastname: lastname, email: email, phone: phone, password: password) ?? self.user
-            
-            // save user data to UserDefaults
-            do {
-                let userData = try JSONEncoder().encode(self.user)
-                try KeychainService.save(key: "userInfo", data: userData)
-            } catch {
-                print("Failed to encode and save user data: \(error)")
-            }
-            
-        }
-    }
+	func createUser(user: User) async throws {
+		let route = "api/user/create"
+		let userURL = HTTP.baseURL.appendingPathComponent(route)
+		
+		// Add user to the database.
+		let userId: AddUserResponse = try await HTTP.post(url: userURL, body: user)
+		
+		print(userId.id)
+		
+		// Set the new properties for the user
+		DispatchQueue.main.async {
+			self.user = User(id: userId.id, firstname: user.firstname, lastname: user.lastname, email: user.email, phone: user.phone, password: user.password)
+			
+			// Save user data to UserDefaults
+			do {
+				let userData = try JSONEncoder().encode(self.user)
+				try KeychainService.save(key: "userInfo", data: userData)
+			} catch {
+				print("Failed to encode and save user data: \(error)")
+			}
+		}
+	}
+
+
+
     
     /// Update user info on the backend server.
     func updateUserInfo() async throws {
@@ -88,92 +89,62 @@ class UserProfileViewModel: ObservableObject {
 	
 
 	
-	//Code for Apple Login
+
+
 	func handleAppleLogin(userIdentifier: String, fullName: PersonNameComponents?, email: String?) async throws {
-		// Check if user exists in your backend
+		// Check if the user exists by querying the backend
 		let userExists = await checkIfUserExists(userIdentifier: userIdentifier)
-		
-		if userExists {
-			// Log in existing user
-			try await loginWithApple(userIdentifier: userIdentifier)
+
+		if userExists != nil {
+			// User exists, so log them in
+			do {
+				print("Userexists -handle")
+				// Perform login with the existing user's identifier
+				try await login(emailOrPhone: "\(userIdentifier)@appleid.com", password: "defaultApplePassword")
+			} catch {
+				print("Error logging in existing user: \(error)")
+			}
 		} else {
-			// Create new user with Apple credentials
+			// User does not exist, create a new user
+			
 			let firstname = fullName?.givenName ?? "Unknown"
 			let lastname = fullName?.familyName ?? "Unknown"
-			let email = email ?? "no-email@apple.com"
-			try await createUserWithApple(userIdentifier: userIdentifier, firstname: firstname, lastname: lastname, email: email)
+			let userEmail = email ?? "\(userIdentifier)@appleid.com"  // Use unique email
+
+			// Set the `_id` field of the new user to the `userIdentifier`
+			let newUser = User(id: userIdentifier, firstname: firstname, lastname: lastname, email: userEmail, phone: "0000000000", password: "defaultApplePassword")
+
+			do {
+				// Attempt to create the new user
+				try await createUser(user: newUser)
+			} catch {
+				print("Error creating a new user: \(error)")
+			}
 		}
 	}
+
+
+
 
 	// Method to check if user exists in backend
-	private func checkIfUserExists(userIdentifier: String) async -> Bool {
-		let route = "api/user/check-exists/\(userIdentifier)"
+	private func checkIfUserExists(userIdentifier: String) async -> User? {
+		let route = "api/user/apple-login/\(userIdentifier)"
 		let userURL = HTTP.baseURL.appendingPathComponent(route)
-
+			
 		do {
-			let exists: Bool = try await HTTP.get(url: userURL, dataType: Bool.self)
-			return exists
+			// Attempt to get the user using the provided URL
+			let user: User? = try await HTTP.get(url: userURL, dataType: User.self)
+			return user  // Return the user object if found
 		} catch {
 			print("Error checking user existence: \(error)")
-			return false
+			return nil  // Return nil if there's an error or if no user is found
 		}
 	}
 
 
-	// Method to log in user with Apple credentials
-	private func loginWithApple(userIdentifier: String) async throws {
-		let route = "api/user/login-with-apple/\(userIdentifier)"
-		let userURL = HTTP.baseURL.appendingPathComponent(route)
-
-		do {
-			let user: User = try await HTTP.get(url: userURL, dataType: User.self)
-			DispatchQueue.main.async {
-				self.user = user
-			}
-
-			let userData = try JSONEncoder().encode(user)
-			try KeychainService.save(key: "userInfo", data: userData)
-		} catch {
-			print("Error logging in with Apple: \(error)")
-			throw error
-		}
-	}
+	
 
 
-	// Method to create a new user with Apple credentials
-	private func createUserWithApple(userIdentifier: String, firstname: String, lastname: String, email: String) async throws {
-		let route = "api/user/create-with-apple"
-		let userURL = HTTP.baseURL.appendingPathComponent(route)
-
-		let defaultPhone = "0000000000" // Default phone number placeholder
-		let defaultPassword = "defaultPassword" // Default password placeholder
-
-		let newUser = User(firstname: firstname, lastname: lastname, email: email, phone: defaultPhone, password: defaultPassword, appleIdentifier: userIdentifier)
-
-		do {
-			let userId: AddUserResponse = try await HTTP.post(url: userURL, body: newUser)
-
-			// Safely unwrap the optional User instance
-			DispatchQueue.main.async {
-				if let createdUser = User(id: userId.id, firstname: firstname, lastname: lastname, email: email, phone: defaultPhone, password: defaultPassword, appleIdentifier: userIdentifier) {
-					self.user = createdUser
-				} else {
-					print("Failed to initialize User")
-					// Handle the failure to create a User instance appropriately
-				}
-			}
-
-
-			
-			// If user creation is successful, save the user data
-			if let userData = try? JSONEncoder().encode(self.user) {
-				try KeychainService.save(key: "userInfo", data: userData)
-			}
-		} catch {
-			print("Error creating user with Apple: \(error)")
-			throw error
-		}
-	}
 
 
 

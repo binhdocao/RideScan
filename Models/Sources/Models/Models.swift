@@ -14,59 +14,39 @@ import SwiftBSON
  * This type conforms to `Identifiable` so that SwiftUI is able to uniquely identify instances of this type when they
  * are used in the iOS interface.
  */
+
+
 public struct User: Identifiable, Codable {
 	
 	/// Unique identifier.
-	public let id: BSONObjectID
+	public var id: String?
 	public var firstname: String
 	public var lastname: String
 	public var email: String
 	public var phone: String
 	public var password: String
-	public var appleIdentifier: String? // New field for Apple user identifier
 
 	private enum CodingKeys: String, CodingKey {
-		case id = "_id", firstname, lastname, email, phone, password, appleIdentifier
+		case id = "_id", firstname, lastname, email, phone, password
 	}
 
 	/// Initializes a new `User` instance. If an `id` is not provided, a new one will be generated automatically.
 	public init(
-		id: BSONObjectID = BSONObjectID(),
+		id: String? = nil,
 		firstname: String,
 		lastname: String,
 		email: String,
 		phone: String,
-		password: String,
-		appleIdentifier: String? = nil // Include in initializer
+		password: String
 	) {
-		self.id = id
+		self.id = id ?? BSONObjectID().hex
 		self.firstname = firstname
 		self.lastname = lastname
 		self.email = email
 		self.phone = phone
 		self.password = password
-		self.appleIdentifier = appleIdentifier
 	}
 
-	/// Initializes a new `User` instance with a string ID. If an `id` is not provided, a new one will be generated automatically.
-	public init?(
-		id: String,
-		firstname: String,
-		lastname: String,
-		email: String,
-		phone: String,
-		password: String,
-		appleIdentifier: String? = nil // Include in initializer
-	) {
-		guard let objectId = try? BSONObjectID(id) else { return nil }
-		self.id = objectId
-		self.firstname = firstname
-		self.lastname = lastname
-		self.email = email
-		self.phone = phone
-		self.password = password
-		self.appleIdentifier = appleIdentifier
-	}
 }
 
 
@@ -83,15 +63,15 @@ public struct AddUserResponse: Codable {
  * This type conforms to `Codable` to allow us to serialize it to and deserialize it from extended JSON and BSON.
  */
 public struct UpdateUserResponse: Codable {
-    public let id: BSONObjectID
-    public let message: String
+	public let id: String // Use String instead of BSONObjectID
+	public let message: String
 
-    /// Initializes a new `UserUpdate` instance.
-    public init(id: BSONObjectID, message: String) {
-        self.id = id
-        self.message = message
-    }
+	public init(id: String, message: String) {
+		self.id = id
+		self.message = message
+	}
 }
+
 
 /// User location
 public struct FindFetiiRequest: Codable {
