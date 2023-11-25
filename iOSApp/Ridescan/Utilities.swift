@@ -41,14 +41,21 @@ extension URLResponse {
     }
 }
 
-
 extension User {
-    /// Corresponding URL for this kitten on the server.
-    var resourceURL: URL {
-        // Use the hexademical string representation of the `BSONObjectID`.
-        HTTP.baseURL.appendingPathComponent(self.id.hex)
-    }
+	/// Corresponding URL for this user on the server.
+	var resourceURL: URL {
+		if let id = self.id {
+			// If id is a String, it's assumed to be already in the correct format
+			return HTTP.baseURL.appendingPathComponent(id)
+		} else {
+			// If the `id` is nil, handle accordingly; FIX THIS LATER BINH - NOT DEFAULT
+			return HTTP.baseURL.appendingPathComponent("default")
+		}
+	}
 }
+
+
+
 
 /// Errors that can result from HTTP requests.
 enum HTTPError: LocalizedError {

@@ -11,6 +11,8 @@ import SwiftUI
 
 struct RideScanApp: App {
 	@StateObject var userSettings = UserSettings()
+	var userProfileVM = UserProfileViewModel()
+
 
 	var body: some Scene {
 		WindowGroup {
@@ -25,6 +27,7 @@ struct RideScanApp: App {
 //					MapView()
 				}
 				.environmentObject(userSettings)
+				.environmentObject(userProfileVM)
 				.accentColor(Color(red: 0.5, green: 0, blue: 0)) //All back buttons are now maroon
 			}
 		}

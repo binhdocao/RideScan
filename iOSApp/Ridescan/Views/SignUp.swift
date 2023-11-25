@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Models
 
 struct SignUpView: View {
     
@@ -108,27 +109,29 @@ struct SignUpView: View {
 				}
 			}
             
-            Button(action: {
-                if validate() {
-                    Task {
-                        do {
-                            try await viewModel.createUser(firstname: firstname, lastname: lastname, email: email, phone: phone, password: password)
+			Button(action: {
+				if validate() {
+					Task {
+						do {
+							let newUser = User(firstname: firstname, lastname: lastname, email: email, phone: phone, password: password)
+							try await viewModel.createUser(user: newUser)
 							userSettings.isAuthenticated = true
-                            createAccountSuccess = true
-                        } catch {
-                            // Handle errors here
-                            createAccountSuccess = false
-                            print("Error updating user info: \(error)")
-                        }
-                    }
-                }
-            }) {
-                Text("Create Account")
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity, maxHeight: 50)
-                    .background(maroonColor)
-                    .cornerRadius(8)
-            }
+							createAccountSuccess = true
+						} catch {
+							// Handle errors here
+							createAccountSuccess = false
+							print("Error creating user: \(error)")
+						}
+					}
+				}
+			}) {
+				Text("Create Account")
+					.foregroundColor(.white)
+					.frame(maxWidth: .infinity, maxHeight: 50)
+					.background(maroonColor)
+					.cornerRadius(8)
+			}
+
             Spacer()
             
             NavigationLink(destination: MapView(), isActive: $createAccountSuccess) {
