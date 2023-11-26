@@ -165,6 +165,7 @@ struct SideMenu: View {
             // Retrieve user data from the Keychain and update the viewModel
             if let userData = try? KeychainService.load(key: "userInfo"), let user = try? JSONDecoder().decode(User.self, from: userData) {
                 viewModel.user = user
+				print("Loaded user from Keychain: \(user)")
             }
         }
     }
