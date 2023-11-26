@@ -38,7 +38,7 @@ func routes(_ app: Application) throws {
         try await req.locateFetii()
     }
 
-    app.post("api", "Veoride", "find") { req async throws -> FindVEOResponse in
+    app.post("api", "veoride", "find") { req async throws -> FindVEOResponse in
         try await req.findVEO()
     }
 }
@@ -289,7 +289,7 @@ func findVEO() async throws -> FindVEOResponse {
         print(userLocation)
 
         // Replace with your bearer token
-        request.addValue("Bearer \(LogIn.VEOtoken)", forHTTPHeaderField: "Authorization")
+        request.addValue("Bearer \(VeoAuth.VEOtoken)", forHTTPHeaderField: "Authorization")
 
         let baseURL = "https://cluster-prod.veoride.com/api/customers/vehicles?lat=\(userLocation.lat)&lng=\(userLocation.lng)"
 

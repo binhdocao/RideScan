@@ -88,7 +88,7 @@ class UserProfileViewModel: ObservableObject {
     /// Starts VEO authentication process
     func VEO() async throws {
         
-        let authURL = "https://cluster-prod.veoride.com/api/customers/auth/auth-code?phone=\(user.phone)"
+        let authURL = URL("https://cluster-prod.veoride.com/api/customers/auth/auth-code?phone=\(user.phone)")!
         
         try await HTTP.get(url: authURL)
     }   
@@ -96,7 +96,7 @@ class UserProfileViewModel: ObservableObject {
     /// Finish VEO verification process
     func VEOVerify(verification: String) async throws {
         
-        let verifyURL = "https://cluster-prod.veoride.com/api/customers/auth/auth-code/verification"
+        let verifyURL = URL(string: "https://cluster-prod.veoride.com/api/customers/auth/auth-code/verification")!
         var request = URLRequest(url: verifyURL)
         request.httpMethod = "POST"
         
