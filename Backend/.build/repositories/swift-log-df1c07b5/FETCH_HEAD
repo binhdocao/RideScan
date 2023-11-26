@@ -1,5 +1,5 @@
 82818e74862476e2abe1b7d3d153f0ec992c9265	not-for-merge	branch 'gh-pages' of https://github.com/apple/swift-log
-cb28750240a9389e0023ee3e3cb6c83ce0960f5c	not-for-merge	branch 'main' of https://github.com/apple/swift-log
+f447991bd27b2e16bf93cc80219da8a7331a55dc	not-for-merge	branch 'main' of https://github.com/apple/swift-log
 eba9b323b5ba542c119ff17382a4ce737bcdc0b8	not-for-merge	branch 'swift-log-0.0' of https://github.com/apple/swift-log
 9788e74ef235a50419ba661b3d3b970a0f5c6280	not-for-merge	branch 'tomerd-patch-1' of https://github.com/apple/swift-log
 f1a88bda3e81e0d19f98dc63fe340df0dcb433f9	not-for-merge	branch 'tomerd-patch-2' of https://github.com/apple/swift-log
@@ -147,9 +147,11 @@ a3d069dbd0c08ba4a0b791dddcd40ec0b3d22a0f	not-for-merge	'refs/pull/27/head' of ht
 86b4cae34bf4c61f2c52ee2829a2ed078cd4611f	not-for-merge	'refs/pull/274/head' of https://github.com/apple/swift-log
 ae90a749a461af4ebf2127ddaa658d7810fb5a4c	not-for-merge	'refs/pull/274/merge' of https://github.com/apple/swift-log
 5e6abbe67fce23b681a8aab6dcf1b4e890d95507	not-for-merge	'refs/pull/276/head' of https://github.com/apple/swift-log
-cb26d0194ff486876ac4a3a25fef4212970f3a37	not-for-merge	'refs/pull/279/head' of https://github.com/apple/swift-log
-deac9f6cf3f4a082b605d92a9c279c869b448fca	not-for-merge	'refs/pull/279/merge' of https://github.com/apple/swift-log
+41407b9221dfc74d5710df2949d65009f74d5b3d	not-for-merge	'refs/pull/279/head' of https://github.com/apple/swift-log
+935920703361396e07dcafc819b464b176d00383	not-for-merge	'refs/pull/279/merge' of https://github.com/apple/swift-log
 1035635178ba56fb23bec9f5c7721847f604d837	not-for-merge	'refs/pull/28/head' of https://github.com/apple/swift-log
+8584634391133cb555bfbe04b129ed61657722f1	not-for-merge	'refs/pull/280/head' of https://github.com/apple/swift-log
+7416ab60522e0eb665a8499921d2f330dfca2bc1	not-for-merge	'refs/pull/281/head' of https://github.com/apple/swift-log
 c1fe63b1ea3996a1583e8970a15a5f1034a3f073	not-for-merge	'refs/pull/29/head' of https://github.com/apple/swift-log
 93bf477aac7899d1d56514dd1b703e0ede22365b	not-for-merge	'refs/pull/3/head' of https://github.com/apple/swift-log
 62ef12e49ff76cf77468b5591c693ad515e7f436	not-for-merge	'refs/pull/30/head' of https://github.com/apple/swift-log

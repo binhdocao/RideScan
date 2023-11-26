@@ -8,6 +8,7 @@ import SwiftUI
 import MapKit
 import CoreLocation
 import URLImage
+import Models
 
 let maroonColor = Color(red: 0.5, green: 0, blue: 0)
 
@@ -16,8 +17,9 @@ struct MapView: View {
 	@ObservedObject var transportViewModel = TransportViewModel()
 	@ObservedObject var locationManager = LocationManager()
 	@State private var destination: String = ""
+    @State private var destinationCoordinate: String = ""
 	@State private var isSideMenuOpened = false
-	
+    @State var has_bus_data = "No data"
 	@ObservedObject var searchCompleter = SearchCompleter()
 	@State private var showResults: Bool = false
 	@State private var shouldAdjustZoom: Bool = false
@@ -32,6 +34,8 @@ struct MapView: View {
 	@State private var isRouteConfirmed: Bool = false
 	
 	@State private var isRouteCalculationComplete = false
+    @State private var showBusRoute : Bool = false //if true, which comparison should change, then add another if in body where it will call
+    @State private var fromTo = FromTo()
 
 	
 	func confirmRoute() {
@@ -45,40 +49,49 @@ struct MapView: View {
 	}
 	
 
-	func calculateRoute(to destination: CLLocationCoordinate2D) {
+    func calculateRoute(from: CLLocationCoordinate2D, to destination: CLLocationCoordinate2D) -> Int{
+        
 		let request = MKDirections.Request()
-		request.source = MKMapItem(placemark: MKPlacemark(coordinate: locationManager.region.center))
+		request.source = MKMapItem(placemark: MKPlacemark(coordinate: from))
 		request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destination))
 		request.transportType = .automobile
 		
 		let directions = MKDirections(request: request)
-		directions.calculate { response, error in
-			guard let newRoute = response?.routes.first else {
-				print("Failed to get route: \(error?.localizedDescription ?? "Unknown error")")
-				return
-			}
-			
-			self.route = newRoute
-			self.updateRouteDistance(with: newRoute)
-			
-			let startAnnotation = IdentifiablePointAnnotation()
-			startAnnotation.coordinate = locationManager.region.center
-			startAnnotation.title = "Start"
+        directions.calculate { response, error in
+            
+            
+            guard let newRoute = response?.routes.first else {
+                print("Failed to get route: \(error?.localizedDescription ?? "Unknown error")")
+                return
+            }
+            DispatchQueue.main.async { // M
+                self.route = newRoute
+                self.updateRouteDistance(with: newRoute)
+                
+                let startAnnotation = IdentifiablePointAnnotation()
+                startAnnotation.coordinate = from
+                startAnnotation.title = "Start"
+                
+                let destinationAnnotation = IdentifiablePointAnnotation()
+                destinationAnnotation.coordinate = destination
+                destinationAnnotation.title = "Destination"
+                
+                
+                self.annotations = [startAnnotation, destinationAnnotation]
 
-			let destinationAnnotation = IdentifiablePointAnnotation()
-			destinationAnnotation.coordinate = destination
-			destinationAnnotation.title = "Destination"
-
-			self.annotations = [startAnnotation, destinationAnnotation]
-			
-			self.shouldAdjustZoom = true
-		}
-		
-		self.isRouteCalculationComplete = true
-		
-		isRouteDisplayed = true
-
-		
+                
+                
+                self.shouldAdjustZoom = true
+                
+                
+                
+                self.isRouteCalculationComplete = true
+                
+                isRouteDisplayed = true
+                //showBusRoute = false
+            }
+        }
+		return 1
 	}
 
 	@State private var routeDistance: String = ""
@@ -90,10 +103,17 @@ struct MapView: View {
 
 	
 	var body: some View {
+
 		ZStack {
+            //calculateRoute(from: fromTo.from ,to: fromTo.to)
+            /*if showBusRoute {
+                var status = calculateRoute(from: fromTo.from ,to: fromTo.to)
+                
+            }*/
 			WrappedMapView(region: $locationManager.region,shouldAdjustZoom: $shouldAdjustZoom, annotations: annotations, route: route)
 				.edgesIgnoringSafeArea(.all)
 			SideMenu(isSidebarVisible: $isSideMenuOpened)
+            
 			VStack(alignment: .leading) {
 				Spacer()
 				if transportViewModel.driverFound {
@@ -101,10 +121,51 @@ struct MapView: View {
 						.font(.title)
 						.fontWeight(.bold)
 				}
-				if showComparisonSheet {
-					ComparisonView(transportViewModel: transportViewModel)
-				} else {
+                if showBusRoute && !isRouteDisplayed && !isRouteCalculationComplete {
+                    //fromTo.from = self.annotations[0].coordinate
+                    var status = calculateRoute(from: fromTo.from ,to: fromTo.to)
+                  /* var buses = fetchBusData()
+                    var newbuses = readInputFromFile(filePath: "/data/bus_stops", buses: &buses)
+
+                    var bestroute = findBestRoute(buses: newbuses, destination: self.annotations[1].coordinate)
+                    
+                    ComparisonView(destination: self.annotations[1].coordinate,showBusRoute: $showBusRoute, fromTo: $fromTo, distance: bestroute.totalDistance,bestStop: bestroute.busStop1, buses: newbuses)
+                    */
+                    /*HStack {
+                                            
+                                            Button(action: {
+                                                fromTo.from = locationManager.region.center
+                                                calculateRoute(from: fromTo.from ,to: fromTo.to)
+                                                /*WrappedMapView(region: $locationManager.region,shouldAdjustZoom: $shouldAdjustZoom, annotations: annotations, route: route)
+                                                    .edgesIgnoringSafeArea(.all)
+                                                SideMenu(isSidebarVisible: $isSideMenuOpened)*/
+                                            }) {
+                                                Image(systemName: "checkmark.circle.fill")
+                                                    .padding()
+                                                    .font(.system(size: 20, weight: .bold))
+                                                    .foregroundColor(maroonColor)
+                                                    .background(Circle().fill(Color.white))
+                                            }
+                                        }*/
+                    
+                    
+                   
+                   
+                }
+				 if showComparisonSheet {
+                    //fromTo.from = locationManager.region.center
+                    //var status = calculateRoute(from: locationManager.region.center, to: self.annotations[1].coordinate)
+                    var buses = fetchBusData()
+                    var newbuses = readInputFromFile(filePath: "/data/bus_stops", buses: &buses)
+                    
+                    var bestroute = findBestRoute(buses: newbuses, destination: self.annotations[1].coordinate)
+                    
+                    ComparisonView(destination: self.annotations[1].coordinate,showBusRoute: $showBusRoute, fromTo: $fromTo, distance: bestroute.totalDistance,bestStop: bestroute.busStop1, buses: newbuses)
+				}
+                
+                else {
 					if isRouteDisplayed && isRouteCalculationComplete {
+                        
 						HStack(spacing: 50) {
 							Text("Distance: \(routeDistance)")
 								.padding(25)
@@ -114,6 +175,10 @@ struct MapView: View {
 							VStack {
 								Button(action: {
 									confirmRoute()
+                                    fromTo.from = self.annotations[0].coordinate
+                                    isRouteDisplayed = false
+                                    isRouteCalculationComplete = false
+                                    
 								}) {
 									Image(systemName: "checkmark.circle.fill")
 										.font(.largeTitle)
@@ -130,6 +195,8 @@ struct MapView: View {
 							VStack {
 								Button(action: {
 									denyRoute()
+                                    isRouteDisplayed = false
+                                    isRouteCalculationComplete = false
 								}) {
 									Image(systemName: "xmark.circle.fill")
 										.font(.largeTitle)
@@ -145,6 +212,8 @@ struct MapView: View {
 						}
 						.padding()
 					}
+                    
+                    
  else {
 						HStack {
 							TextField("Enter destination...", text: $destination)
@@ -161,7 +230,7 @@ struct MapView: View {
 										
 										// Calculate the route to the selected location
 										if let destinationCoordinate = searchCompleter.transportViewModel?.dropoffLocation {
-											calculateRoute(to: destinationCoordinate)
+                                            calculateRoute(from: locationManager.region.center, to: destinationCoordinate)
 										}
 										
 										// Update the search bar with the selected address
@@ -216,6 +285,164 @@ struct MapView: View {
 		UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
 	}
 	
+    func fetchBusData() -> [BrazosDriver] {
+        //var newBuses : [BrazosDriver] = []
+        var newBuses : [BrazosDriver] = [BrazosDriver(RouteId: 40, lat: 30.00, lng: -97.32)]
+
+        let baseURL = "https://www.ridebtd.org/Services/JSONPRelay.svc/GetMapVehiclePoints?apiKey=8882812681"
+        guard let url = URL(string: baseURL) else {
+            has_bus_data = "Invalid URL"
+            return newBuses
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        // Add your authorization header if needed
+        // request.addValue("Bearer YOUR_BEARER_TOKEN", forHTTPHeaderField: "Authorization")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                DispatchQueue.main.async {
+                    has_bus_data = "Network error: \(error.localizedDescription)"
+                }
+                return
+            }
+            
+            guard let data = data else {
+                DispatchQueue.main.async {
+                    has_bus_data = "No data received from the server"
+                }
+                return
+            }
+            
+            do {
+                // Parse the JSON response as an array of dictionaries
+                if let jsonArray = try JSONSerialization.jsonObject(with: data, options: []) as? [[String: Any]] {
+                    
+                    for dict in jsonArray {
+                        if let lat = dict["Latitude"] as? Double,
+                           let lon = dict["Longitude"] as? Double,
+                           let id = dict["RouteID"] as? Int {
+                            //let driver = BrazosDriver(RouteId: id, lat: lat, lng: lon, stops: [])
+                            let driver = BrazosDriver(RouteId: id, lat: lat, lng: lon)
+                            newBuses.append(driver)
+                        }
+                    }
+                    //let driver = BrazosDriver(RouteId: 40, lat: 30.00, lng: -97.32)
+                    
+                    
+                    DispatchQueue.main.async {
+                        
+                        has_bus_data = "Data fetched successfully"
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        has_bus_data = "Failed to decode the response data"
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    has_bus_data = "Error: \(error.localizedDescription)"
+                }
+            }
+        }.resume()
+        return newBuses
+    }
+    
+    
+    func findBestRoute(buses: [BrazosDriver], destination: CLLocationCoordinate2D) -> (totalDistance: Double, busStop1:CLLocationCoordinate2D) {
+        //print("curr location is ",locationManager.region.center)
+        
+        if buses.count == 0 {
+            print( "error - no buses nearby")
+        }
+        
+        let coordinates = locationManager.region.center
+        var totalDistance: Double  = 10000 // miles
+        var busStop1 : CLLocationCoordinate2D = CLLocationCoordinate2D()
+        var busStop2 : CLLocationCoordinate2D = CLLocationCoordinate2D()
+        var routeID = 0
+        
+        for bus in buses {
+            var currToStop : Double = 10000 //miles
+            var StopToDest : Double = 10000 //miles
+            var coordinatesStop1 : CLLocationCoordinate2D = CLLocationCoordinate2D()
+            var coordinatesStop2 : CLLocationCoordinate2D = CLLocationCoordinate2D()
+            print("My route id", bus.RouteId)
+            for stop in bus.stops {
+                print(stop)
+                if distance(from: coordinates, to: stop) < currToStop {
+                    currToStop = distance(from : coordinates, to: stop)
+                    coordinatesStop1 = stop
+                    
+                }
+                if distance(from : stop, to : destination) < StopToDest {
+                    StopToDest = distance(from: stop, to: destination)
+                    coordinatesStop2 = stop
+                    
+                }
+            }
+            if totalDistance > currToStop + StopToDest {
+                totalDistance = currToStop + StopToDest
+                routeID = bus.RouteId
+                busStop1 = coordinatesStop1
+                busStop2 = coordinatesStop2
+            }
+
+        }
+        //BusStop1 = busStop1
+        return (totalDistance,busStop1)
+        //find route from coordinates to coordinatesStop1 and the rest of the trip
+    }
+    func changeShowBusRoute() {
+        if showBusRoute {
+            showBusRoute = false
+        }
+        else {
+            showBusRoute = true
+        }
+    }
+    func readInputFromFile( filePath: String, buses: inout [BrazosDriver])  -> [BrazosDriver]{
+        //let fileManager = FileManager.default
+        
+        // Check if the file exists at the given path
+        if let file = Bundle.main.path(forResource: filePath, ofType: "txt") {
+            let fileURL = URL(fileURLWithPath: file)
+            do {
+                // Read the contents of the file
+                let fileContents = try String(contentsOf: fileURL, encoding: .utf8)
+                let lines = fileContents.components(separatedBy: .newlines)
+                for line in lines {
+                    if line == "" {
+                        continue
+                    }
+                    let components = line.components(separatedBy: " ")
+                    let id = Int(components[0])
+                    let lat : Double = Double(components[1])!
+                    let lon : Double = Double(components[2])!
+                    for i in 0..<buses.count {
+                        
+                        if buses[i].RouteId == id {
+                            buses[i].stops.append(CLLocationCoordinate2D(latitude: lat, longitude: lon))
+                        }
+                    }
+                }
+                
+            } catch {
+                print("Error reading file: \(error)")
+            }
+        } else {
+            print("File not found at path: \(filePath)")
+        }
+        return buses
+    }
+    
+    func distance(from : CLLocationCoordinate2D, to : CLLocationCoordinate2D) -> Double{
+        let myLocation = CLLocation(latitude: from.latitude, longitude: from.longitude)
+        let toLocation = CLLocation(latitude: to.latitude, longitude: to.longitude)
+        let distanceMiles = myLocation.distance(from: toLocation) / 1609.34
+        return distanceMiles
+    }
 	
 }
 
@@ -235,6 +462,11 @@ struct SidebarView: View {
 		.background(Color.white)
 		.offset(x: showSidebar ? 0 : -200) // Slide in from the left when open
 	}
+}
+
+struct FromTo {
+    var from : CLLocationCoordinate2D = CLLocationCoordinate2D()
+    var to : CLLocationCoordinate2D = CLLocationCoordinate2D()
 }
 
 

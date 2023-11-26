@@ -7,7 +7,7 @@
 
 import Foundation
 import SwiftBSON
-
+import CoreLocation
 /**
  * Represents a user.
  * This type conforms to `Codable` to allow us to serialize it to and deserialize it from extended JSON and BSON.
@@ -192,12 +192,36 @@ public struct BrazosDriver: Codable {
     public let RouteId: Int
     public let lat: Double
     public let lng: Double
+    public var stops: [CLLocationCoordinate2D] = [] // stops is not decodable. hardcoded instead
     
-    public init(RouteId: Int, lat: Double, lng: Double) {
+    public init(RouteId: Int, lat: Double, lng: Double, stops: [CLLocationCoordinate2D] = [] ) {
         self.RouteId = RouteId
         self.lat = lat
         self.lng = lng
+        self.stops = stops
     }
+    
+    private enum CodingKeys: String, CodingKey {
+        case RouteId, lat, lng
+        // Exclude 'stops' from coding
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        RouteId = try container.decode(Int.self, forKey: .RouteId)
+        lat = try container.decode(Double.self, forKey: .lat)
+        lng = try container.decode(Double.self, forKey: .lng)
+        // Do not decode stops
+    }
+        
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(RouteId, forKey: .RouteId)
+        try container.encode(lat, forKey: .lat)
+        try container.encode(lng, forKey: .lng)
+        // Do not encode stops
+    }
+    
 }
 //
 public struct BrazosVehicleType: Codable {
