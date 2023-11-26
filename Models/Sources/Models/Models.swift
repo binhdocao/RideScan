@@ -14,60 +14,41 @@ import SwiftBSON
  * This type conforms to `Identifiable` so that SwiftUI is able to uniquely identify instances of this type when they
  * are used in the iOS interface.
  */
+
+
 public struct User: Identifiable, Codable {
-    
-    /// Unique identifier.
-    public let id: BSONObjectID
-    public var firstname: String
-    public var lastname: String
-    public var email: String
-    public var phone: String
-    public var password: String
+	
+	/// Unique identifier.
+	public var id: String?
+	public var firstname: String
+	public var lastname: String
+	public var email: String
+	public var phone: String
+	public var password: String
 
-    private enum CodingKeys: String, CodingKey {
-        // We store the identifier under the name `id` on the struct to satisfy the requirements of the `Identifiable`
-        // protocol, which this type conforms to in order to allow usage with certain SwiftUI features. However,
-        // MongoDB uses the name `_id` for unique identifiers, so we need to use `_id` in the extended JSON
-        // representation of this type.
-        case id = "_id", firstname, lastname, email, phone, password
-    }
+	private enum CodingKeys: String, CodingKey {
+		case id = "_id", firstname, lastname, email, phone, password
+	}
 
-    /// Initializes a new `User` instance. If an `id` is not provided, a new one will be generated automatically.
-    public init(
-        id: BSONObjectID = BSONObjectID(),
-        firstname: String,
-        lastname: String,
-        email: String,
-        phone: String,
-        password: String
-    ) {
-        self.id = id
-        self.firstname = firstname
-        self.lastname = lastname
-        self.email = email
-        self.phone = phone
-        self.password = password
-    }
+	/// Initializes a new `User` instance. If an `id` is not provided, a new one will be generated automatically.
+	public init(
+		id: String? = nil,
+		firstname: String,
+		lastname: String,
+		email: String,
+		phone: String,
+		password: String
+	) {
+		self.id = id ?? BSONObjectID().hex
+		self.firstname = firstname
+		self.lastname = lastname
+		self.email = email
+		self.phone = phone
+		self.password = password
+	}
 
-    /// Initializes a new `User` instance. If an `id` is not provided, a new one will be generated automatically.
-    public init?(
-        id: String,
-        firstname: String,
-        lastname: String,
-        email: String,
-        phone: String,
-        password: String
-    ) {
-        guard let objectId = try? BSONObjectID(id) else { return nil }
-        self.id = objectId
-        self.firstname = firstname
-        self.lastname = lastname
-        self.email = email
-        self.phone = phone
-        self.password = password
-    }
-        
 }
+
 
 public struct AddUserResponse: Codable {
     public let id: String
@@ -82,15 +63,15 @@ public struct AddUserResponse: Codable {
  * This type conforms to `Codable` to allow us to serialize it to and deserialize it from extended JSON and BSON.
  */
 public struct UpdateUserResponse: Codable {
-    public let id: BSONObjectID
-    public let message: String
+	public let id: String // Use String instead of BSONObjectID
+	public let message: String
 
-    /// Initializes a new `UserUpdate` instance.
-    public init(id: BSONObjectID, message: String) {
-        self.id = id
-        self.message = message
-    }
+	public init(id: String, message: String) {
+		self.id = id
+		self.message = message
+	}
 }
+
 
 /// User location
 public struct FindFetiiRequest: Codable {
@@ -206,6 +187,12 @@ public struct BrazosVehicleType: Codable {
 }
 ///
 ///
+public struct VEOVerificationRequest: Codable {
+    public let msg: String
+    public let code: Int
+    public let data: String
+}
+
 public struct VEOVerificationResponseData: Codable {
     public let token: String
     public let isLogin: Bool
@@ -213,15 +200,21 @@ public struct VEOVerificationResponseData: Codable {
 
 public struct VEOVerificationResponse: Codable {
     public let msg: String
-    public let code: String
-    public let data: [VEOVerificationResponseData]
+    public let code: Int
+    public let data: VEOVerificationResponseData
 }
 
-public struct FindVEOResponse: Codable {
+public struct FindVEOResponseData: Codable {
     public let vehicleNumber: Int
     public let vehicleType: Int
     public let vehicleVersion: String
     public let iotBattery: Int
     public let vehicleBattery: Int
     public let location: Int
+}
+
+public struct FindVEOResponse: Codable {
+    public let message: Int
+    public let code: Int
+    public let data: [FindVEOResponseData]
 }

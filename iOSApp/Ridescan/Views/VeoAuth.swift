@@ -8,7 +8,7 @@
 import SwiftUI
 import Combine
 
-struct LogInView: View {
+struct VeoAuthView: View {
 	
 	/// Model for the data in this view.
 	@StateObject private var viewModel = UserProfileViewModel()
@@ -45,8 +45,8 @@ struct LogInView: View {
 						VEOtoken = try await viewModel.VEOVerify(verification: verification)
 					} catch {
 						// Handle errors here
-						errorMessage = "Invalid credentials" // Set error message
-						print("Error updating user info: \(error)")
+						errorMessage = "VeoRide Verification Error" // Set error message
+						print("Error verifying: \(error)")
 					}
 				}
 				

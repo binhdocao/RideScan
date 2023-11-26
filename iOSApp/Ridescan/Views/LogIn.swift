@@ -66,7 +66,7 @@ struct LogInView: View {
 					}
 				}
 				
-			}){
+			}) {
 				Text("Log In")
 					.foregroundColor(.white)
 					.frame(maxWidth: .infinity, maxHeight: 50)
@@ -75,8 +75,8 @@ struct LogInView: View {
 			}
 			Spacer()
 			
-			NavigationLink(destination: VeoAuth(), isActive: $loginSuccess) {
-				EmptyView() // Use NavigationLink to navigate to MapView
+			NavigationLink(destination: VeoAuthView(), isActive: $loginSuccess) {
+				EmptyView() // Use NavigationLink to navigate to VeoAuth View then MapView
 			}
 		}
 		.padding(.horizontal, 20)

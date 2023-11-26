@@ -20,7 +20,7 @@ enum TransportationMode: String, CaseIterable {
 	case driving = "Driving"
 	case uber = "Uber"
 	case lyft = "Lyft"
-	case bike = "VEO"
+	case bike = "Rideshare Bike"
 	case allS = "All"
 	// ... Add more modes as needed
 }
