@@ -34,6 +34,7 @@ struct ComparisonView: View {
     @State var current_fetii_max_people = 15
     @State var destination : CLLocationCoordinate2D
     @ObservedObject var locationManager = LocationManager()
+    @State private var showAlert = false
     
     // BTD Bus
     @State var has_bus_data = "No data"
@@ -97,7 +98,12 @@ struct ComparisonView: View {
         //let distance = distance
         self.buses = buses
         self.BusStop1 = bestStop
-        rideServices.append(RideService(name: "Brazos Bus Service", price: 1.0, min_people: 1, max_people: 1, iconName: "bus", timeEstimate: 20, distanceEstimate: distance))
+        var mydistance : Double = 0
+        if self.buses.count != 0 {
+            mydistance = distance
+        }
+        
+        rideServices.append(RideService(name: "Brazos Bus Service", price: 1.0, min_people: 1, max_people: 1, iconName: "bus", timeEstimate: 20, distanceEstimate: mydistance))
         
         }
     
@@ -158,10 +164,13 @@ struct ComparisonView: View {
                 VStack(spacing: 10) {
                     ForEach(sortedRideServices) { service in
                         Button(action: {
-                            if service.name == "Brazos Bus Service" {
-                                print("houston lat", BusStop1)
+                            if service.name == "Brazos Bus Service" && self.buses.count != 0 {
+                                
                                 fromTo.to = BusStop1
                                 changeShowBusRoute()
+                            }
+                            else {
+                                showAlert = true
                             }
                             //fetchBusData()
                             //print(findBestRoute())
@@ -206,6 +215,18 @@ struct ComparisonView: View {
                 .padding(20)
                 .onChange(of: selectedSortOption) { _ in
                     refreshView.toggle() // Force a view refresh
+                    
+                }
+                .alert(isPresented: $showAlert) {
+                    Alert(
+                        title: Text("No Buses"),
+                        message: Text("There are no buses available at this time!"),
+                        primaryButton: .default(Text("OK")) {
+                            // Additional action to perform when the OK button is tapped
+                            
+                        },
+                        secondaryButton: .cancel() // Optional secondary button (e.g., for Cancel)
+                    )
                 }
             }
 			Spacer() // Push content to the top
@@ -416,6 +437,7 @@ struct ComparisonView: View {
         let distanceMiles = myLocation.distance(from: toLocation) / 1609.34
         return distanceMiles
     }
+    
 }
 
 
@@ -428,6 +450,25 @@ struct ServiceModifier: ViewModifier {
 			.cornerRadius(8)
 			.shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
 	}
+}
+
+struct AlertWrapper: UIViewControllerRepresentable {
+    let title: String
+    let message: String
+    let actionTitle: String
+    
+    func makeUIViewController(context: Context) -> UIViewController {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: actionTitle, style: .default, handler: nil))
+        
+        // This is important to capture and manage the presentation in the SwiftUI environment
+        let viewController = UIViewController()
+        viewController.present(alert, animated: true, completion: nil)
+        
+        return viewController
+    }
+    
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
 }
 
 /*func findBestRoute(buses: [BrazosDriver], cords: CLLocationCoordinate2D) -> CLLocationCoordinate2D{

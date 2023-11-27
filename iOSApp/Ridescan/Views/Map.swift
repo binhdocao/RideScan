@@ -286,8 +286,8 @@ struct MapView: View {
 	}
 	
     func fetchBusData() -> [BrazosDriver] {
-        //var newBuses : [BrazosDriver] = []
-        var newBuses : [BrazosDriver] = [BrazosDriver(RouteId: 40, lat: 30.00, lng: -97.32)]
+        var newBuses : [BrazosDriver] = []
+        //var newBuses : [BrazosDriver] = [BrazosDriver(RouteId: 40, lat: 30.00, lng: -97.32)]
 
         let baseURL = "https://www.ridebtd.org/Services/JSONPRelay.svc/GetMapVehiclePoints?apiKey=8882812681"
         guard let url = URL(string: baseURL) else {
