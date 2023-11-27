@@ -103,6 +103,20 @@ class TransportViewModel: ObservableObject {
 //            self.user = user
 //        }
     }
+
+    /// Logs user in from the backend server.
+    func findVEO(veoToken: String) async throws -> VEOBikeResponse {
+        
+        let route = "api/veoride/find/"
+        let userURL = HTTP.baseURL.appendingPathComponent(route)
+        
+        let veoRequest = FindVEORequest(userLatitude: String(pickupLocation.latitude), userLongitude: String(pickupLocation.longitude), veoToken: veoToken)
+        
+        // send the request to backend
+        let response: VEOBikeResponse = try await HTTP.post(url: userURL, body: veoRequest)
+        
+        return response
+    }
     
 }
 

@@ -204,17 +204,61 @@ public struct VEOVerificationResponse: Codable {
     public let data: VEOVerificationResponseData
 }
 
+public struct VEOPrice: Codable {
+    public let price: Double
+    public let frequency: Int
+    public let unlockFee: Double
+    public let freeRideMinutes: String?
+}
+
+public struct VEOBikeInfo: Codable {
+    public let vehicleNumber: Int
+    public let vehicleType: Int
+    public let vehicleVersion: String
+    public let locked: Bool
+    public let chainLocked: String?
+    public let mac: String
+    public let connected: Bool
+    public let vehicleBattery: Int
+    public let price: VEOPrice
+    public let chainLock: String?
+}
+
+public struct VEOBikeResponse: Codable {
+    public let msg: String
+    public let code: Int
+    public let data: VEOBikeInfo
+}
+
+public struct BikeLoc: Codable {
+    public let lat: Double
+    public let lng: Double
+}
+
+public struct FindVEORequest: Codable {
+    public let userLatitude: String
+    public let userLongitude: String
+    public let veoToken: String
+    
+    /// Initializes a new `UserLoc` instance.
+    public init(userLatitude: String, userLongitude: String, veoToken: String) {
+        self.userLatitude = userLatitude
+        self.userLongitude = userLongitude
+        self.veoToken = veoToken
+    }
+}
+
 public struct FindVEOResponseData: Codable {
     public let vehicleNumber: Int
     public let vehicleType: Int
     public let vehicleVersion: String
     public let iotBattery: Int
     public let vehicleBattery: Int
-    public let location: Int
+    public let location: BikeLoc
 }
 
 public struct FindVEOResponse: Codable {
-    public let message: Int
+    public let msg: String
     public let code: Int
     public let data: [FindVEOResponseData]
 }

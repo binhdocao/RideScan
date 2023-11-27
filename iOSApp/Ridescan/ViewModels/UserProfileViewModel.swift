@@ -153,36 +153,39 @@ class UserProfileViewModel: ObservableObject {
     	func VEOVerify(verification: String) async throws {
         
         	let verifyURL = URL(string: "https://cluster-prod.veoride.com/api/customers/auth/auth-code/verification")!
+
+        	// Add values for verification request
+        	let json: [String: String] = [
+			"phone": user.phone,
+			"phoneModel": "iPhone 12",
+			"appVersion": "4.1.5",
+			"phone": verification
+		]
+
+        	let jsonData = try? JSONSerialization.data(withJSONObject: json, options: [])
+
+        	// Create request
         	var request = URLRequest(url: verifyURL)
         	request.httpMethod = "POST"
-        
-        	// Add values for verification request
-        	request.addValue("\(user.phone)", forHTTPHeaderField: "phone")
-        	request.addValue("iPhone 12", forHTTPHeaderField: "phoneModel")
-        	request.addValue("4.1.5", forHTTPHeaderField: "appVersion")
-        	request.addValue(verification, forHTTPHeaderField: "code")
+           	request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        	request.httpBody = jsonData
 
-        	let response = try await URLSession.shared.data(for: request)
-        	guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            		throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
-        	}
-        
-        	do {
-            		let decodedData = try JSONDecoder().decode(VEOVerificationResponse.self, from: response)
-            		print(decodedData)
-            		return decodedData.data.token
-        	} catch {
-            		throw Abort(.internalServerError, reason: "Error decoding JSON: \(error)")
-        	}
-    	} 
+        	// Send request
+        	let task = URLSession.shared.dataTask(with: request) {data, response, error in
+			guard let data = data, error == nil else {
+				print(error?.localizedDescription ?? "No data")
+				return
+			}
+			let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+			if let responseJOSN = responseJSON as? [String: Any] {
+				let defaults = UserDefaults.standard
+				if let tempJSON = responseJSON["data"] as? [String: Any] {
+					let veoToken = tempJSON["token"] as! String
+					defaults.set(veoToken, forKey: "veoToken")
+				}
+			}
+		}
 
-
-	
-
-
-
-
-
-
-
+		task.resume()
+    	}
 }

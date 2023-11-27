@@ -31,6 +31,7 @@ struct ComparisonView: View {
     @State var current_fetii_price = 15.0
     @State var current_fetii_min_people = 5
     @State var current_fetii_max_people = 15
+    @State var current_veo_price = 15.0
     
     // BTD Bus
     @State var has_bus_data = "No data"
@@ -181,6 +182,11 @@ struct ComparisonView: View {
 		.edgesIgnoringSafeArea(.all)
         .task {
             do {
+                let defaults = UserDefaults.standard
+                let veoToken = defaults.string(forKey: "veoToken")
+                let veo_result = try await transportViewModel.findVEO(veoToken: veoToken ?? "none")
+                current_veo_price = veo_result.data.price.price ?? 15.0
+
                 let result = try await transportViewModel.findFetii()
                 current_fetii_price = result.data.first?.min_charge_per_person ?? 15.0
                 current_fetii_min_people = result.data.first?.direct_min_passengers ?? 1

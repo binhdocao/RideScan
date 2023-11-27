@@ -434,17 +434,16 @@ extension Request {
 
 	func findVEO() async throws -> FindVEOResponse {
         
-		let user = try self.content.decode(User.self)
-		let userLocation = try self.content.decode(UserLoc.self)
+		let findVEO = try self.content.decode(FindVEORequest.self)
+		print(findVEO)
 
-
-		let baseURL = "https://cluster-prod.veoride.com/api/customers/vehicles?lat=\(userLocation.lat)&lng=\(userLocation.lng)"
+		let baseURL = URL(string: "https://cluster-prod.veoride.com/api/customers/vehicles?lat=\(findVEO.userLatitude)&lng=\(findVEO.userLongitude)")!
  
 		var request = URLRequest(url: baseURL)
 		request.httpMethod = "GET"
 
 		// Replace with your bearer token
-		request.addValue("Bearer \(VeoAuth.VEOtoken)", forHTTPHeaderField: "Authorization")
+		request.addValue("Bearer \(findVEO.veoToken)", forHTTPHeaderField: "Authorization")
 
 	        let (data, response) = try await URLSession.shared.data(for: request)
         	guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
@@ -454,13 +453,36 @@ extension Request {
 	        do {
 	            let decodedData = try JSONDecoder().decode(FindVEOResponse.self, from: data)
 	            print(decodedData)
-	            if decodedData.status == 200 {
-	                return decodedData
+	            if decodedData.msg == "Request Success" {
+	                let bikeURL = URL(string: "https://cluster-prod.veoride.com/api/customers/vehicles/number/\(decodedData.data.first!.vehicleNumber)")!
+ 
+			var bike_request = URLRequest(url: bikeURL)
+			bike_request.httpMethod = "GET"
+
+			// Replace with your bearer token
+			bike_request.addValue("Bearer \(findVEO.veoToken)", forHTTPHeaderField: "Authorization")
+
+	        	let (data2, response2) = try await URLSession.shared.data(for: bike_request)
+        		guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+	            		throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
+	        	}
+			do {
+	            		let bikeData = try JSONDecoder().decode(VEOBikeResponse.self, from: data2)
+	           		print(bikeData)
+	            		if bikeData.msg == "Request Success" {
+					return bikeData
+				} else {
+	                		throw Abort(.notFound, reason: "No bikes found")
+	            		}
+	       		} catch {
+	            		throw Abort(.internalServerError, reason: "Error decoding JSON: \(error)")
+	        	}
+
 	            } else {
 	                throw Abort(.notFound, reason: "No bikes found")
 	            }
 	        } catch {
 	            throw Abort(.internalServerError, reason: "Error decoding JSON: \(error)")
 	        }
-	    }
+	}
 }

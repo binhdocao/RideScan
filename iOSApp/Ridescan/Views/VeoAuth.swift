@@ -16,8 +16,8 @@ struct VeoAuthView: View {
 	@State private var busy = false
 	@State private var errorMessage: String?
 
-	@State private var verification = ""
-	@State private var VEOtoken = ""
+	@State private var verification = ""	
+	@EnvironmentObject var userSettings: UserSettings
 
 	
 	var body: some View {
@@ -42,7 +42,8 @@ struct VeoAuthView: View {
 			Button(action: {
 				Task {
 					do {
-						VEOtoken = try await viewModel.VEOVerify(verification: verification)
+						try await viewModel.VEOVerify(verification: verification)
+						userSettings.isVerified = true
 					} catch {
 						// Handle errors here
 						errorMessage = "VeoRide Verification Error" // Set error message
