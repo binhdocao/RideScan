@@ -14,7 +14,9 @@ xcuserdata/
 *.xccheckout
 
 ## compatibility with Xcode 3 and earlier (ignoring not required starting Xcode 4)
-build/
+.build/
+
+
 DerivedData/
 *.moved-aside
 *.pbxuser
@@ -67,6 +69,9 @@ Carthage/Build/
 # Accio dependency management
 Dependencies/
 .accio/
+
+
+.build/
 
 # fastlane
 # It is recommended to not store the screenshots in the git repo.
