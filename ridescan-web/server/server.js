@@ -2,10 +2,15 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-
 const app = express();
 app.use(bodyParser.json());
-app.use(cors());
+
+const corsOptions = {
+    origin: process.env.ORIGIN_LINK, // Your Vercel app URL
+    optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 
 const nodemailer = require('nodemailer');
 
