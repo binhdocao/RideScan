@@ -8,33 +8,37 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Connect to MongoDB
-mongoose.connect("mongodb+srv://rideuser:rideuser123@ridescan.zvz8zbl.mongodb.net/?retryWrites=true&w=majority", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
+mongoose.connect("mongodb+srv://rideuser:rideuser123@ridescan.zvz8zbl.mongodb.net/ridescan?retryWrites=true&w=majority");
 
 // Define a schema
-const userSchema = new mongoose.Schema({
-    name: String,
+const proposedServiceSchema = new mongoose.Schema({
+    contactName: String,
+    email: String,
     phoneNumber: String,
-    email: String
+    user_proposed: Boolean,
+    send_to_application: Boolean,
+    serviceName: String,
+    address: String,
+    radius: String,
+    comments: String
 });
 
-// Create a model
-const User = mongoose.model('User', userSchema);
+// Create a model for proposed services
+const ProposedService = mongoose.model('ProposedService', proposedServiceSchema, 'proposedServices');
 
-// Endpoint to handle user data submission
-app.post('/submit', async (req, res) => {
-    const newUser = new User(req.body);
+// Endpoint to handle proposed services data submission
+app.post('/proposedServices', async (req, res) => {
+    const newService = new ProposedService(req.body);
     try {
-        await newUser.save();
-        res.status(201).send("User data saved");
+        await newService.save();
+        res.status(201).send("Proposed service data saved");
     } catch (error) {
         res.status(500).send(error);
     }
 });
 
-const PORT = 5000;
+
+const PORT = 5500;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

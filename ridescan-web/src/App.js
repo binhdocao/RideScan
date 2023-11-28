@@ -5,7 +5,6 @@ import Form from './components/Form';
 function App() {
   return (
     <div className="App">
-      <h1>User Data Form</h1>
       <Form />
   </div>
   );
