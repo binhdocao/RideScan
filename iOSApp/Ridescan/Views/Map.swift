@@ -25,6 +25,8 @@ struct MapView: View {
 	@State private var shouldAdjustZoom: Bool = false
 
 	@State private var annotations: [IdentifiablePointAnnotation] = []
+    @State private var annotations1: [IdentifiablePointAnnotation] = []
+    
 	
 	@State private var route: MKRoute?
 	
@@ -49,7 +51,7 @@ struct MapView: View {
 	}
 	
 
-    func calculateRoute(from: CLLocationCoordinate2D, to destination: CLLocationCoordinate2D) -> Int{
+    func calculateRoute(from: CLLocationCoordinate2D, to destination: CLLocationCoordinate2D, forBus: Bool = false) -> Int{
         
 		let request = MKDirections.Request()
 		request.source = MKMapItem(placemark: MKPlacemark(coordinate: from))
@@ -78,7 +80,11 @@ struct MapView: View {
                 
                 
                 self.annotations = [startAnnotation, destinationAnnotation]
-
+                if forBus {
+                    self.annotations.append(contentsOf: annotations1)
+                    self.annotations[1].title = "Your Stop"
+                }
+                
                 
                 
                 self.shouldAdjustZoom = true
@@ -101,9 +107,25 @@ struct MapView: View {
 		routeDistance = String(format: "%.2f miles", distanceInMiles)
 	}
 
-	
+    func addpins(pin1: CLLocationCoordinate2D, pin2: CLLocationCoordinate2D) -> Int{
+        DispatchQueue.main.async {
+            let startAnnotation = IdentifiablePointAnnotation()
+            startAnnotation.coordinate = pin1
+            startAnnotation.title = "get off here"
+            
+            let destinationAnnotation = IdentifiablePointAnnotation()
+            destinationAnnotation.coordinate = pin2
+            destinationAnnotation.title = "Destination"
+            
+            
+            self.annotations1 = []
+            annotations1.append(startAnnotation)
+            annotations1.append(destinationAnnotation)
+        }
+        return 1
+    }
 	var body: some View {
-
+        //var extrapins : [IdentifiablePointAnnotation] = []
 		ZStack {
             //calculateRoute(from: fromTo.from ,to: fromTo.to)
             /*if showBusRoute {
@@ -123,7 +145,15 @@ struct MapView: View {
 				}
                 if showBusRoute && !isRouteDisplayed && !isRouteCalculationComplete {
                     //fromTo.from = self.annotations[0].coordinate
-                    var status = calculateRoute(from: fromTo.from ,to: fromTo.to)
+                    
+
+                    var status = calculateRoute(from: fromTo.from ,to: fromTo.to, forBus: true)
+                    //var idk = addpins(pin1: annotations1[0], pin2: annotations1[1])
+                    //var i = IdentifiablePointAnnotation()
+                    //var a = IdentifiablePointAnnotation()
+                    
+                    
+                    
                   /* var buses = fetchBusData()
                     var newbuses = readInputFromFile(filePath: "/data/bus_stops", buses: &buses)
 
@@ -159,7 +189,10 @@ struct MapView: View {
                     var newbuses = readInputFromFile(filePath: "/data/bus_stops", buses: &buses)
                     
                     var bestroute = findBestRoute(buses: newbuses, destination: self.annotations[1].coordinate)
-                    
+                     
+                     //var o = DispatchQueue.main.async {
+                         var status = addpins(pin1: bestroute.busStop2, pin2: self.annotations[1].coordinate)
+                     
                     ComparisonView(destination: self.annotations[1].coordinate,showBusRoute: $showBusRoute, fromTo: $fromTo, distance: bestroute.totalDistance,bestStop: bestroute.busStop1, buses: newbuses)
 				}
                 
@@ -178,6 +211,7 @@ struct MapView: View {
                                     fromTo.from = self.annotations[0].coordinate
                                     isRouteDisplayed = false
                                     isRouteCalculationComplete = false
+                                    
                                     
 								}) {
 									Image(systemName: "checkmark.circle.fill")
@@ -287,7 +321,7 @@ struct MapView: View {
 	
     func fetchBusData() -> [BrazosDriver] {
         var newBuses : [BrazosDriver] = []
-        //var newBuses : [BrazosDriver] = [BrazosDriver(RouteId: 40, lat: 30.00, lng: -97.32)]
+        //var newBuses : [BrazosDriver] = [BrazosDriver(RouteId: 48, lat: 30.00, lng: -97.32)]
 
         let baseURL = "https://www.ridebtd.org/Services/JSONPRelay.svc/GetMapVehiclePoints?apiKey=8882812681"
         guard let url = URL(string: baseURL) else {
@@ -350,7 +384,7 @@ struct MapView: View {
     }
     
     
-    func findBestRoute(buses: [BrazosDriver], destination: CLLocationCoordinate2D) -> (totalDistance: Double, busStop1:CLLocationCoordinate2D) {
+    func findBestRoute(buses: [BrazosDriver], destination: CLLocationCoordinate2D) -> (totalDistance: Double, busStop1:CLLocationCoordinate2D, busStop2: CLLocationCoordinate2D) {
         //print("curr location is ",locationManager.region.center)
         
         if buses.count == 0 {
@@ -368,9 +402,9 @@ struct MapView: View {
             var StopToDest : Double = 10000 //miles
             var coordinatesStop1 : CLLocationCoordinate2D = CLLocationCoordinate2D()
             var coordinatesStop2 : CLLocationCoordinate2D = CLLocationCoordinate2D()
-            print("My route id", bus.RouteId)
+            //print("My route id", bus.RouteId)
             for stop in bus.stops {
-                print(stop)
+                //print(stop)
                 if distance(from: coordinates, to: stop) < currToStop {
                     currToStop = distance(from : coordinates, to: stop)
                     coordinatesStop1 = stop
@@ -391,7 +425,7 @@ struct MapView: View {
 
         }
         //BusStop1 = busStop1
-        return (totalDistance,busStop1)
+        return (totalDistance,busStop1, busStop2)
         //find route from coordinates to coordinatesStop1 and the rest of the trip
     }
     func changeShowBusRoute() {
@@ -637,4 +671,5 @@ struct WrappedMapView: UIViewRepresentable {
 		}
 	}
 }
+
 
