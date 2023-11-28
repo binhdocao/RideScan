@@ -87,6 +87,8 @@ Dependencies/
 .accio/
 
 
+.env
+
 .build/
 
 # fastlane

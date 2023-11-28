@@ -7,8 +7,27 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
+const nodemailer = require('nodemailer');
+
+require('dotenv').config();
+
+
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: "ridescan.notifications@gmail.com",
+      pass: process.env.EMAIL_APP_PASSWORD,
+    },
+  });
+
+
 // Connect to MongoDB
-mongoose.connect("mongodb+srv://rideuser:rideuser123@ridescan.zvz8zbl.mongodb.net/ridescan?retryWrites=true&w=majority");
+mongoose.connect(process.env.MONGO_CONNECT);
+console.log("process.env.MONGO_CONNECT: ", process.env.MONGO_CONNECT);
+
 
 // Define a schema
 const proposedServiceSchema = new mongoose.Schema({
@@ -28,14 +47,32 @@ const ProposedService = mongoose.model('ProposedService', proposedServiceSchema,
 
 // Endpoint to handle proposed services data submission
 app.post('/proposedServices', async (req, res) => {
-    const newService = new ProposedService(req.body);
     try {
+        const newService = new ProposedService(req.body);
         await newService.save();
-        res.status(201).send("Proposed service data saved");
+
+        const mailOptions = {
+            from: 'ridescan.notifications@gmail.com',
+            to: req.body.email, 
+            subject: 'Submission Received',
+            text: 'Your submission has been received. Please wait 1-2 business days for a response.'
+        };
+    
+        transporter.sendMail(mailOptions, function(error, info) {
+            if (error) {
+                console.log(error);
+                res.status(500).send('Error sending email');
+            } else {
+                console.log('Email sent: ' + info.response);
+                res.status(201).send('Proposed service data saved and email sent');
+            }
+        });
     } catch (error) {
-        res.status(500).send(error);
+        console.log(error);
+        res.status(500).send('Error saving data');
     }
 });
+
 
 
 const PORT = 5500;

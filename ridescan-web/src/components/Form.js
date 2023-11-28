@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import logo from '../images/ridescan-logo.png';
-
+import { useNavigate } from "react-router-dom";
 
 
 function Form() {
+    const navigate = useNavigate(); 
 
     const [serviceData, setServiceData] = useState({
         contactName: '',
@@ -18,16 +19,18 @@ function Form() {
         comments: ''
     });
 
+
     const handleChange = (e) => {
         setServiceData({ ...serviceData, [e.target.name]: e.target.value });
     };
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // Change the endpoint to /proposedServices
             await axios.post('http://localhost:5500/proposedServices', serviceData);
-            alert('Service proposal submitted!');
+            setServiceData({ ...serviceData, [e.target.name]: e.target.value });
+            navigate('/submission-confirmation'); // Redirect to success page
         } catch (error) {
             console.error('Error submitting data', error);
         }
@@ -121,7 +124,7 @@ function Form() {
                     placeholder="Operational Radius"
                 />
                 <textarea
-                    style={{ ...inputStyle, height: '100px' }} // Added height for textarea
+                    style={{ ...inputStyle, height: '100px' }} 
                     name="comments"
                     value={serviceData.comments}
                     onChange={handleChange}
