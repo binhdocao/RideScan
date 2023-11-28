@@ -51,7 +51,7 @@ func routes(_ app: Application) throws {
 		try await req.locateFetii()
 	}
 
-	app.post("api", "veoride", "find") { req async throws -> FindFetiiResponse in
+	app.post("api", "veoride", "find") { req async throws -> VEOBikeResponse in
 		try await req.findVEO()
 	}
 
@@ -102,6 +102,7 @@ extension LocateFetiiResponse: Content {}
 extension AddUserResponse: Content {}
 extension UpdateUserResponse: Content {}
 extension FindVEOResponse: Content {}
+extension VEOBikeResponse: Content {}
 
 extension Request {
 	/// Convenience extension for obtaining a collection.
@@ -432,7 +433,7 @@ extension Request {
 		}
 	}
 
-	func findVEO() async throws -> FindVEOResponse {
+	func findVEO() async throws -> VEOBikeResponse {
         
 		let findVEO = try self.content.decode(FindVEORequest.self)
 		print(findVEO)
@@ -463,7 +464,7 @@ extension Request {
 			bike_request.addValue("Bearer \(findVEO.veoToken)", forHTTPHeaderField: "Authorization")
 
 	        	let (data2, response2) = try await URLSession.shared.data(for: bike_request)
-        		guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+        		guard let httpResponse = response2 as? HTTPURLResponse, httpResponse.statusCode == 200 else {
 	            		throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
 	        	}
 			do {

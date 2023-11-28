@@ -156,36 +156,40 @@ class UserProfileViewModel: ObservableObject {
 
         	// Add values for verification request
         	let json: [String: String] = [
-			"phone": user.phone,
-			"phoneModel": "iPhone 12",
-			"appVersion": "4.1.5",
-			"phone": verification
-		]
+                "phone": user.phone,
+                "phoneModel": "iPhone 12",
+                "appVersion": "4.1.5",
+                "phone": verification
+            ]
+            
+            
+            let jsonData = try? JSONSerialization.data(withJSONObject: json, options: [])
+            
+            var request = URLRequest(url: verifyURL)
+            request.httpMethod = "POST"
+        
+            // Add values for verification request
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            //request.setValue("\(jsonData?.count)", forHTTPHeaderField: "Content-Length")
+            
+            request.httpBody = jsonData
+            
+            print(json)
 
-        	let jsonData = try? JSONSerialization.data(withJSONObject: json, options: [])
-
-        	// Create request
-        	var request = URLRequest(url: verifyURL)
-        	request.httpMethod = "POST"
-           	request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        	request.httpBody = jsonData
-
-        	// Send request
-        	let task = URLSession.shared.dataTask(with: request) {data, response, error in
-			guard let data = data, error == nil else {
-				print(error?.localizedDescription ?? "No data")
-				return
-			}
-			let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
-			if let responseJOSN = responseJSON as? [String: Any] {
-				let defaults = UserDefaults.standard
-				if let tempJSON = responseJSON["data"] as? [String: Any] {
-					let veoToken = tempJSON["token"] as! String
-					defaults.set(veoToken, forKey: "veoToken")
-				}
-			}
-		}
-
-		task.resume()
-    	}
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                guard let data = data, error == nil else {
+                    print(error?.localizedDescription ?? "No data")
+                    return
+                }
+                let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                if let responseJSON = responseJSON as? [String: Any] {
+                    let defaults = UserDefaults.standard
+                    if let tempJSON = responseJSON["data"] as? [String: Any] {
+                        let veoToken = tempJSON["token"] as! String
+                        print("VEOToken:\(veoToken)")
+                        defaults.set(veoToken, forKey: "veoToken")
+                    }
+                }
+            }
+        }
 }
