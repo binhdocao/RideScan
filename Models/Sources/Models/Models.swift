@@ -17,35 +17,35 @@ import SwiftBSON
 
 
 public struct User: Identifiable, Codable {
-	
-	/// Unique identifier.
-	public var id: String?
-	public var firstname: String
-	public var lastname: String
-	public var email: String
-	public var phone: String
-	public var password: String
+    
+    /// Unique identifier.
+    public var id: String?
+    public var firstname: String
+    public var lastname: String
+    public var email: String
+    public var phone: String
+    public var password: String
 
-	private enum CodingKeys: String, CodingKey {
-		case id = "_id", firstname, lastname, email, phone, password
-	}
+    private enum CodingKeys: String, CodingKey {
+        case id = "_id", firstname, lastname, email, phone, password
+    }
 
-	/// Initializes a new `User` instance. If an `id` is not provided, a new one will be generated automatically.
-	public init(
-		id: String? = nil,
-		firstname: String,
-		lastname: String,
-		email: String,
-		phone: String,
-		password: String
-	) {
-		self.id = id ?? BSONObjectID().hex
-		self.firstname = firstname
-		self.lastname = lastname
-		self.email = email
-		self.phone = phone
-		self.password = password
-	}
+    /// Initializes a new `User` instance. If an `id` is not provided, a new one will be generated automatically.
+    public init(
+        id: String? = nil,
+        firstname: String,
+        lastname: String,
+        email: String,
+        phone: String,
+        password: String
+    ) {
+        self.id = id ?? BSONObjectID().hex
+        self.firstname = firstname
+        self.lastname = lastname
+        self.email = email
+        self.phone = phone
+        self.password = password
+    }
 
 }
 
@@ -63,13 +63,13 @@ public struct AddUserResponse: Codable {
  * This type conforms to `Codable` to allow us to serialize it to and deserialize it from extended JSON and BSON.
  */
 public struct UpdateUserResponse: Codable {
-	public let id: String // Use String instead of BSONObjectID
-	public let message: String
+    public let id: String // Use String instead of BSONObjectID
+    public let message: String
 
-	public init(id: String, message: String) {
-		self.id = id
-		self.message = message
-	}
+    public init(id: String, message: String) {
+        self.id = id
+        self.message = message
+    }
 }
 
 
@@ -211,6 +211,17 @@ public struct VEOPrice: Codable {
     public let freeRideMinutes: String?
 }
 
+public struct VEOPriceLocation: Codable {
+    public let price: VEOPrice
+    public let closestBikes: [BikeDistance]
+    
+    /// Initializes a new `UserLoc` instance.
+    public init(price: VEOPrice, closestBikes: [BikeDistance]) {
+        self.price = price
+        self.closestBikes = closestBikes
+    }
+}
+
 public struct VEOBikeInfo: Codable {
     public let vehicleNumber: Int
     public let vehicleType: Int
@@ -228,6 +239,19 @@ public struct VEOBikeResponse: Codable {
     public let msg: String
     public let code: Int
     public let data: VEOBikeInfo
+}
+
+public struct BikeDistance: Codable {
+    public let lat: Double
+    public let lng: Double
+    public let distance: Double
+    
+    /// Initializes a new `UserLoc` instance.
+    public init(lat: Double, lng: Double, distance: Double) {
+        self.lat = lat
+        self.lng = lng
+        self.distance = distance
+    }
 }
 
 public struct BikeLoc: Codable {

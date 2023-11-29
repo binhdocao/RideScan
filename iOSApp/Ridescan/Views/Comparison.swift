@@ -10,19 +10,19 @@ import SwiftUI
 import Models
 
 enum SortingOption: String, CaseIterable {
-	case name = "Name"
-	case price = "Price"
-	case time = "Time"
+    case name = "Name"
+    case price = "Price"
+    case time = "Time"
 }
 
 enum TransportationMode: String, CaseIterable {
-	case walking = "Walking"
-	case driving = "Driving"
-	case uber = "Uber"
-	case lyft = "Lyft"
-	case bike = "Rideshare Bike"
-	case allS = "All"
-	// ... Add more modes as needed
+    case walking = "Walking"
+    case driving = "Driving"
+    case uber = "Uber"
+    case lyft = "Lyft"
+    case bike = "Rideshare Bike"
+    case allS = "All"
+    // ... Add more modes as needed
 }
 
 struct ComparisonView: View {
@@ -37,16 +37,16 @@ struct ComparisonView: View {
     @State var has_bus_data = "No data"
     @State private var buses: [BrazosDriver] = []
 
-	struct RideService: Identifiable {
-		var id = UUID()
-		let name: String
-		let price: Double
+    struct RideService: Identifiable {
+        var id = UUID()
+        let name: String
+        let price: Double
         let min_people: Int
         let max_people: Int
-		let iconName: String
-		let timeEstimate: Int
-	}
-	
+        let iconName: String
+        let timeEstimate: Int
+    }
+    
     var rideServices: [RideService] {
         [
             RideService(name: "Uber", price: 10.0, min_people: 1, max_people: 4,iconName: "car",timeEstimate: 6),
@@ -59,76 +59,76 @@ struct ComparisonView: View {
             // ... Add more services as needed
         ]
     }
-	
-	@State private var refreshView: Bool = false
+    
+    @State private var refreshView: Bool = false
 
-	
-	var sortedRideServices: [RideService] {
-		switch selectedSortOption {
-		case .time:
-			return rideServices.sorted { $0.timeEstimate < $1.timeEstimate }
-		case .name:
-			return rideServices.sorted { $0.name < $1.name }
-		case .price:
-			return rideServices.sorted { $0.price < $1.price }
-		}
-	}
-	
-	@State private var selectedSortOption: SortingOption = .time
-	@State private var selectedTransportation: TransportationMode = .allS
-	@State private var showTransportationPicker: Bool = false
-	@State private var showSortingPicker: Bool = false
+    
+    var sortedRideServices: [RideService] {
+        switch selectedSortOption {
+        case .time:
+            return rideServices.sorted { $0.timeEstimate < $1.timeEstimate }
+        case .name:
+            return rideServices.sorted { $0.name < $1.name }
+        case .price:
+            return rideServices.sorted { $0.price < $1.price }
+        }
+    }
+    
+    @State private var selectedSortOption: SortingOption = .time
+    @State private var selectedTransportation: TransportationMode = .allS
+    @State private var showTransportationPicker: Bool = false
+    @State private var showSortingPicker: Bool = false
 
-	var body: some View {
-		VStack(spacing: 0) {
-			Capsule()
-				.fill(Color.gray)
-				.frame(width: 40, height: 5)
-				.padding(.top, 8)
-			
-			// Transportation Mode Picker
-			HStack {
-				Text("Mode: \(selectedTransportation.rawValue)")
-					.foregroundColor(Color.white)
-				Spacer()
-				Image(systemName: "car.fill") // Icon for transportation
-					.resizable()
-					.frame(width: 20, height: 20)
-					.onTapGesture {
-						showTransportationPicker = true
-					}
-					.foregroundColor(Color.white)
-			}
-			.actionSheet(isPresented: $showTransportationPicker) {
-				ActionSheet(title: Text("Select Transportation Mode"), buttons: TransportationMode.allCases.map { mode in
-					.default(Text(mode.rawValue)) {
-						selectedTransportation = mode
-					}
-				})
-			}
-			.padding(.horizontal)
+    var body: some View {
+        VStack(spacing: 0) {
+            Capsule()
+                .fill(Color.gray)
+                .frame(width: 40, height: 5)
+                .padding(.top, 8)
+            
+            // Transportation Mode Picker
+            HStack {
+                Text("Mode: \(selectedTransportation.rawValue)")
+                    .foregroundColor(Color.white)
+                Spacer()
+                Image(systemName: "car.fill") // Icon for transportation
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                    .onTapGesture {
+                        showTransportationPicker = true
+                    }
+                    .foregroundColor(Color.white)
+            }
+            .actionSheet(isPresented: $showTransportationPicker) {
+                ActionSheet(title: Text("Select Transportation Mode"), buttons: TransportationMode.allCases.map { mode in
+                    .default(Text(mode.rawValue)) {
+                        selectedTransportation = mode
+                    }
+                })
+            }
+            .padding(.horizontal)
 
-			// Sorting Picker
-			HStack {
-				Text("Sort by: \(selectedSortOption.rawValue)")
-					.foregroundColor(Color.white)
-				Spacer()
-				Image(systemName: "arrow.up.arrow.down.square.fill") // Icon for sorting
-					.resizable()
-					.frame(width: 20, height: 20)
-					.onTapGesture {
-						showSortingPicker = true
-					}
-					.foregroundColor(Color.white)
-			}
-			.actionSheet(isPresented: $showSortingPicker) {
-				ActionSheet(title: Text("Sort by"), buttons: SortingOption.allCases.map { option in
-					.default(Text(option.rawValue)) {
-						selectedSortOption = option
-					}
-				})
-			}
-			.padding(.horizontal)
+            // Sorting Picker
+            HStack {
+                Text("Sort by: \(selectedSortOption.rawValue)")
+                    .foregroundColor(Color.white)
+                Spacer()
+                Image(systemName: "arrow.up.arrow.down.square.fill") // Icon for sorting
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                    .onTapGesture {
+                        showSortingPicker = true
+                    }
+                    .foregroundColor(Color.white)
+            }
+            .actionSheet(isPresented: $showSortingPicker) {
+                ActionSheet(title: Text("Sort by"), buttons: SortingOption.allCases.map { option in
+                    .default(Text(option.rawValue)) {
+                        selectedSortOption = option
+                    }
+                })
+            }
+            .padding(.horizontal)
 
             // Service List
             ScrollView {
@@ -136,7 +136,7 @@ struct ComparisonView: View {
                     ForEach(sortedRideServices) { service in
                         HStack {
                             // Image on the left
-							Image(systemName: service.iconName)
+                            Image(systemName: service.iconName)
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 50, height: 50) // Set the image size as needed
@@ -172,20 +172,20 @@ struct ComparisonView: View {
                     refreshView.toggle() // Force a view refresh
                 }
             }
-			Spacer() // Push content to the top
-		}
-		.background(maroonColor.opacity(0.8))
-		.cornerRadius(20, corners: [.topLeft, .topRight])
+            Spacer() // Push content to the top
+        }
+        .background(maroonColor.opacity(0.8))
+        .cornerRadius(20, corners: [.topLeft, .topRight])
 
-		.frame(maxWidth: .infinity, maxHeight:(UIScreen.main.bounds.height / 3))
-		
-		.edgesIgnoringSafeArea(.all)
+        .frame(maxWidth: .infinity, maxHeight:(UIScreen.main.bounds.height / 3))
+        
+        .edgesIgnoringSafeArea(.all)
         .task {
             do {
                 let defaults = UserDefaults.standard
                 let veoToken = defaults.string(forKey: "veoToken")
                 let veo_result = try await transportViewModel.findVEO(veoToken: veoToken ?? "none")
-                current_veo_price = veo_result.data.price.price ?? 15.0
+                current_veo_price = (veo_result.price.price + veo_result.price.unlockFee)
 
                 let result = try await transportViewModel.findFetii()
                 current_fetii_price = result.data.first?.min_charge_per_person ?? 15.0
@@ -199,7 +199,7 @@ struct ComparisonView: View {
                 print("Error fetching data: \(error)")
             }
         }
-	}
+    }
     
     func fetchBusData() {
         // Replace with your endpoint
@@ -262,12 +262,12 @@ struct ComparisonView: View {
 
 
 struct ServiceModifier: ViewModifier {
-	func body(content: Content) -> some View {
-		content
-			.padding(.horizontal) // Add horizontal padding here
-			.padding(.vertical)
-			.background(Color.white)
-			.cornerRadius(8)
-			.shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-	}
+    func body(content: Content) -> some View {
+        content
+            .padding(.horizontal) // Add horizontal padding here
+            .padding(.vertical)
+            .background(Color.white)
+            .cornerRadius(8)
+            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+    }
 }
