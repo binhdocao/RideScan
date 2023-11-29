@@ -31,7 +31,7 @@ struct ComparisonView: View {
     @State var current_fetii_price = 15.0
     @State var current_fetii_min_people = 5
     @State var current_fetii_max_people = 15
-    @State var current_veo_price = 15.0
+    @State var current_veo_price = 0.5
     
     // BTD Bus
     @State var has_bus_data = "No data"
@@ -55,7 +55,7 @@ struct ComparisonView: View {
             RideService(name: "Piggyback", price: Double.random(in: 5...20), min_people: 1, max_people: 1,iconName: "person.fill",timeEstimate: 23),
             RideService(name: "Fetii", price: current_fetii_price, min_people: current_fetii_min_people, max_people: current_fetii_max_people, iconName: "bus", timeEstimate: 26),
             RideService(name: "Brazos Bus Service", price: 1.0, min_people: 1, max_people: 1, iconName: "bus", timeEstimate: 20),
-            RideService(name: "VeoRide", price: 0.5, min_people: 1, max_people: 1, iconName: "figure.walk", timeEstimate: 30),
+            RideService(name: "VeoRide", price: current_veo_price, min_people: 1, max_people: 1, iconName: "figure.walk", timeEstimate: 22),
             // ... Add more services as needed
         ]
     }
@@ -185,6 +185,7 @@ struct ComparisonView: View {
                 let defaults = UserDefaults.standard
                 let veoToken = defaults.string(forKey: "veoToken")
                 let veo_result = try await transportViewModel.findVEO(veoToken: veoToken ?? "none")
+                // Include unlockFee in initial price
                 current_veo_price = (veo_result.price.price + veo_result.price.unlockFee)
 
                 let result = try await transportViewModel.findFetii()
