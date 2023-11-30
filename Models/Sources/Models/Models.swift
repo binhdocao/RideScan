@@ -285,6 +285,23 @@ public struct Vehicletype: Codable {
 }
 ///
 ///
+public struct FromTo {
+    public var from: CLLocationCoordinate2D = CLLocationCoordinate2D()
+    public var to: CLLocationCoordinate2D = CLLocationCoordinate2D()
+    
+    // Public initializer
+    public init(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D) {
+        self.from = from
+        self.to = to
+    }
+    
+    // Public initializer without parameters
+    public init() {
+        self.from = CLLocationCoordinate2D()
+        self.to = CLLocationCoordinate2D()
+    }
+}
+
 public struct BrazosAPIResponse: Codable {
     public let status: Int
     public let message: String
