@@ -7,14 +7,10 @@
 
 import SwiftUI
 
-struct Criteria: Hashable, Codable {
+struct Criteria: Identifiable, Hashable {
+    let id = UUID()
     let name: String
     var isSelected: Bool = true
-    var order: Int
-    // Computed property for multiplier
-    var multiplier: Int = 1
-    var selectedVal: String = ""
-    var possVals: [String] = []
 }
 
 struct SettingsView: View {
@@ -22,14 +18,15 @@ struct SettingsView: View {
     @AppStorage("isDarkMode") private var isDarkMode: Bool = false
     
     @State private var sortCriteriaArray: [Criteria] = [
-        Criteria(name: "Price", order: 1, multiplier: 8, selectedVal: "Lowest", possVals: ["Lowest", "Highest"]),
-        Criteria(name: "Time", order: 2, multiplier: 7, selectedVal: "Lowest", possVals: ["Lowest", "Highest"]),
-        Criteria(name: "Safety", order: 3, multiplier: 6, selectedVal: "Highest", possVals: ["Highest"]),
-        Criteria(name: "Calories Burned", order: 4, multiplier: 5, selectedVal: "Highest", possVals: ["Lowest", "Highest"]),
-        Criteria(name: "Carbon Emissions", order: 5, multiplier: 4, selectedVal: "Lowest", possVals: ["Lowest", "Highest"]),
-        Criteria(name: "Experience", order: 6, multiplier: 3, selectedVal: "True", possVals: ["True", "False"]),
-        Criteria(name: "Small Businesses", order: 7, multiplier: 2, selectedVal: "True", possVals: ["True", "False"]),
-        Criteria(name: "Public", order: 8, multiplier: 1, selectedVal: "True", possVals: ["True", "False"]),
+        Criteria(name: "Price"),
+        Criteria(name: "Cost"),
+        Criteria(name: "Time"),
+        Criteria(name: "Carbon Emmissions"),
+        Criteria(name: "Safety"),
+        Criteria(name: "Experience"),
+        Criteria(name: "Small Businesses"),
+        Criteria(name: "Public/Private"),
+        Criteria(name: "Most Scenic")
     ]
 
     // Initialize with initially selected criteria
@@ -41,13 +38,19 @@ struct SettingsView: View {
     // grab the default min list row height
     @Environment(\.defaultMinListRowHeight) var minRowHeight
 
+
+    init() {
+        // Initialize selectedCriteria with initially selected criteria
+        _selectedCriteria = State(initialValue: sortCriteriaArray.filter { $0.isSelected })
+    }
+
     var body: some View {
         Form {
             Section(header: Text("Switches")) {
                 Toggle("Dark Mode", isOn: $isDarkMode)
-                    .onChange(of: isDarkMode) { value in
-                        UIApplication.shared.windows.first?.overrideUserInterfaceStyle = value ? .dark : .light
-                    }
+                .onChange(of: isDarkMode) { value in
+                    UIApplication.shared.windows.first?.overrideUserInterfaceStyle = value ? .dark : .light
+                }
             }
             // Selectable Bubbles (LazyHGrid with dynamic columns)
             Section(header: Text("Which criteria are most important to you?")) {
@@ -72,111 +75,44 @@ struct SettingsView: View {
                 }
             }
             .listRowBackground(Color.clear) // Set the background color of the section to clear
-            
+
             Section(header: Text("Criteria sort")) {
                 // Ranking List (Draggable)
                 List {
-                    ForEach(Array(selectedCriteria.enumerated()), id: \.1.name) { (index, criteria) in
+                    ForEach(Array(selectedCriteria.enumerated()), id: \.1.id) { (index, object) in
                         HStack {
                             Text("\(index + 1).") // Display the rank
-                            Text(criteria.name)
-                            Picker(selection: $selectedCriteria[index].selectedVal, label: Text("")) {
-                                ForEach(selectedCriteria[index].possVals, id: \.self) { val in
-                                    Text(val)
-                                }
-                            }
+                            Text(object.name)
                         }
                     }
                     .onMove(perform: moveCriteria)
-                    .onChange(of: selectedCriteria) { _ in
-                        savePreferences()
-                    }
                 }
+                .listRowInsets(EdgeInsets()) // Remove extra space
+                .frame(minHeight: minRowHeight * CGFloat(selectedCriteria.count))
+                .listStyle(InsetListStyle())
                 .environment(\.editMode, $editMode) /// bind it here!
-//                .listStyle(InsetListStyle())
             }
-            
+
         }
         .background(Color.clear) // Set the background color of the Form to clear
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { 
-            loadPreferences()
-        }
     }
     
     func toggleCriterion(_ criterion: Criteria) {
-        // If the cretireon is in the sortArray
-        if let index = self.sortCriteriaArray.firstIndex(where: { $0.name == criterion.name }) {
-            // toggle in the sort array
-            self.sortCriteriaArray[index].isSelected.toggle()
-            
-            // if this results in selected
-            if self.sortCriteriaArray[index].isSelected {
-                // add to selected criteria
-                if !self.selectedCriteria.contains(where: { $0.name == criterion.name }) {
-                    self.selectedCriteria.append(self.sortCriteriaArray[index])
-                    updateCriteriaOrder()
-                    setMultipliers()
-                }
+        if let index = sortCriteriaArray.firstIndex(where: { $0.id == criterion.id }) {
+            sortCriteriaArray[index].isSelected.toggle()
+            if sortCriteriaArray[index].isSelected {
+                selectedCriteria.append(criterion)
             } else {
-                // otherwise remove from selected criteria
-                self.selectedCriteria.removeAll { $0.name == criterion.name }
-                updateCriteriaOrder()
-                setMultipliers()
+                selectedCriteria.removeAll { $0.id == criterion.id }
             }
-                        
-            // save info - saves selected criteria
-            savePreferences()
         }
     }
 
     func moveCriteria(from source: IndexSet, to destination: Int) {
         // Reorder the selectedCriteria based on user interaction
-        self.selectedCriteria.move(fromOffsets: source, toOffset: destination)
-        updateCriteriaOrder()
-        setMultipliers()
-        savePreferences() // Save updated preferences to database
-
-    }
-    
-    // Function to load criteria
-    func loadPreferences() {
-        // Attempt to load saved preferences
-        if let savedPreferences = UserDefaults.standard.data(forKey: "criteriaOrder"),
-           let decodedPreferences = try? JSONDecoder().decode([Criteria].self, from: savedPreferences) {
-            self.selectedCriteria = decodedPreferences
-            
-            // Update isSelected state in sortCriteriaArray based on selectedCriteria
-            for (index, _) in sortCriteriaArray.enumerated() {
-                self.sortCriteriaArray[index].isSelected = self.selectedCriteria.contains(where: { $0.name == self.sortCriteriaArray[index].name })
-            }
-        } else {
-            
-            // Initialize selectedCriteria with initially selected criteria
-            self.selectedCriteria = self.sortCriteriaArray.filter { $0.isSelected }
-        }
-    }
-    
-    // Function to set the multipliers of criteria in the sortCriteriaArray
-    func setMultipliers() {
-        for (index, _ ) in self.selectedCriteria.enumerated() {
-            self.selectedCriteria[index].multiplier = self.selectedCriteria.count + 1 - self.selectedCriteria[index].order
-        }
-    }
-    
-    // Function to update the order of each criterion
-    func updateCriteriaOrder() {
-        for (index, _) in self.selectedCriteria.enumerated() {
-            self.selectedCriteria[index].order = index + 1
-        }
-    }
-
-    // Function to save preferences to the UserPreferences
-    func savePreferences() {
-        if let encoded = try? JSONEncoder().encode(self.selectedCriteria) {
-            UserDefaults.standard.set(encoded, forKey: "criteriaOrder")
-        }
+        selectedCriteria.move(fromOffsets: source, toOffset: destination)
     }
 }
 

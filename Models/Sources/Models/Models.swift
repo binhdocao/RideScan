@@ -48,129 +48,6 @@ public struct User: Identifiable, Codable {
 }
 
 
-/**
- * Represents a service.
- */
-public struct Service: Identifiable, Codable {
-    
-    public let id: BSONObjectID
-    
-    // Service details
-    public var ride_method: String
-    public var user_proposed: Bool
-    public var send_to_application: Bool
-    
-    // Reviews is an array of Review objects
-    public var reviews: [Review]
-    
-    // Criteria
-    public var criteria: Criteria
-    
-    // Name of the service
-    public var name: String
-
-    private enum CodingKeys: String, CodingKey {
-        case id = "_id"
-        case ride_method
-        case user_proposed
-        case send_to_application
-        case reviews
-        case criteria
-        case name
-    }
-
-    public init(
-        id: BSONObjectID = BSONObjectID(),
-        ride_method: String,
-        user_proposed: Bool,
-        send_to_application: Bool,
-        reviews: [Review],
-        criteria: Criteria,
-        name: String
-    ) {
-        self.id = id
-        self.ride_method = ride_method
-        self.user_proposed = user_proposed
-        self.send_to_application = send_to_application
-        self.reviews = reviews
-        self.criteria = criteria
-        self.name = name
-    }
-    
-    public init?(
-        id: String,
-        ride_method: String,
-        user_proposed: Bool,
-        send_to_application: Bool,
-        reviews: [Review],
-        criteria: Criteria,
-        name: String
-    ) {
-        guard let objectId = try? BSONObjectID(id) else { return nil }
-        self.id = objectId
-        self.ride_method = ride_method
-        self.user_proposed = user_proposed
-        self.send_to_application = send_to_application
-        self.reviews = reviews
-        self.criteria = criteria
-        self.name = name
-    }
-}
-
-// Object to hold the service and calculated score
-public struct RideService: Identifiable, Codable {
-    public var id: UUID
-    public var service: Service
-    public var score: Int
-}
-
-// Review struct as seen in the MongoDB document
-public struct Review: Codable {
-    public var date: String
-    public var rating: Int
-    public var text: String
-}
-
-// Criteria struct based on the MongoDB document
-public struct Criteria: Codable {
-    public var price: Double
-    public var time: Int
-    public var calories_burned: Int
-    public var carbon_emissions: Int
-    public var experience: Bool
-    public var `public`: Bool
-    public var small_business: Bool
-    public var safety_rating: Int
-}
-
-public struct BikeDirectionsResponse: Decodable {
-    // Define your properties here
-    // For example:
-    public var routes: [Route]
-    // ...
-
-    public struct Route: Decodable {
-        public var legs: [Leg]
-        // ...
-    }
-
-    public struct Leg: Decodable {
-        public var distance: Distance
-        public var duration: Duration
-        // ...
-    }
-
-    public struct Distance: Decodable {
-        public var text: String
-        public var value: Int
-    }
-
-    public struct Duration: Decodable {
-        public var text: String
-        public var value: Int
-    }
-}
-
 public struct AddUserResponse: Codable {
     public let id: String
 
@@ -258,9 +135,7 @@ public struct Ride: Codable {
     public let running_vehicles_count: Int
     public let km: Double
     public let age_surge_charge: Int
-    public let arriveIn_min_time: Int?
-    public let arriveIn_max_time: Int?
-    public let is_all_vehicles_running: Bool?
+   
 }
 
 public struct LocateFetiiResponse: Codable {

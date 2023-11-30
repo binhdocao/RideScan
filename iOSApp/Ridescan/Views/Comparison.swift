@@ -10,41 +10,25 @@ import SwiftUI
 import Models
 import CoreLocation
 enum SortingOption: String, CaseIterable {
-    case name = "name (A-Z)"
-    case price = "price"
-    case time = "time"
-    case experience = "experience"
-    case `public` = "public"
-    case small_business = "small business"
-    case safety = "safety rating"
-    case carbon_emissions = "carbon emissions"
-    case calories_burned = "calories burned"
-    case score = "score"
+    case name = "Name"
+    case price = "Price"
+    case time = "Time"
 }
 
 enum TransportationMode: String, CaseIterable {
-	  case walking = "walking"
-    case biking = "biking"
-	  case driving = "driving"
-    case transit = "transit"
-    case other = "other"
-}
-
-enum SortingFilters: String, CaseIterable {
-    case experience = "experience"
-    case `public` = "public"
-    case small_business = "small business"
+    case walking = "Walking"
+    case driving = "Driving"
+    case uber = "Uber"
+    case lyft = "Lyft"
+    case bike = "Rideshare Bike"
+    case allS = "All"
+    // ... Add more modes as needed
 }
 
 struct ComparisonView: View {
     @Binding var showBusRoute : Bool // create a function that changes value to true when you press on the bus button. in the do part of the button, add this function
     @Binding var fromTo : FromTo
     @ObservedObject var transportViewModel = TransportViewModel()
-    
-    // user criteria preferences
-    @State private var criteriaPrefs: [Criteria] = []
-    
-    // Fetii info
     @State var current_fetii_price = 15.0
     @State var current_fetii_min_people = 5
     @State var current_fetii_max_people = 15
@@ -53,41 +37,46 @@ struct ComparisonView: View {
     @State private var showAlert = false
     @State var current_veo_price = 0.5
     
-    // BTD Bus info
+    // BTD Bus
     @State var has_bus_data = "No data"
-	    
-    @State private var filteredServices: [(Service, Double)] = []
     
     //dont need anymore
     @State private var buses: [BrazosDriver] //[BrazosDriver(RouteId: 40, lat: 30.00, lng: -97.32,stops: [CLLocationCoordinate2D(latitude: 29.749907, longitude: -95.358421)])]
 
-    struct RideService: Identifiable {
-      var id = UUID()
-      let name: String
-      let price: Double
-          var min_people: Int
-          var max_people: Int
-      let iconName: String
-      var timeEstimate: Int
-          var distanceEstimate: Double = 0
-    }
+	struct RideService: Identifiable {
+		var id = UUID()
+		let name: String
+		let price: Double
+        var min_people: Int
+        var max_people: Int
+		let iconName: String
+		var timeEstimate: Int
+        var distanceEstimate: Double = 0
+	}
 	
     var rideServices: [RideService]
     @State var BusStop1 : CLLocationCoordinate2D //= CLLocationCoordinate2D(latitude: 29.749907, longitude: -95.358421)
         
+    
 	
-	  @State private var refreshView: Bool = false
+	@State private var refreshView: Bool = false
+
 	
-	  @State private var selectedSortOption: SortingOption = .score
-    @State private var selectedTransportationModes: Set<TransportationMode> = Set(TransportationMode.allCases)
-    @State private var selectedSortingOptions: Set<SortingFilters> = []
-
-    @State private var isAllSelected: Bool = false
-
-	  @State private var showTransportationPicker: Bool = false
-	  @State private var showSortingPicker: Bool = false
-    @State private var isAscendingOrder = true
-  
+	var sortedRideServices: [RideService] {
+		switch selectedSortOption {
+		case .time:
+			return rideServices.sorted { $0.timeEstimate < $1.timeEstimate }
+		case .name:
+			return rideServices.sorted { $0.name < $1.name }
+		case .price:
+			return rideServices.sorted { $0.price < $1.price }
+		}
+	}
+	
+	@State private var selectedSortOption: SortingOption = .time
+	@State private var selectedTransportation: TransportationMode = .allS
+	@State private var showTransportationPicker: Bool = false
+	@State private var showSortingPicker: Bool = false
     init(destination: CLLocationCoordinate2D, showBusRoute: Binding<Bool>, fromTo: Binding<FromTo>, distance: Double, bestStop: CLLocationCoordinate2D, buses: [BrazosDriver] ) {
             self.destination = destination
         _showBusRoute = showBusRoute
@@ -100,6 +89,14 @@ struct ComparisonView: View {
             /*RideService(name: "Fetii", price: current_fetii_price, min_people: current_fetii_min_people, max_people: current_fetii_max_people, iconName: "bus", timeEstimate: 26),*/
 
         ]
+        //buses = self.fetchBusData()
+        //let driver = BrazosDriver(RouteId: 40, lat: 30.00, lng: -97.32, stops: [CLLocationCoordinate2D(latitude: 30.23456565, longitude: -97.4342342)])
+        //buses.append(driver)
+        //print("buses ---", buses)
+        //buses[0].stops = [CLLocationCoordinate2D(latitude: 29.749907, longitude: -95.358421)]
+       // print("buses ---", buses)
+        //readInputFromFile(filePath: "/data/bus_stops")
+        //let distance = distance
         self.buses = buses
         self.BusStop1 = bestStop
         var mydistance : Double = 0
@@ -114,171 +111,105 @@ struct ComparisonView: View {
 	var body: some View {
         
 		VStack(spacing: 0) {
-            HStack {
-                Menu {
-                    // Submenu for Transport Types
-                    Menu("Transport Types") {
-                        ForEach(TransportationMode.allCases, id: \.self) { mode in
-                            Toggle(isOn: Binding(
-                                get: { self.selectedTransportationModes.contains(mode) },
-                                set: { isSelected in
-                                    if isSelected {
-                                        self.selectedTransportationModes.insert(mode)
-                                    } else {
-                                        self.selectedTransportationModes.remove(mode)
-                                    }
-                                }
-                            )) {
-                                Text(mode.rawValue)
-                            }
-                        }
-                    }
-
-                    // Submenu for Criteria
-                    Menu("Criteria") {
-                        ForEach(SortingFilters.allCases, id: \.self) { option in
-                            Toggle(isOn: Binding(
-                                get: { self.selectedSortingOptions.contains(option) },
-                                set: { isSelected in
-                                    if isSelected {
-                                        self.selectedSortingOptions.insert(option)
-                                    } else {
-                                        self.selectedSortingOptions.remove(option)
-                                    }
-                                }
-                            )) {
-                                Text(option.rawValue)
-                            }
-                        }
-                    }
-                } label: {
-                    HStack {
-                        Text("Filters")
-                            .foregroundColor(Color.white)
-                        Image(systemName: "line.horizontal.3.decrease.circle") // This is a commonly used filter icon
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                            .foregroundColor(Color.white)
-                    }
-                }
-
-                Spacer()
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 5)
-            .padding(.top, 10)
-
+			Capsule()
+				.fill(Color.gray)
+				.frame(width: 40, height: 5)
+				.padding(.top, 8)
+			
+			// Transportation Mode Picker
+			HStack {
+				Text("Mode: \(selectedTransportation.rawValue)")
+					.foregroundColor(Color.white)
+				Spacer()
+				Image(systemName: "car.fill") // Icon for transportation
+					.resizable()
+					.frame(width: 20, height: 20)
+					.onTapGesture {
+						showTransportationPicker = true
+					}
+					.foregroundColor(Color.white)
+			}
+			.actionSheet(isPresented: $showTransportationPicker) {
+				ActionSheet(title: Text("Select Transportation Mode"), buttons: TransportationMode.allCases.map { mode in
+					.default(Text(mode.rawValue)) {
+						selectedTransportation = mode
+					}
+				})
+			}
+			.padding(.horizontal)
 
             // Sorting Picker
             HStack {
-                Menu {
-                    ForEach(SortingOption.allCases, id: \.self) { option in
-                        Button(action: {
-                            selectedSortOption = option
-                        }) {
-                            Label(
-                                title: { Text(option.rawValue) },
-                                icon: {
-                                    if option == selectedSortOption {
-                                        Image(systemName: "checkmark")
-                                    }
-                                }
-                            )
-                        }
-                    }
-                } label: {
-                    HStack {
-                        Text("Sort by: \(selectedSortOption.rawValue)")
-                            .foregroundColor(Color.white)
-                        Image(systemName: "chevron.down") // Dropdown icon
-                            .resizable()
-                            .frame(width: 10, height: 6)
-                            .foregroundColor(Color.white)
-                    }
-                }
-
+                Text("Sort by: \(selectedSortOption.rawValue)")
+                    .foregroundColor(Color.white)
                 Spacer()
-                
-                Image(systemName: isAscendingOrder ? "arrow.up.square.fill" : "arrow.down.square.fill") // Icon for sorting
+                Image(systemName: "arrow.up.arrow.down.square.fill") // Icon for sorting
                     .resizable()
                     .frame(width: 20, height: 20)
                     .onTapGesture {
-                        isAscendingOrder.toggle()
+                        showSortingPicker = true
                     }
                     .foregroundColor(Color.white)
             }
+            .actionSheet(isPresented: $showSortingPicker) {
+                ActionSheet(title: Text("Sort by"), buttons: SortingOption.allCases.map { option in
+                    .default(Text(option.rawValue)) {
+                        selectedSortOption = option
+                    }
+                })
+            }
             .padding(.horizontal)
-            .padding(.vertical, 5)
 
+            // Service List
             ScrollView {
                 VStack(spacing: 10) {
-                    ForEach(filteredServices, id: \.0.id) { (service, score) in
+                    ForEach(sortedRideServices) { service in
                         Button(action: {
-                            if service.ride_method == "walking" {
-                                transportViewModel.currentTransportType = .walking
-                            } else if service.ride_method == "driving" {
-                                transportViewModel.currentTransportType = .automobile
-                            } else if service.ride_method == "biking" {
-                                // using .any for biking right now
-                                transportViewModel.currentTransportType = .walking
-                            } else {
-                                // default will be car for now
-                                transportViewModel.currentTransportType = .automobile
-                            }
-                          
                             if service.name == "Brazos Bus Service" && self.buses.count != 0 {
-
+                                
                                 fromTo.to = BusStop1
                                 changeShowBusRoute()
                             }
+                            else {
+                                showAlert = true
+                            }
+                            //fetchBusData()
+                            //print(findBestRoute())
                         }) {
                             HStack {
                                 // Image on the left
-                                Image(systemName: iconName(for: service.ride_method)) // Make sure to add `iconName` to your `Service` model
+                                Image(systemName: service.iconName)
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 50, height: 50) // Set the image size as needed
                                     .padding(.trailing, 10)
-                                    .foregroundColor(.black)
                                 
                                 // Name in the middle with min and max person counts
                                 VStack(alignment: .leading) {
                                     Text(service.name)
                                         .font(.headline)
-                                        .foregroundColor(.black)
-                                    if service.name == "Walking" {
-                                        Text("Time: \(Int(transportViewModel.walkRoute.expectedTravelTime / 60)) minutes")
-                                            .font(.subheadline)
-                                            .foregroundColor(.black)
-                                    } else if service.name == "Biking" {
-                                        Text("Time: \(transportViewModel.bikeTimeEstimate) minutes")
-                                            .font(.subheadline)
-                                            .foregroundColor(.black)
-                                    } else {
-                                        Text("Time: \(service.criteria.time) minutes")
-                                            .font(.subheadline)
-                                            .foregroundColor(.black)
-                                    }
-                                    Text(String(format: "Score: %.2f points", score))
+                                    Text("Time:\(service.timeEstimate)")
                                         .font(.subheadline)
-                                        .foregroundColor(.black)
                                 }
                                 
                                 Spacer() // This will push the following elements to the right
                                 
                                 // Cost per person and minimum number of passengers on the right
                                 VStack(alignment: .trailing) {
-                                    // Format the price and timeEstimate as needed
-                                    Text(String(format: "%.2f /person", service.criteria.price))
+                                    Text(String(format: "$%.2f /person", service.price))
                                         .font(.body)
-                                        .foregroundColor(.black)
-                                    Text("Carbon emissions: \(service.criteria.carbon_emissions) g/km") // Adjust based on actual data
+                                    Text("Min Passengers: \(service.min_people)")
                                         .font(.subheadline)
-                                        .foregroundColor(.black)
+                                    Text("Distance: \(service.distanceEstimate)")
+                                        .font(.subheadline)
                                 }
                             }
-                            .modifier(ServiceModifier()) // Use your ServiceModifier for consistent styling
-                        }
+                            
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(8)
+                            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                        }.buttonStyle(PlainButtonStyle())
                     }
                 }
                 .padding(.horizontal)
@@ -299,43 +230,33 @@ struct ComparisonView: View {
                     )
                 }
             }
-            .onChange(of: selectedTransportationModes) { _ in
-                filteredServices = transportViewModel.filterServices(modes: selectedTransportationModes, sorting_options: selectedSortingOptions)
-            }
-            .onChange(of: selectedSortingOptions) { _ in
-                filteredServices = transportViewModel.filterServices(modes: selectedTransportationModes, sorting_options: selectedSortingOptions)
-            }
-            .onChange(of: selectedSortOption) { newValue in
-                filteredServices = transportViewModel.sortServices(services: filteredServices, for: newValue, isAscending: isAscendingOrder)
-            }
-            .onChange(of: isAscendingOrder) { _ in
-                filteredServices = transportViewModel.sortServices(services: filteredServices, for: selectedSortOption, isAscending: isAscendingOrder)
-            }
+            Spacer() // Push content to the top
         }
-        .frame(maxWidth: .infinity)
         .background(maroonColor.opacity(0.8))
+        .cornerRadius(20, corners: [.topLeft, .topRight])
+
+        .frame(maxWidth: .infinity, maxHeight:(UIScreen.main.bounds.height / 3))
+        
         .edgesIgnoringSafeArea(.all)
         .task {
+            //print("before")
+            //fetchBusData()
+            //print(buses)
+            //print("after")
             do {
-                // all services
-                try await transportViewModel.fetchServices()
-              
-                // update bike and walk info
-                transportViewModel.updateBikeServiceTime(time: transportViewModel.bikeTimeEstimate)
-                transportViewModel.updateCaloriesEstimates()
-                transportViewModel.updateWalkServiceTime(time: Int(transportViewModel.walkRoute.expectedTravelTime / 60))
-              
-                // sort and filter
-                let filtered = transportViewModel.filterServices(modes: selectedTransportationModes, sorting_options: selectedSortingOptions)
-                filteredServices = transportViewModel.sortServices(services: filtered, for: selectedSortOption, isAscending: isAscendingOrder)
-                
-                // veo ride
                 let defaults = UserDefaults.standard
                 let veoToken = defaults.string(forKey: "veoToken")
                 let veo_result = try await transportViewModel.findVEO(veoToken: veoToken ?? "none")
                 // Include unlockFee in initial price
                 current_veo_price = (veo_result.price.price + veo_result.price.unlockFee)
 
+                let result = try await transportViewModel.findFetii()
+                current_fetii_price = result.data.first?.min_charge_per_person ?? 15.0
+                current_fetii_min_people = result.data.first?.direct_min_passengers ?? 1
+                current_fetii_max_people = result.data.first?.direct_max_passengers ?? 4
+
+//                let result = try await transportViewModel.locateFetii()
+                // Handle the result here, possibly setting it to another @State or @Published property
             } catch {
                 // Handle the error here. Perhaps by showing an alert to the user or logging the error.
                 print("Error fetching data: \(error)")
@@ -483,22 +404,6 @@ struct ComparisonView: View {
             showBusRoute = true
         }
     }
-    
-    // Helper function to map ride_method to systemName
-    func iconName(for rideMethod: String) -> String {
-        switch rideMethod {
-        case "driving":
-            return "car.fill"
-        case "biking":
-            return "bicycle"
-        case "walking":
-            return "figure.walk"
-        // Add more cases as needed
-        default:
-            return "questionmark" // or any default icon you prefer
-        }
-    }
-
     func readInputFromFile( filePath: String) {
         //let fileManager = FileManager.default
         
@@ -539,6 +444,7 @@ struct ComparisonView: View {
         let distanceMiles = myLocation.distance(from: toLocation) / 1609.34
         return distanceMiles
     }
+    
 }
 
 
@@ -571,3 +477,51 @@ struct AlertWrapper: UIViewControllerRepresentable {
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
 }
+
+/*func findBestRoute(buses: [BrazosDriver], cords: CLLocationCoordinate2D) -> CLLocationCoordinate2D{
+   //print("curr location is ",locationManager.region.center)
+   
+   if buses.count == 0 {
+       print( "error - no buses nearby")
+   }
+   let coordinates = cords
+   var totalDistance: Double  = 10000 // miles
+   var busStop1 : CLLocationCoordinate2D = CLLocationCoordinate2D()
+   var busStop2 : CLLocationCoordinate2D = CLLocationCoordinate2D()
+   var routeID = 0
+   
+   for bus in buses {
+       var currToStop : Double = 10000 //miles
+       var StopToDest : Double = 10000 //miles
+       var coordinatesStop1 : CLLocationCoordinate2D = CLLocationCoordinate2D()
+       var coordinatesStop2 : CLLocationCoordinate2D = CLLocationCoordinate2D()
+       print("My route id", bus.RouteId)
+       for stop in bus.stops {
+           print(stop)
+           if distance(from: coordinates, to: stop) < currToStop {
+               currToStop = distance(from : coordinates, to: stop)
+               coordinatesStop1 = stop
+               
+               print("goes in")
+           }
+           if distance(from : stop, to : destination) < StopToDest {
+               StopToDest = distance(from: stop, to: destination)
+               coordinatesStop2 = stop
+               
+               print("goes in")
+           }
+       }
+       if totalDistance > currToStop + StopToDest {
+           print("goes in")
+           totalDistance = currToStop + StopToDest
+           routeID = bus.RouteId
+           busStop1 = coordinatesStop1
+           busStop2 = coordinatesStop2
+       }
+
+   }
+   //BusStop1 = busStop1
+   print("The distance is: ", totalDistance)
+   return busStop1
+   //find route from coordinates to coordinatesStop1 and the rest of the trip
+}*/

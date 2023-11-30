@@ -8,7 +8,6 @@ import SwiftUI
 import MapKit
 import CoreLocation
 import URLImage
-import Alamofire
 import Models
 
 let maroonColor = Color(red: 0.5, green: 0, blue: 0)
@@ -37,9 +36,8 @@ struct MapView: View {
 	@State private var isRouteConfirmed: Bool = false
 	
 	@State private var isRouteCalculationComplete = false
-  @State private var settingsDetent = PresentationDetent.fraction(0.3)
-  @State private var showBusRoute : Bool = false //if true, which comparison should change, then add another if in body where it will call
-  @State private var fromTo = FromTo()
+    @State private var showBusRoute : Bool = false //if true, which comparison should change, then add another if in body where it will call
+    @State private var fromTo = FromTo()
 
 	
 	func confirmRoute() {
@@ -53,103 +51,60 @@ struct MapView: View {
 	}
 	
 
-  func calculateRoute(from: CLLocationCoordinate2D, to destination: CLLocationCoordinate2D, with transport_type: MKDirectionsTransportType, forBus: Bool = false) -> Int {
+    func calculateRoute(from: CLLocationCoordinate2D, to destination: CLLocationCoordinate2D, forBus: Bool = false) -> Int{
         
-      let request = MKDirections.Request()
-      request.source = MKMapItem(placemark: MKPlacemark(coordinate: from))
-      request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destination))
-      request.transportType = transport_type
-
-      let directions = MKDirections(request: request)
-      directions.calculate { response, error in
-
-
-      guard let newRoute = response?.routes.first else {
-          print("Failed to get route: \(error?.localizedDescription ?? "Unknown error")")
-          return
-      }
-      DispatchQueue.main.async { // M
-          self.route = newRoute
-          self.updateRouteDistance(with: newRoute)
-
-          let startAnnotation = IdentifiablePointAnnotation()
-          startAnnotation.coordinate = from
-          startAnnotation.title = "Start"
-
-          let destinationAnnotation = IdentifiablePointAnnotation()
-          destinationAnnotation.coordinate = destination
-          destinationAnnotation.title = "Destination"
-
-
-          self.annotations = [startAnnotation, destinationAnnotation]
-          if forBus {
-              self.annotations.append(contentsOf: annotations1)
-              self.annotations[1].title = "Your Stop"
-          }
-
-
-
-          self.shouldAdjustZoom = true
-
-
-
-          self.isRouteCalculationComplete = true
-
-          isRouteDisplayed = true
-            //showBusRoute = false
-          }
-      }
-		  return 1
-	}
-    
-    func fetchBikingTimeEstimate(from start: CLLocationCoordinate2D, to end: CLLocationCoordinate2D) {
-        
-        guard let path = Bundle.main.path(forResource: "Config", ofType: "plist"),
-              let config = NSDictionary(contentsOfFile: path),
-              let apiKey = config["GoogleMapsAPIKey"] as? String else {
-            print("Error: Unable to find GoogleMapsAPIKey in Config.plist")
-            return
-        }
-        
-        let url = "https://maps.googleapis.com/maps/api/directions/json"
-        let parameters: [String: Any] = [
-            "origin": "\(start.latitude),\(start.longitude)",
-            "destination": "\(end.latitude),\(end.longitude)",
-            "mode": "bicycling",
-            "key": apiKey
-        ]
-
-        AF.request(url, parameters: parameters).responseDecodable(of: BikeDirectionsResponse.self) { response in
-            switch response.result {
-            case .success(let directionsResponse):
-                // Handle the decoded response
-                if let firstRoute = directionsResponse.routes.first,
-                   let firstLeg = firstRoute.legs.first {
-                    transportViewModel.bikeTimeEstimate = firstLeg.duration.value / 60
+		let request = MKDirections.Request()
+		request.source = MKMapItem(placemark: MKPlacemark(coordinate: from))
+		request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destination))
+		request.transportType = .automobile
+		
+		let directions = MKDirections(request: request)
+        directions.calculate { response, error in
+            
+            
+            guard let newRoute = response?.routes.first else {
+                print("Failed to get route: \(error?.localizedDescription ?? "Unknown error")")
+                return
+            }
+            DispatchQueue.main.async { // M
+                self.route = newRoute
+                self.updateRouteDistance(with: newRoute)
+                
+                let startAnnotation = IdentifiablePointAnnotation()
+                startAnnotation.coordinate = from
+                startAnnotation.title = "Start"
+                
+                let destinationAnnotation = IdentifiablePointAnnotation()
+                destinationAnnotation.coordinate = destination
+                destinationAnnotation.title = "Destination"
+                
+                
+                self.annotations = [startAnnotation, destinationAnnotation]
+                if forBus {
+                    self.annotations.append(contentsOf: annotations1)
+                    self.annotations[1].title = "Your Stop"
                 }
-            case .failure(let error):
-                print("Error: \(error)")
+                
+                
+                
+                self.shouldAdjustZoom = true
+                
+                
+                
+                self.isRouteCalculationComplete = true
+                
+                isRouteDisplayed = true
+                //showBusRoute = false
             }
         }
-    }
+		return 1
+	}
 
 	@State private var routeDistance: String = ""
-    @State private var carTimeEstimate: Double = 0.0
-    @State private var walkTimeEstimate: Double = 0.0
-    @State private var bikeTimeEstimate: Double = 0.0
-    
 
-    func updateRouteInfo(with route: MKRoute, transport_type: MKDirectionsTransportType) {
+	func updateRouteDistance(with route: MKRoute) {
 		let distanceInMiles = route.distance / 1609.344 // Convert meters to miles
 		routeDistance = String(format: "%.2f miles", distanceInMiles)
-        transportViewModel.setTotalDistance(distance: distanceInMiles)
-        transportViewModel.setCaloriesBurnedEstimate(dist: distanceInMiles)
-        
-        if transport_type == .automobile {
-            transportViewModel.setCarRoute(route: route)
-        } else if transport_type == .walking {
-            transportViewModel.setWalkRoute(route: route)
-        }
 	}
 
     func addpins(pin1: CLLocationCoordinate2D, pin2: CLLocationCoordinate2D) -> Int{
@@ -188,22 +143,60 @@ struct MapView: View {
 						.font(.title)
 						.fontWeight(.bold)
 				}
+                if showBusRoute && !isRouteDisplayed && !isRouteCalculationComplete {
+                    //fromTo.from = self.annotations[0].coordinate
+                    
 
-        if showBusRoute && !isRouteDisplayed && !isRouteCalculationComplete {
-            var status = calculateRoute(from: fromTo.from , to: fromTo.to, forBus: true)   
-        }
-        if showComparisonSheet {
-            //var status = calculateRoute(from: locationManager.region.center, to: self.annotations[1].coordinate)
-            var buses = fetchBusData()
-            var newbuses = readInputFromFile(filePath: "/data/bus_stops", buses: &buses)
+                    var status = calculateRoute(from: fromTo.from ,to: fromTo.to, forBus: true)
+                    //var idk = addpins(pin1: annotations1[0], pin2: annotations1[1])
+                    //var i = IdentifiablePointAnnotation()
+                    //var a = IdentifiablePointAnnotation()
+                    
+                    
+                    
+                  /* var buses = fetchBusData()
+                    var newbuses = readInputFromFile(filePath: "/data/bus_stops", buses: &buses)
 
-            var bestroute = findBestRoute(buses: newbuses, destination: self.annotations[1].coordinate)
-
-             //var o = DispatchQueue.main.async {
-                 var status = addpins(pin1: bestroute.busStop2, pin2: self.annotations[1].coordinate)
-
-            ComparisonView(destination: self.annotations[1].coordinate,showBusRoute: $showBusRoute, fromTo: $fromTo, distance: bestroute.totalDistance,bestStop: bestroute.busStop1, buses: newbuses)
-				} else {
+                    var bestroute = findBestRoute(buses: newbuses, destination: self.annotations[1].coordinate)
+                    
+                    ComparisonView(destination: self.annotations[1].coordinate,showBusRoute: $showBusRoute, fromTo: $fromTo, distance: bestroute.totalDistance,bestStop: bestroute.busStop1, buses: newbuses)
+                    */
+                    /*HStack {
+                                            
+                                            Button(action: {
+                                                fromTo.from = locationManager.region.center
+                                                calculateRoute(from: fromTo.from ,to: fromTo.to)
+                                                /*WrappedMapView(region: $locationManager.region,shouldAdjustZoom: $shouldAdjustZoom, annotations: annotations, route: route)
+                                                    .edgesIgnoringSafeArea(.all)
+                                                SideMenu(isSidebarVisible: $isSideMenuOpened)*/
+                                            }) {
+                                                Image(systemName: "checkmark.circle.fill")
+                                                    .padding()
+                                                    .font(.system(size: 20, weight: .bold))
+                                                    .foregroundColor(maroonColor)
+                                                    .background(Circle().fill(Color.white))
+                                            }
+                                        }*/
+                    
+                    
+                   
+                   
+                }
+				 if showComparisonSheet {
+                    //fromTo.from = locationManager.region.center
+                    //var status = calculateRoute(from: locationManager.region.center, to: self.annotations[1].coordinate)
+                    var buses = fetchBusData()
+                    var newbuses = readInputFromFile(filePath: "/data/bus_stops", buses: &buses)
+                    
+                    var bestroute = findBestRoute(buses: newbuses, destination: self.annotations[1].coordinate)
+                     
+                     //var o = DispatchQueue.main.async {
+                         var status = addpins(pin1: bestroute.busStop2, pin2: self.annotations[1].coordinate)
+                     
+                    ComparisonView(destination: self.annotations[1].coordinate,showBusRoute: $showBusRoute, fromTo: $fromTo, distance: bestroute.totalDistance,bestStop: bestroute.busStop1, buses: newbuses)
+				}
+                
+                else {
 					if isRouteDisplayed && isRouteCalculationComplete {
                         
 						HStack(spacing: 50) {
@@ -215,9 +208,9 @@ struct MapView: View {
 							VStack {
 								Button(action: {
 									confirmRoute()
-                  fromTo.from = self.annotations[0].coordinate
-                  isRouteDisplayed = false
-                  isRouteCalculationComplete = false
+                                    fromTo.from = self.annotations[0].coordinate
+                                    isRouteDisplayed = false
+                                    isRouteCalculationComplete = false
                                     
                                     
 								}) {
@@ -255,7 +248,7 @@ struct MapView: View {
 					}
                     
                     
-          else {
+ else {
 						HStack {
 							TextField("Enter destination...", text: $destination)
 							.padding(.horizontal)
@@ -271,21 +264,7 @@ struct MapView: View {
 										
 										// Calculate the route to the selected location
 										if let destinationCoordinate = searchCompleter.transportViewModel?.dropoffLocation {
-
-                        let transport_types: [MKDirectionsTransportType] = [.walking, .automobile]
-
-                        for trans_type in transport_types {
-                            calculateRoute(from: locationManager.region.center, to: destinationCoordinate, with: trans_type)
-                        }
-
-                        fetchBikingTimeEstimate(from: locationManager.region.center, to: destinationCoordinate)
-
-                        self.shouldAdjustZoom = true
-
-                        isRouteCalculationComplete = true
-
-                        isRouteDisplayed = true
-                                            
+                                            calculateRoute(from: locationManager.region.center, to: destinationCoordinate)
 										}
 										
 										// Update the search bar with the selected address
@@ -316,13 +295,6 @@ struct MapView: View {
 					}
                 }
             }
-            .sheet(isPresented: $showComparisonSheet) {
-                ComparisonView(transportViewModel: transportViewModel)
-                    .presentationDetents(
-                        [.medium, .large, .fraction(0.3)],
-                        selection: $settingsDetent
-                     )
-            }
 		}
 	
 		.gesture(
@@ -335,11 +307,6 @@ struct MapView: View {
 			// set users current location
 			transportViewModel.setLocation(locationManager.region.center, type: "pickup")
 		}
-        .onChange(of: transportViewModel.currentTransportType) { newTransportType in
-            if let destinationCoordinate = searchCompleter.transportViewModel?.dropoffLocation {
-                calculateRoute(to: destinationCoordinate, with: newTransportType)
-            }
-        }
 		.navigationBarBackButtonHidden(true) // Hide the back button
 	}
 	
