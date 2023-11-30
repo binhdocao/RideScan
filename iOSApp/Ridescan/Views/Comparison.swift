@@ -10,19 +10,19 @@ import SwiftUI
 import Models
 import CoreLocation
 enum SortingOption: String, CaseIterable {
-	case name = "Name"
-	case price = "Price"
-	case time = "Time"
+    case name = "Name"
+    case price = "Price"
+    case time = "Time"
 }
 
 enum TransportationMode: String, CaseIterable {
-	case walking = "Walking"
-	case driving = "Driving"
-	case uber = "Uber"
-	case lyft = "Lyft"
-	case bike = "Rideshare Bike"
-	case allS = "All"
-	// ... Add more modes as needed
+    case walking = "Walking"
+    case driving = "Driving"
+    case uber = "Uber"
+    case lyft = "Lyft"
+    case bike = "Rideshare Bike"
+    case allS = "All"
+    // ... Add more modes as needed
 }
 
 struct ComparisonView: View {
@@ -35,6 +35,7 @@ struct ComparisonView: View {
     @State var destination : CLLocationCoordinate2D
     @ObservedObject var locationManager = LocationManager()
     @State private var showAlert = false
+    @State var current_veo_price = 0.5
     
     // BTD Bus
     @State var has_bus_data = "No data"
@@ -137,27 +138,27 @@ struct ComparisonView: View {
 			}
 			.padding(.horizontal)
 
-			// Sorting Picker
-			HStack {
-				Text("Sort by: \(selectedSortOption.rawValue)")
-					.foregroundColor(Color.white)
-				Spacer()
-				Image(systemName: "arrow.up.arrow.down.square.fill") // Icon for sorting
-					.resizable()
-					.frame(width: 20, height: 20)
-					.onTapGesture {
-						showSortingPicker = true
-					}
-					.foregroundColor(Color.white)
-			}
-			.actionSheet(isPresented: $showSortingPicker) {
-				ActionSheet(title: Text("Sort by"), buttons: SortingOption.allCases.map { option in
-					.default(Text(option.rawValue)) {
-						selectedSortOption = option
-					}
-				})
-			}
-			.padding(.horizontal)
+            // Sorting Picker
+            HStack {
+                Text("Sort by: \(selectedSortOption.rawValue)")
+                    .foregroundColor(Color.white)
+                Spacer()
+                Image(systemName: "arrow.up.arrow.down.square.fill") // Icon for sorting
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                    .onTapGesture {
+                        showSortingPicker = true
+                    }
+                    .foregroundColor(Color.white)
+            }
+            .actionSheet(isPresented: $showSortingPicker) {
+                ActionSheet(title: Text("Sort by"), buttons: SortingOption.allCases.map { option in
+                    .default(Text(option.rawValue)) {
+                        selectedSortOption = option
+                    }
+                })
+            }
+            .padding(.horizontal)
 
             // Service List
             ScrollView {
@@ -229,20 +230,26 @@ struct ComparisonView: View {
                     )
                 }
             }
-			Spacer() // Push content to the top
-		}
-		.background(maroonColor.opacity(0.8))
-		.cornerRadius(20, corners: [.topLeft, .topRight])
+            Spacer() // Push content to the top
+        }
+        .background(maroonColor.opacity(0.8))
+        .cornerRadius(20, corners: [.topLeft, .topRight])
 
-		.frame(maxWidth: .infinity, maxHeight:(UIScreen.main.bounds.height / 3))
-		
-		.edgesIgnoringSafeArea(.all)
+        .frame(maxWidth: .infinity, maxHeight:(UIScreen.main.bounds.height / 3))
+        
+        .edgesIgnoringSafeArea(.all)
         .task {
             //print("before")
             //fetchBusData()
             //print(buses)
             //print("after")
             do {
+                let defaults = UserDefaults.standard
+                let veoToken = defaults.string(forKey: "veoToken")
+                let veo_result = try await transportViewModel.findVEO(veoToken: veoToken ?? "none")
+                // Include unlockFee in initial price
+                current_veo_price = (veo_result.price.price + veo_result.price.unlockFee)
+
                 let result = try await transportViewModel.findFetii()
                 current_fetii_price = result.data.first?.min_charge_per_person ?? 15.0
                 current_fetii_min_people = result.data.first?.direct_min_passengers ?? 1
@@ -255,7 +262,7 @@ struct ComparisonView: View {
                 print("Error fetching data: \(error)")
             }
         }
-	}
+    }
     
     /*func updateBusService(min_people: Int, max_people: Int, timeEstimate: Int,distanceEstimate: Double ) {
         if let index = rideServices.firstIndex(where: { $0.name == "Brazos Bus Service" }) {
@@ -442,14 +449,14 @@ struct ComparisonView: View {
 
 
 struct ServiceModifier: ViewModifier {
-	func body(content: Content) -> some View {
-		content
-			.padding(.horizontal) // Add horizontal padding here
-			.padding(.vertical)
-			.background(Color.white)
-			.cornerRadius(8)
-			.shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-	}
+    func body(content: Content) -> some View {
+        content
+            .padding(.horizontal) // Add horizontal padding here
+            .padding(.vertical)
+            .background(Color.white)
+            .cornerRadius(8)
+            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+    }
 }
 
 struct AlertWrapper: UIViewControllerRepresentable {

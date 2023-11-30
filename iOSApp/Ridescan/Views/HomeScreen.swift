@@ -5,6 +5,7 @@ import AuthenticationServices
 class UserSettings: ObservableObject {
 	
 	@Published var isAuthenticated: Bool = false
+	@Published var isVerified: Bool = false
 
 	init() {
 		isAuthenticated = isAuthenticatedUser()
