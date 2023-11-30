@@ -531,11 +531,6 @@ struct SidebarView: View {
 	}
 }
 
-struct FromTo {
-    var from : CLLocationCoordinate2D = CLLocationCoordinate2D()
-    var to : CLLocationCoordinate2D = CLLocationCoordinate2D()
-}
-
 
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 	private var locationManager = CLLocationManager()
