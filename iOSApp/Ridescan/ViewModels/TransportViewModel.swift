@@ -68,7 +68,7 @@ class TransportViewModel: ObservableObject {
 //        } catch {
 //            print("Failed to encode and save user data: \(error)")
 //        }
-//        
+//
 //        // set the user on the main thread to publish and update views
 //        DispatchQueue.main.async {
 //            self.user = user
@@ -102,6 +102,20 @@ class TransportViewModel: ObservableObject {
 //        DispatchQueue.main.async {
 //            self.user = user
 //        }
+    }
+
+    /// Logs user in from the backend server.
+    func findVEO(veoToken: String) async throws -> VEOPriceLocation {
+        
+        let route = "api/veoride/find/"
+        let userURL = HTTP.baseURL.appendingPathComponent(route)
+        
+        let veoRequest = FindVEORequest(userLatitude: String(pickupLocation.latitude), userLongitude: String(pickupLocation.longitude), veoToken: veoToken)
+        
+        // send the request to backend
+        let response: VEOPriceLocation = try await HTTP.post(url: userURL, body: veoRequest)
+        
+        return response
     }
     
 }
