@@ -116,6 +116,18 @@ class TransportViewModel: ObservableObject {
         }
     }
     
+    func updateVeoInfo(info: VEOPriceLocation) {
+        for (index, serviceTuple) in services.enumerated() {
+            var service = serviceTuple.0
+            if service.name == "VeoRide" {
+                // Update the time criteria for the biking service
+                service.criteria.time = bikeTimeEstimate + 5
+                service.criteria.price = info.price.unlockFee + (info.price.price * (info.closestBikes.first?.distance ?? 0))
+                services[index] = (service, serviceTuple.1)
+            }
+        }
+    }
+    
     func setTotalDistance(distance: Double) {
         total_distance = distance
     }

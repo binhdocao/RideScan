@@ -37,9 +37,14 @@ struct MapView: View {
 	@State private var isRouteConfirmed: Bool = false
 	
 	@State private var isRouteCalculationComplete = false
-  @State private var settingsDetent = PresentationDetent.fraction(0.3)
-  @State private var showBusRoute : Bool = false //if true, which comparison should change, then add another if in body where it will call
-  @State private var fromTo = FromTo()
+    @State private var settingsDetent = PresentationDetent.fraction(0.3)
+    @State private var showBusRoute : Bool = false //if true, which comparison should change, then add another if in body where it will call
+    @State private var fromTo = FromTo()
+    
+    // Bus states
+    @State private var buses = [BrazosDriver]()
+    @State private var bestroute: (totalDistance: Double, busStop1: CLLocationCoordinate2D, busStop2: CLLocationCoordinate2D) = (0, CLLocationCoordinate2D(), CLLocationCoordinate2D())
+    @State private var newbuses = [BrazosDriver]()
 
 	
 	func confirmRoute() {
@@ -70,7 +75,7 @@ struct MapView: View {
       }
       DispatchQueue.main.async { // M
           self.route = newRoute
-          self.updateRouteDistance(with: newRoute)
+          self.updateRouteInfo(with: newRoute, transport_type: transport_type)
 
           let startAnnotation = IdentifiablePointAnnotation()
           startAnnotation.coordinate = from
@@ -183,20 +188,10 @@ struct MapView: View {
 				}
 
         if showBusRoute && !isRouteDisplayed && !isRouteCalculationComplete {
-            var status = calculateRoute(from: fromTo.from , to: fromTo.to, forBus: true)   
+            var status = calculateRoute(from: fromTo.from , to: fromTo.to, with: .transit, forBus: true)
         }
-        if showComparisonSheet {
-            //var status = calculateRoute(from: locationManager.region.center, to: self.annotations[1].coordinate)
-            var buses = fetchBusData()
-            var newbuses = readInputFromFile(filePath: "/data/bus_stops", buses: &buses)
 
-            var bestroute = findBestRoute(buses: newbuses, destination: self.annotations[1].coordinate)
-
-             //var o = DispatchQueue.main.async {
-                 var status = addpins(pin1: bestroute.busStop2, pin2: self.annotations[1].coordinate)
-
-            ComparisonView(destination: self.annotations[1].coordinate,showBusRoute: $showBusRoute, fromTo: $fromTo, distance: bestroute.totalDistance,bestStop: bestroute.busStop1, buses: newbuses)
-				} else {
+            if !showComparisonSheet {
 					if isRouteDisplayed && isRouteCalculationComplete {
                         
 						HStack(spacing: 50) {
@@ -272,6 +267,13 @@ struct MapView: View {
                         }
 
                         fetchBikingTimeEstimate(from: locationManager.region.center, to: destinationCoordinate)
+                                            
+//                        buses = fetchBusData()
+//                        newbuses = readInputFromFile(filePath: "/data/bus_stops", buses: &buses)
+//
+//                        bestroute = findBestRoute(buses: newbuses, destination: self.annotations[1].coordinate)
+//
+//                        var status = addpins(pin1: bestroute.busStop2, pin2: self.annotations[1].coordinate)
 
                         self.shouldAdjustZoom = true
 
@@ -310,7 +312,8 @@ struct MapView: View {
                 }
             }
             .sheet(isPresented: $showComparisonSheet) {
-                ComparisonView(transportViewModel: transportViewModel)
+                
+                ComparisonView(viewModel: transportViewModel, destination: self.annotations[1].coordinate,showBusRoute: $showBusRoute, fromTo: $fromTo, distance: bestroute.totalDistance,bestStop: bestroute.busStop1, buses: newbuses)
                     .presentationDetents(
                         [.medium, .large, .fraction(0.3)],
                         selection: $settingsDetent
@@ -330,7 +333,7 @@ struct MapView: View {
 		}
         .onChange(of: transportViewModel.currentTransportType) { newTransportType in
             if let destinationCoordinate = searchCompleter.transportViewModel?.dropoffLocation {
-                calculateRoute(to: destinationCoordinate, with: newTransportType)
+                calculateRoute(from: locationManager.region.center, to: destinationCoordinate, with: newTransportType)
             }
         }
 		.navigationBarBackButtonHidden(true) // Hide the back button
@@ -462,7 +465,7 @@ struct MapView: View {
             showBusRoute = true
         }
     }
-    func readInputFromFile( filePath: String, buses: inout [BrazosDriver])  -> [BrazosDriver]{
+    func readInputFromFile( filePath: String, buses: inout [BrazosDriver])  -> [BrazosDriver] {
         //let fileManager = FileManager.default
         
         // Check if the file exists at the given path

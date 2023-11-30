@@ -65,51 +65,54 @@ struct ComparisonView: View {
       var id = UUID()
       let name: String
       let price: Double
-          var min_people: Int
-          var max_people: Int
+      var min_people: Int
+      var max_people: Int
       let iconName: String
       var timeEstimate: Int
-          var distanceEstimate: Double = 0
+      var distanceEstimate: Double = 0
     }
 	
-    var rideServices: [RideService]
+    @State var rideServices: [RideService] = []
     @State var BusStop1 : CLLocationCoordinate2D //= CLLocationCoordinate2D(latitude: 29.749907, longitude: -95.358421)
         
 	
-	  @State private var refreshView: Bool = false
+    @State private var refreshView: Bool = false
 	
-	  @State private var selectedSortOption: SortingOption = .score
+    @State private var selectedSortOption: SortingOption = .score
     @State private var selectedTransportationModes: Set<TransportationMode> = Set(TransportationMode.allCases)
     @State private var selectedSortingOptions: Set<SortingFilters> = []
 
     @State private var isAllSelected: Bool = false
 
-	  @State private var showTransportationPicker: Bool = false
-	  @State private var showSortingPicker: Bool = false
+    @State private var showTransportationPicker: Bool = false
+    @State private var showSortingPicker: Bool = false
     @State private var isAscendingOrder = true
   
-    init(destination: CLLocationCoordinate2D, showBusRoute: Binding<Bool>, fromTo: Binding<FromTo>, distance: Double, bestStop: CLLocationCoordinate2D, buses: [BrazosDriver] ) {
-            self.destination = destination
+    init(viewModel: TransportViewModel, destination: CLLocationCoordinate2D, showBusRoute: Binding<Bool>, fromTo: Binding<FromTo>, distance: Double, bestStop: CLLocationCoordinate2D, buses: [BrazosDriver]) {
+        self.transportViewModel = viewModel
+        self.destination = destination
         _showBusRoute = showBusRoute
         _fromTo = fromTo
-        self.rideServices = [
+        self.buses = buses
+        self.BusStop1 = bestStop
+
+        // Initialize rideServices after all properties are initialized
+        var rideServices: [RideService] = [
             RideService(name: "Uber", price: 10.0, min_people: 1, max_people: 4,iconName: "car",timeEstimate: 6),
             RideService(name: "Lyft", price: 12.0, min_people: 1, max_people: 4,iconName: "car.fill",timeEstimate: 8),
             RideService(name: "Walking", price: 0.0, min_people: 0, max_people: 0, iconName: "figure.walk", timeEstimate: 30),
-            RideService(name: "Piggyback", price: Double.random(in: 5...20), min_people: 1, max_people: 1,iconName: "person.fill",timeEstimate: 23),
-            /*RideService(name: "Fetii", price: current_fetii_price, min_people: current_fetii_min_people, max_people: current_fetii_max_people, iconName: "bus", timeEstimate: 26),*/
-
+            RideService(name: "Piggyback", price: Double.random(in: 5...20), min_people: 1, max_people: 1,iconName: "person.fill",timeEstimate: 23)
         ]
-        self.buses = buses
-        self.BusStop1 = bestStop
-        var mydistance : Double = 0
-        if self.buses.count != 0 {
-            mydistance = distance
+
+        var myDistance: Double = 0
+        if !buses.isEmpty {
+            myDistance = distance
         }
-        
-        rideServices.append(RideService(name: "Brazos Bus Service", price: 1.0, min_people: 1, max_people: 1, iconName: "bus", timeEstimate: 20, distanceEstimate: mydistance))
-        
-        }
+
+        rideServices.append(RideService(name: "Brazos Bus Service", price: 1.0, min_people: 1, max_people: 1, iconName: "bus", timeEstimate: 20, distanceEstimate: myDistance))
+
+        self.rideServices = rideServices
+    }
     
 	var body: some View {
         
@@ -209,6 +212,7 @@ struct ComparisonView: View {
             }
             .padding(.horizontal)
             .padding(.vertical, 5)
+            .padding(.bottom, 10)
 
             ScrollView {
                 VStack(spacing: 10) {
@@ -324,17 +328,19 @@ struct ComparisonView: View {
                 transportViewModel.updateBikeServiceTime(time: transportViewModel.bikeTimeEstimate)
                 transportViewModel.updateCaloriesEstimates()
                 transportViewModel.updateWalkServiceTime(time: Int(transportViewModel.walkRoute.expectedTravelTime / 60))
-              
-                // sort and filter
-                let filtered = transportViewModel.filterServices(modes: selectedTransportationModes, sorting_options: selectedSortingOptions)
-                filteredServices = transportViewModel.sortServices(services: filtered, for: selectedSortOption, isAscending: isAscendingOrder)
                 
                 // veo ride
                 let defaults = UserDefaults.standard
                 let veoToken = defaults.string(forKey: "veoToken")
                 let veo_result = try await transportViewModel.findVEO(veoToken: veoToken ?? "none")
                 // Include unlockFee in initial price
+                transportViewModel.updateVeoInfo(info: veo_result)
                 current_veo_price = (veo_result.price.price + veo_result.price.unlockFee)
+              
+                // sort and filter
+                let filtered = transportViewModel.filterServices(modes: selectedTransportationModes, sorting_options: selectedSortingOptions)
+                filteredServices = transportViewModel.sortServices(services: filtered, for: selectedSortOption, isAscending: isAscendingOrder)
+                                
 
             } catch {
                 // Handle the error here. Perhaps by showing an alert to the user or logging the error.
@@ -494,6 +500,8 @@ struct ComparisonView: View {
         case "walking":
             return "figure.walk"
         // Add more cases as needed
+        case "transit":
+            return "bus.fill"
         default:
             return "questionmark" // or any default icon you prefer
         }

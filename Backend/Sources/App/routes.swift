@@ -9,7 +9,12 @@ func routes(_ app: Application) throws {
         try await req.findUsers()
     }
 
-    /// Handles a request to load info about a particular kitten.
+	/// Handles a request to load the list of services.
+    app.get("api", "services") { req async throws -> [Service] in
+        try await req.findServices(req: req)
+    }
+
+    /// Handles a request to load info about a particular user.
     app.get(":_id") { req async throws -> User in
         try await req.findUser()
     }
@@ -43,9 +48,9 @@ func routes(_ app: Application) throws {
         try await req.updateUser()
     }
 
-    app.post("api", "fetii", "find") { req async throws -> FindFetiiResponse in
-        try await req.findFetii()
-    }
+    // app.post("api", "fetii", "find") { req async throws -> FindFetiiResponse in
+    //     try await req.findFetii(req: req)
+    // }
 
     app.post("api", "fetii", "locate") { req async throws -> LocateFetiiResponse in
         try await req.locateFetii()
