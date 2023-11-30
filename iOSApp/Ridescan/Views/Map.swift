@@ -80,12 +80,20 @@ struct MapView: View {
 	}
     
     func fetchBikingTimeEstimate(from start: CLLocationCoordinate2D, to end: CLLocationCoordinate2D) {
+        
+        guard let path = Bundle.main.path(forResource: "Config", ofType: "plist"),
+              let config = NSDictionary(contentsOfFile: path),
+              let apiKey = config["GoogleMapsAPIKey"] as? String else {
+            print("Error: Unable to find GoogleMapsAPIKey in Config.plist")
+            return
+        }
+        
         let url = "https://maps.googleapis.com/maps/api/directions/json"
         let parameters: [String: Any] = [
             "origin": "\(start.latitude),\(start.longitude)",
             "destination": "\(end.latitude),\(end.longitude)",
             "mode": "bicycling",
-            "key": "AIzaSyD9JMtV4HJ4OMXXjPI_Y0b7vbPp30FEPyg"
+            "key": apiKey
         ]
 
         AF.request(url, parameters: parameters).responseDecodable(of: BikeDirectionsResponse.self) { response in
