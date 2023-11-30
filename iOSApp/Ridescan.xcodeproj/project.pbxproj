@@ -27,6 +27,7 @@
 		9B7ABBE62AD5B9D100A822BA /* UserProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7ABBE52AD5B9D100A822BA /* UserProfileViewModel.swift */; };
 		9B9EC71A2AEA0A94007DDADB /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9EC7192AEA0A94007DDADB /* KeychainService.swift */; };
 		9BCC6B242AEAE4EB000BEF81 /* TransportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BCC6B232AEAE4EB000BEF81 /* TransportViewModel.swift */; };
+		9BFE284A2B141DEC0017E66F /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 9BFE28492B141DEC0017E66F /* Alamofire */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -58,6 +59,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9B281C592AEDE6040004D677 /* URLImageStore in Frameworks */,
+				9BFE284A2B141DEC0017E66F /* Alamofire in Frameworks */,
 				8BC62A4727CEF38B0015343B /* Models in Frameworks */,
 				9B281C572AEDE6040004D677 /* URLImage in Frameworks */,
 			);
@@ -160,6 +162,7 @@
 				8BC62A4627CEF38B0015343B /* Models */,
 				9B281C562AEDE6040004D677 /* URLImage */,
 				9B281C582AEDE6040004D677 /* URLImageStore */,
+				9BFE28492B141DEC0017E66F /* Alamofire */,
 			);
 			productName = Kittens;
 			productReference = 8B20582E27BEFFDF00A9E2A1 /* Ridescan.app */;
@@ -191,6 +194,7 @@
 			mainGroup = 8B20582527BEFFDF00A9E2A1;
 			packageReferences = (
 				9B281C552AEDE6040004D677 /* XCRemoteSwiftPackageReference "url-image" */,
+				9BFE28482B141DEC0017E66F /* XCRemoteSwiftPackageReference "Alamofire" */,
 			);
 			productRefGroup = 8B20582F27BEFFDF00A9E2A1 /* Products */;
 			projectDirPath = "";
@@ -455,6 +459,14 @@
 				minimumVersion = 3.1.1;
 			};
 		};
+		9BFE28482B141DEC0017E66F /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.8.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -471,6 +483,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9B281C552AEDE6040004D677 /* XCRemoteSwiftPackageReference "url-image" */;
 			productName = URLImageStore;
+		};
+		9BFE28492B141DEC0017E66F /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9BFE28482B141DEC0017E66F /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

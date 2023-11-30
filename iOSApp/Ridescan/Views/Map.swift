@@ -8,6 +8,8 @@ import SwiftUI
 import MapKit
 import CoreLocation
 import URLImage
+import Alamofire
+import Models
 
 let maroonColor = Color(red: 0.5, green: 0, blue: 0)
 
@@ -32,6 +34,8 @@ struct MapView: View {
 	@State private var isRouteConfirmed: Bool = false
 	
 	@State private var isRouteCalculationComplete = false
+    
+    @State private var settingsDetent = PresentationDetent.fraction(0.3)
 
 	
 	func confirmRoute() {
@@ -45,11 +49,11 @@ struct MapView: View {
 	}
 	
 
-	func calculateRoute(to destination: CLLocationCoordinate2D) {
+    func calculateRoute(to destination: CLLocationCoordinate2D, with transport_type: MKDirectionsTransportType) {
 		let request = MKDirections.Request()
 		request.source = MKMapItem(placemark: MKPlacemark(coordinate: locationManager.region.center))
 		request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destination))
-		request.transportType = .automobile
+		request.transportType = transport_type
 		
 		let directions = MKDirections(request: request)
 		directions.calculate { response, error in
@@ -59,33 +63,62 @@ struct MapView: View {
 			}
 			
 			self.route = newRoute
-			self.updateRouteDistance(with: newRoute)
+			self.updateRouteInfo(with: newRoute, transport_type: transport_type)
+			                
+            let startAnnotation = IdentifiablePointAnnotation()
+            startAnnotation.coordinate = locationManager.region.center
+            startAnnotation.title = "Start"
+            
+            let destinationAnnotation = IdentifiablePointAnnotation()
+            destinationAnnotation.coordinate = destination
+            destinationAnnotation.title = "Destination"
+            
+            self.annotations = [startAnnotation, destinationAnnotation]
 			
-			let startAnnotation = IdentifiablePointAnnotation()
-			startAnnotation.coordinate = locationManager.region.center
-			startAnnotation.title = "Start"
-
-			let destinationAnnotation = IdentifiablePointAnnotation()
-			destinationAnnotation.coordinate = destination
-			destinationAnnotation.title = "Destination"
-
-			self.annotations = [startAnnotation, destinationAnnotation]
-			
-			self.shouldAdjustZoom = true
 		}
 		
-		self.isRouteCalculationComplete = true
-		
-		isRouteDisplayed = true
-
-		
 	}
+    
+    func fetchBikingTimeEstimate(from start: CLLocationCoordinate2D, to end: CLLocationCoordinate2D) {
+        let url = "https://maps.googleapis.com/maps/api/directions/json"
+        let parameters: [String: Any] = [
+            "origin": "\(start.latitude),\(start.longitude)",
+            "destination": "\(end.latitude),\(end.longitude)",
+            "mode": "bicycling",
+            "key": "AIzaSyD9JMtV4HJ4OMXXjPI_Y0b7vbPp30FEPyg"
+        ]
+
+        AF.request(url, parameters: parameters).responseDecodable(of: BikeDirectionsResponse.self) { response in
+            switch response.result {
+            case .success(let directionsResponse):
+                // Handle the decoded response
+                if let firstRoute = directionsResponse.routes.first,
+                   let firstLeg = firstRoute.legs.first {
+                    transportViewModel.bikeTimeEstimate = firstLeg.duration.value / 60
+                }
+            case .failure(let error):
+                print("Error: \(error)")
+            }
+        }
+    }
 
 	@State private var routeDistance: String = ""
+    @State private var carTimeEstimate: Double = 0.0
+    @State private var walkTimeEstimate: Double = 0.0
+    @State private var bikeTimeEstimate: Double = 0.0
+    
 
-	func updateRouteDistance(with route: MKRoute) {
+    func updateRouteInfo(with route: MKRoute, transport_type: MKDirectionsTransportType) {
 		let distanceInMiles = route.distance / 1609.344 // Convert meters to miles
 		routeDistance = String(format: "%.2f miles", distanceInMiles)
+        transportViewModel.setTotalDistance(distance: distanceInMiles)
+        transportViewModel.setCaloriesBurnedEstimate(dist: distanceInMiles)
+        
+        if transport_type == .automobile {
+            transportViewModel.setCarRoute(route: route)
+        } else if transport_type == .walking {
+            transportViewModel.setWalkRoute(route: route)
+        }
 	}
 
 	
@@ -101,9 +134,7 @@ struct MapView: View {
 						.font(.title)
 						.fontWeight(.bold)
 				}
-				if showComparisonSheet {
-					ComparisonView(transportViewModel: transportViewModel)
-				} else {
+				if !showComparisonSheet {
 					if isRouteDisplayed && isRouteCalculationComplete {
 						HStack(spacing: 50) {
 							Text("Distance: \(routeDistance)")
@@ -161,7 +192,20 @@ struct MapView: View {
 										
 										// Calculate the route to the selected location
 										if let destinationCoordinate = searchCompleter.transportViewModel?.dropoffLocation {
-											calculateRoute(to: destinationCoordinate)
+                                            let transport_types: [MKDirectionsTransportType] = [.walking, .automobile]
+                                            
+                                            for trans_type in transport_types {
+                                                calculateRoute(to: destinationCoordinate, with: trans_type)
+                                            }
+                                            
+                                            fetchBikingTimeEstimate(from: locationManager.region.center, to: destinationCoordinate)
+                                            
+                                            self.shouldAdjustZoom = true
+                                            
+                                            isRouteCalculationComplete = true
+                                            
+                                            isRouteDisplayed = true
+                                            
 										}
 										
 										// Update the search bar with the selected address
@@ -192,6 +236,13 @@ struct MapView: View {
 					}
                 }
             }
+            .sheet(isPresented: $showComparisonSheet) {
+                ComparisonView(transportViewModel: transportViewModel)
+                    .presentationDetents(
+                        [.medium, .large, .fraction(0.3)],
+                        selection: $settingsDetent
+                     )
+            }
 		}
 	
 		.gesture(
@@ -204,6 +255,11 @@ struct MapView: View {
 			// set users current location
 			transportViewModel.setLocation(locationManager.region.center, type: "pickup")
 		}
+        .onChange(of: transportViewModel.currentTransportType) { newTransportType in
+            if let destinationCoordinate = searchCompleter.transportViewModel?.dropoffLocation {
+                calculateRoute(to: destinationCoordinate, with: newTransportType)
+            }
+        }
 		.navigationBarBackButtonHidden(true) // Hide the back button
 	}
 	

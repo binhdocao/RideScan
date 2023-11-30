@@ -4,10 +4,15 @@ import Vapor
 
 // Adds API routes to the application.
 func routes(_ app: Application) throws {
-	/// Handles a request to load the list of kittens.
-	app.get { req async throws -> [User] in
-		try await req.findUsers()
-	}
+    /// Handles a request to load the list of users.
+    app.get { req async throws -> [User] in
+        try await req.findUsers()
+    }
+
+    /// Handles a request to load the list of services.
+    app.get("api", "services") { req async throws -> [Service] in
+        try await req.findServices(req: req)
+    }
 
 	/// Handles a request to load info about a particular kitten.
 	app.get(":_id") { req async throws -> User in
@@ -43,9 +48,9 @@ func routes(_ app: Application) throws {
 		try await req.updateUser()
 	}
 
-	app.post("api", "fetii", "find") { req async throws -> FindFetiiResponse in
-		try await req.findFetii()
-	}
+    // app.post("api", "fetii", "find") { req async throws -> FindFetiiResponse in
+    //     try await req.findFetii()
+    // }
 
 	app.post("api", "fetii", "locate") { req async throws -> LocateFetiiResponse in
 		try await req.locateFetii()
@@ -93,6 +98,7 @@ func routes(_ app: Application) throws {
 }
 
 extension User: Content {}
+extension Service: Content {}
 extension FindFetiiResponse: Content {}
 extension LocateFetiiResponse: Content {}
 extension AddUserResponse: Content {}
@@ -101,9 +107,13 @@ extension UpdateUserResponse: Content {}
 extension Request {
 	/// Convenience extension for obtaining a collection.
 
-	var userCollection: MongoCollection<User> {
-		self.application.mongoDB.client.db("ridescan").collection("users", withType: User.self)
-	}
+    var userCollection: MongoCollection<User> {
+        self.application.mongoDB.client.db("ridescan").collection("users", withType: User.self)
+    }
+
+    var serviceCollection: MongoCollection<Service> {
+        self.application.mongoDB.client.db("ridescan").collection("transportation", withType: Service.self)
+    }
 
 	/// Constructs a document using the _id from this request which can be used a filter for MongoDB
 	/// reads/updates/deletions.
@@ -121,6 +131,54 @@ extension Request {
 			throw Abort(.internalServerError, reason: "Failed to load users: \(error)")
 		}
 	}
+
+    func findServices(req: Request) async throws -> [Service] {
+        do {
+
+            let locationInfo = try req.query.decode(LocationInformation.self)
+
+            var services = try await self.serviceCollection.find().toArray()
+            
+            // Loop through each service and call a different function
+            for index in services.indices {
+                var service = services[index]
+
+                // We can assume that we only need to obtain data for non-user proposed services
+                if service.user_proposed == false {
+
+                    // Fetii information
+                    if service.name == "Fetii" {
+                        let findFetiiResponse = try await findFetii(locationInfo: locationInfo)
+
+                        // set price
+                        service.criteria.price = findFetiiResponse.data.first!.min_charge_per_person
+
+                        // set time
+                        if let max_time = findFetiiResponse.data.first!.arriveIn_max_time, let min_time = findFetiiResponse.data.first!.arriveIn_min_time {
+                            if max_time != 0 && min_time != 0 {
+                                service.criteria.time = (max_time + min_time) / 2
+                            }
+                        }
+                        
+                    }
+
+                    // set calories burned
+                    if service.ride_method == "walking" {
+                        service.criteria.calories_burned = service.criteria.time * 5
+                    } else if service.ride_method == "biking" {
+                        service.criteria.calories_burned = service.criteria.time * 10
+                    }
+
+                    services[index] = service
+                }
+            }
+
+            return services
+
+        } catch {
+            throw Abort(.internalServerError, reason: "Failed to load services: \(error)")
+        }
+    }
 	
 	func appleUserExists(appleIdentifier: String) async throws -> Bool {
 		let filter: BSONDocument = [
@@ -330,31 +388,27 @@ extension Request {
 		return String(string[extractionStart..<endIndex!])
 	}
 
-	func findFetii() async throws -> FindFetiiResponse {
-
-		let findFetii = try self.content.decode(FindFetiiRequest.self)
-		print(findFetii)
-
-		// Replace with your endpoint
-		let baseURL = "https://www.fetii.com/api/v29/vehicle-types-list"
+    func findFetii(locationInfo: LocationInformation) async throws -> FindFetiiResponse {
+        
+        let baseURL = "https://www.fetii.com/api/v29/vehicle-types-list"
 
 		guard var urlComponents = URLComponents(string: baseURL) else {
 			throw Abort(.internalServerError, reason: "Invalid URL")
 		}
 
-		// Add query parameters
-		urlComponents.queryItems = [
-			URLQueryItem(name: "pickup_latitude", value: "\(findFetii.userLatitude)"),
-			URLQueryItem(name: "pickup_longitude", value: "\(findFetii.userLongitude)"),
-			URLQueryItem(name: "dropoff_latitude", value: "\(findFetii.destLatitude)"),
-			URLQueryItem(name: "dropoff_longitude", value: "\(findFetii.destLongitude)"),
-			URLQueryItem(name: "dropoff_long_address", value: "\(findFetii.dropoff_long_address)"),
-			URLQueryItem(name: "dropoff_short_address", value: "\(findFetii.dropoff_short_address)"),
-			URLQueryItem(name: "pickup_long_address", value: "\(findFetii.pickup_long_address)"),
-			URLQueryItem(name: "pickup_short_address", value: "\(findFetii.pickup_short_address)"),
-			URLQueryItem(name: "radius_id", value: "1"),
-			URLQueryItem(name: "ride_type", value: "normal")
-		]
+        // Add query parameters
+        urlComponents.queryItems = [
+            URLQueryItem(name: "pickup_latitude", value: "\(locationInfo.userLatitude)"),
+            URLQueryItem(name: "pickup_longitude", value: "\(locationInfo.userLongitude)"),
+            URLQueryItem(name: "dropoff_latitude", value: "\(locationInfo.destLatitude)"),
+            URLQueryItem(name: "dropoff_longitude", value: "\(locationInfo.destLongitude)"),
+            URLQueryItem(name: "dropoff_long_address", value: "\(locationInfo.dropoff_long_address)"),
+            URLQueryItem(name: "dropoff_short_address", value: "\(locationInfo.dropoff_short_address)"),
+            URLQueryItem(name: "pickup_long_address", value: "\(locationInfo.pickup_long_address)"),
+            URLQueryItem(name: "pickup_short_address", value: "\(locationInfo.pickup_short_address)"),
+            URLQueryItem(name: "radius_id", value: "1"),
+            URLQueryItem(name: "ride_type", value: "normal")
+        ]
 
 		guard let url = urlComponents.url else {
 			throw Abort(.internalServerError, reason: "Failed to compose url with parameters")
@@ -363,7 +417,7 @@ extension Request {
 		var request = URLRequest(url: url)
 		request.httpMethod = "GET"
 		// Replace with your bearer token
-		request.addValue("Bearer <#YourBearerToken#>", forHTTPHeaderField: "Authorization")
+        request.addValue("Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImNlNjA5MDY2ZDZjZTc3OTkyZDgxYjZhZDEwNWQyZDBkN2Q0NGQ1MjIxNDQyMTU1NThlZTc2ZmVmMTJjYjQwMzcwOTIzODNlOWIxMWM4MTI1In0.eyJhdWQiOiIzIiwianRpIjoiY2U2MDkwNjZkNmNlNzc5OTJkODFiNmFkMTA1ZDJkMGQ3ZDQ0ZDUyMjE0NDIxNTU1OGVlNzZmZWYxMmNiNDAzNzA5MjM4M2U5YjExYzgxMjUiLCJpYXQiOjE2OTQ3Mzg5MzYsIm5iZiI6MTY5NDczODkzNiwiZXhwIjoxNzI2MzYxMzM2LCJzdWIiOiIxOTY0NjIiLCJzY29wZXMiOltdfQ.cfLhUNZr95dy_QxDAb82AXvE2XtgVqwrQK0EOg_Uaa3NgiMqDV-F0z14ecSXWkm9ALYobzmZqpp68uXzoEsIsQW6yNrqcCYulrIBGFy0tZtObuaeOpmzKV8rEqq2lXWxzxFDpvNd678QIOH2LIpE_Gr1VlrAWGeA6rj9JV6boAaqfpPpDddeT-ThbXecNehsSyUeS_lbmkKSzFMjbeFiX6WP4TbR7ozeJokv47GHJkhJyZoQodpoWPlOCFmy9U7l1JHH4PvQxmvrdYscetPp-d_bQgNn59W9QN-EZUaiSQ5E-mUsTp6ZP320vgG5eOKpTgvANjiUd9bZ17eyQ8160LzDOmnDdynBvjBYLUmIJaRQ2xVnR5TL7XsFkdak0xfIYYWQNpIM4cEsvXyey9Hya7yRf06ZdIDeWnxT5YcIi4PDOMU8JQ38RLRSDCNUTS1x5_qQvcPGuirIbPStNlnIPfoNdAg_GpKuBH931LpzEtD7I6AX-p8DtIuXx1CkKHHTkbviK0CSgkLM2mxVPpCNMGxP5rUVIDL3KRzUvYqyGjFJilWX4fL8Fv5rXWXF8F5T0YWbWLAO5TEn6IMqawaFzzAjAcQnopbG1Tiq9gBF0ZPZCmoOgS54af2IBW_XC9NQyDFqNp_wV_XgKH9GD89ANXElaedhmB5yDtnwGQ0oWW0", forHTTPHeaderField: "Authorization")
 
 		let (data, response) = try await URLSession.shared.data(for: request)
 		guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
@@ -426,4 +480,16 @@ extension Request {
 			throw Abort(.internalServerError, reason: "Error decoding JSON: \(error)")
 		}
 	}
+}
+
+// Define a structure that matches the expected query parameters
+struct LocationInformation: Content {
+    var userLatitude: String
+    var userLongitude: String
+    var pickup_long_address: String
+    var pickup_short_address: String
+    var destLatitude: String
+    var destLongitude: String
+    var dropoff_long_address: String
+    var dropoff_short_address: String
 }
