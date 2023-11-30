@@ -27,6 +27,7 @@
 		9B7ABBE62AD5B9D100A822BA /* UserProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7ABBE52AD5B9D100A822BA /* UserProfileViewModel.swift */; };
 		9B9EC71A2AEA0A94007DDADB /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9EC7192AEA0A94007DDADB /* KeychainService.swift */; };
 		9BCC6B242AEAE4EB000BEF81 /* TransportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BCC6B232AEAE4EB000BEF81 /* TransportViewModel.swift */; };
+		E61154FB2B0F0F6B003F4CB0 /* data in Resources */ = {isa = PBXBuildFile; fileRef = E61154FA2B0F0F6B003F4CB0 /* data */; };
 		DFA39C962B156390003A7B14 /* VeoAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFA39C952B156390003A7B14 /* VeoAuth.swift */; };
 /* End PBXBuildFile section */
 
@@ -51,6 +52,7 @@
 		9B9EC7192AEA0A94007DDADB /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
 		9BCC6B222AEAC000000BEF81 /* Ridescan.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Ridescan.entitlements; sourceTree = "<group>"; };
 		9BCC6B232AEAE4EB000BEF81 /* TransportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransportViewModel.swift; sourceTree = "<group>"; };
+		E61154FA2B0F0F6B003F4CB0 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data; sourceTree = "<group>"; };
 		DFA39C952B156390003A7B14 /* VeoAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VeoAuth.swift; path = Ridescan/Views/VeoAuth.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -90,6 +92,7 @@
 		8B20583027BEFFDF00A9E2A1 /* Ridescan */ = {
 			isa = PBXGroup;
 			children = (
+				E61154FA2B0F0F6B003F4CB0 /* data */,
 				9BCC6B222AEAC000000BEF81 /* Ridescan.entitlements */,
 				15CB3D672AE1740300000F7C /* Assets.xcassets */,
 				8BE0611127C7119200D5E981 /* Utilities.swift */,
@@ -209,6 +212,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E61154FB2B0F0F6B003F4CB0 /* data in Resources */,
 				15CB3D682AE1740300000F7C /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

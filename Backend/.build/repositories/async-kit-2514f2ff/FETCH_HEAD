@@ -1,9 +1,10 @@
-eab9edff78e8ace20bd7cb6e792ab46d54f59ab9	not-for-merge	branch 'main' of https://github.com/vapor/async-kit
+bfcc9cb15b41b3138074196503e29ba5a3e4c6e9	not-for-merge	branch 'main' of https://github.com/vapor/async-kit
 6b3040e523043bb02c5b59692dd493ae7ef420dc	not-for-merge	'refs/pull/10/head' of https://github.com/vapor/async-kit
 25111d707668f06d2777abf6b02a522cf67b5e66	not-for-merge	'refs/pull/100/head' of https://github.com/vapor/async-kit
 deda9849966eccdef69b7c9e67fe3bf29da230bd	not-for-merge	'refs/pull/102/head' of https://github.com/vapor/async-kit
 696bfab5ec5fcb3e013752e6d98de25cd6c9d1b0	not-for-merge	'refs/pull/103/head' of https://github.com/vapor/async-kit
 598f9d0f81d7c279f157fb0832865999ef5c8b55	not-for-merge	'refs/pull/105/head' of https://github.com/vapor/async-kit
+c6a584c12e51e35af7923e8d682efd44f9a4851a	not-for-merge	'refs/pull/106/head' of https://github.com/vapor/async-kit
 63ef59e2a289abb57e622952be9829e681f6f3a4	not-for-merge	'refs/pull/11/head' of https://github.com/vapor/async-kit
 835c97df011a0e38580cb3aed8b54d8c805df014	not-for-merge	'refs/pull/14/head' of https://github.com/vapor/async-kit
 57f61ea9b4d13f768654cbbf7033520bf1592835	not-for-merge	'refs/pull/15/head' of https://github.com/vapor/async-kit
@@ -105,6 +106,7 @@ c3329e444bafbb12d1d312af9191be95348a8175	not-for-merge	tag '1.13.0' of https://g
 9acea4c92f51a5885c149904f0d11db4712dda80	not-for-merge	tag '1.16.0' of https://github.com/vapor/async-kit
 a61da00d404ec91d12766f1b9aac7d90777b484d	not-for-merge	tag '1.17.0' of https://github.com/vapor/async-kit
 eab9edff78e8ace20bd7cb6e792ab46d54f59ab9	not-for-merge	tag '1.18.0' of https://github.com/vapor/async-kit
+7ece208cd401687641c88367a00e3ea2b04311f1	not-for-merge	tag '1.19.0' of https://github.com/vapor/async-kit
 7457413e57dbfac762b32dd30c1caf2c55a02a3d	not-for-merge	tag '1.2.0' of https://github.com/vapor/async-kit
 ff6deaafeea8e9ec2b64e8ae00297a3fa2ae25a9	not-for-merge	tag '1.2.1' of https://github.com/vapor/async-kit
 5760c79afb8ebc24fd3251fdd9724af225fdf1f9	not-for-merge	tag '1.3.0' of https://github.com/vapor/async-kit

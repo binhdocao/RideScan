@@ -1,12 +1,9 @@
 7a46a5fc86cb917f69e3daf79fcb045283d8f008	not-for-merge	branch '8.x-branch' of https://github.com/Quick/Nimble
 0ec9cc4fe41254d3aa6957c55114ef074edced6a	not-for-merge	branch '9.x-branch' of https://github.com/Quick/Nimble
-25b3c6147208f4ca98fc53869ff3b339a76e7141	not-for-merge	branch 'dependabot/bundler/cocoapods-1.14.2' of https://github.com/Quick/Nimble
-d616f15123bfb36db1b1075153f73cf40605b39d	not-for-merge	branch 'main' of https://github.com/Quick/Nimble
+ef552dcfc42948f29ffe50be8f935df6073df853	not-for-merge	branch 'main' of https://github.com/Quick/Nimble
 89f54792a30850930a85a2bbadb7f65b43f1b754	not-for-merge	branch 'nimble-13' of https://github.com/Quick/Nimble
-80e4be6fe6119715574df978034e181e5a442e98	not-for-merge	branch 'pollingdefaults_sendable' of https://github.com/Quick/Nimble
 5359d306beebec808b761e8837751ae51238f954	not-for-merge	branch 'release_11.2.2' of https://github.com/Quick/Nimble
 fb8768c70b092e3c913c9792e9e532eda6194ce5	not-for-merge	branch 'try-fortify' of https://github.com/Quick/Nimble
-c3edec13ef7f72dd75f68d7d69ec38a131a5185a	not-for-merge	branch 'use_actor_in_pollblock' of https://github.com/Quick/Nimble
 e6915c8104657ab4457d1651a11949dd4fa28d1b	not-for-merge	'refs/pull/10/head' of https://github.com/Quick/Nimble
 903d9d076f5d366eda4f6356bc6a42ea5e6a7e34	not-for-merge	'refs/pull/1000/head' of https://github.com/Quick/Nimble
 79a55a6c2b31cf632f34b38d4ace36c29d5d45f0	not-for-merge	'refs/pull/1001/head' of https://github.com/Quick/Nimble
@@ -68,7 +65,6 @@ e9f061bf23e875db0b4a1f905c7c6c4456599f5e	not-for-merge	'refs/pull/1079/head' of 
 8bc7f716c3e0b19e97c4e3117b4a351b5bbcf173	not-for-merge	'refs/pull/1080/head' of https://github.com/Quick/Nimble
 ec023ebf6e2bac15ba459dd4953a9d3e74d0637a	not-for-merge	'refs/pull/1081/head' of https://github.com/Quick/Nimble
 2bbec776afc170c7a8050ba8ab24777c91d92a3c	not-for-merge	'refs/pull/1083/head' of https://github.com/Quick/Nimble
-e7f161d65702bdc6556bb37c209e9833dbcef128	not-for-merge	'refs/pull/1083/merge' of https://github.com/Quick/Nimble
 d8bac5136581ce02d8888d751fcdfbfaf2e9d970	not-for-merge	'refs/pull/1085/head' of https://github.com/Quick/Nimble
 c66790fc444a44f226901190f11fd6f4765c8ed1	not-for-merge	'refs/pull/1086/head' of https://github.com/Quick/Nimble
 2edb21165d81d7f7e4c9630097eb77501fbef44e	not-for-merge	'refs/pull/1088/head' of https://github.com/Quick/Nimble
@@ -78,7 +74,8 @@ c66790fc444a44f226901190f11fd6f4765c8ed1	not-for-merge	'refs/pull/1086/head' of 
 832d0fa568677d5a02a3a2e422f0ed4d55019a87	not-for-merge	'refs/pull/1092/head' of https://github.com/Quick/Nimble
 d5623c102f6bb640076ce30fad0cf2e0ed16ebab	not-for-merge	'refs/pull/1093/head' of https://github.com/Quick/Nimble
 25b3c6147208f4ca98fc53869ff3b339a76e7141	not-for-merge	'refs/pull/1094/head' of https://github.com/Quick/Nimble
-6edc91d66e86e2fe837a0289a35c048a087ada32	not-for-merge	'refs/pull/1094/merge' of https://github.com/Quick/Nimble
+3ff34fc02d5a4130d055ba731a1af27c4c304d99	not-for-merge	'refs/pull/1098/head' of https://github.com/Quick/Nimble
+f8431db2a39b7331cbf7d4da4fec8f7714ff8122	not-for-merge	'refs/pull/1098/merge' of https://github.com/Quick/Nimble
 3e4e70acb6299124e5f79eaddcf5d012f99c4c72	not-for-merge	'refs/pull/114/head' of https://github.com/Quick/Nimble
 6a9a1036c0604119c5567e45916149e16f251152	not-for-merge	'refs/pull/118/head' of https://github.com/Quick/Nimble
 c9bbfdaf826e06ecf27eed79c8b6a37ae5c35a4b	not-for-merge	'refs/pull/120/head' of https://github.com/Quick/Nimble

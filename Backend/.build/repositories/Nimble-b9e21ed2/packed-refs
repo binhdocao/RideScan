@@ -3,10 +3,8 @@
 0ec9cc4fe41254d3aa6957c55114ef074edced6a refs/heads/9.x-branch
 d616f15123bfb36db1b1075153f73cf40605b39d refs/heads/main
 89f54792a30850930a85a2bbadb7f65b43f1b754 refs/heads/nimble-13
-80e4be6fe6119715574df978034e181e5a442e98 refs/heads/pollingdefaults_sendable
 5359d306beebec808b761e8837751ae51238f954 refs/heads/release_11.2.2
 fb8768c70b092e3c913c9792e9e532eda6194ce5 refs/heads/try-fortify
-c3edec13ef7f72dd75f68d7d69ec38a131a5185a refs/heads/use_actor_in_pollblock
 e6915c8104657ab4457d1651a11949dd4fa28d1b refs/pull/10/head
 903d9d076f5d366eda4f6356bc6a42ea5e6a7e34 refs/pull/1000/head
 79a55a6c2b31cf632f34b38d4ace36c29d5d45f0 refs/pull/1001/head
@@ -68,7 +66,6 @@ e9f061bf23e875db0b4a1f905c7c6c4456599f5e refs/pull/1079/head
 8bc7f716c3e0b19e97c4e3117b4a351b5bbcf173 refs/pull/1080/head
 ec023ebf6e2bac15ba459dd4953a9d3e74d0637a refs/pull/1081/head
 2bbec776afc170c7a8050ba8ab24777c91d92a3c refs/pull/1083/head
-e7f161d65702bdc6556bb37c209e9833dbcef128 refs/pull/1083/merge
 d8bac5136581ce02d8888d751fcdfbfaf2e9d970 refs/pull/1085/head
 c66790fc444a44f226901190f11fd6f4765c8ed1 refs/pull/1086/head
 2edb21165d81d7f7e4c9630097eb77501fbef44e refs/pull/1088/head

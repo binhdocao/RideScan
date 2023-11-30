@@ -4,7 +4,8 @@ b64e70d133116987544125770ab8912ab2d06b39	not-for-merge	branch 'beta' of https://
 2f06450ac97435d45280e6141df2c9c38cb5c1d7	not-for-merge	branch 'feature/use-swift-collections' of https://github.com/vapor/multipart-kit
 2676981c04b16deffeed763db795b2e16a160397	not-for-merge	branch 'joannis-performance' of https://github.com/vapor/multipart-kit
 ae89fefe60011d557c42ddb17e9e8a80bdd356ba	not-for-merge	branch 'linux-ci' of https://github.com/vapor/multipart-kit
-d722ba47ee4acdef7faf9de6b5497753e3ad1c74	not-for-merge	branch 'main' of https://github.com/vapor/multipart-kit
+cf2f6ad2f831006d51023d59aa208f0f7ddd6cc6	not-for-merge	branch 'main' of https://github.com/vapor/multipart-kit
+bb1757941fbaa54c6542af55df7badc221b74713	not-for-merge	branch 'sendable' of https://github.com/vapor/multipart-kit
 fc15a1617ade3e0d5ef2be72c671f1a9f2a8fec6	not-for-merge	branch 'vapor-1' of https://github.com/vapor/multipart-kit
 3d0d7da9dfa7ab08185d5dc4b9dfee6c098149c3	not-for-merge	'refs/pull/1/head' of https://github.com/vapor/multipart-kit
 d891c02fc2a40ae1114b891d3bd506f06eeed189	not-for-merge	'refs/pull/10/head' of https://github.com/vapor/multipart-kit
@@ -69,6 +70,8 @@ b55af93b7ca697a318462481d9260a79f3372820	not-for-merge	'refs/pull/71/head' of ht
 bba4803a3d4ca0ef9a92e850cfc9ec4781aabede	not-for-merge	'refs/pull/88/head' of https://github.com/vapor/multipart-kit
 cc0d786e694dc997c4c36ef30760243f86ec0f08	not-for-merge	'refs/pull/89/head' of https://github.com/vapor/multipart-kit
 0904266cac07df572774dad7cfbc5ac2ea184815	not-for-merge	'refs/pull/9/head' of https://github.com/vapor/multipart-kit
+bb1757941fbaa54c6542af55df7badc221b74713	not-for-merge	'refs/pull/90/head' of https://github.com/vapor/multipart-kit
+c534a12e4eb24e2643e2e41de3f66fa72db2f887	not-for-merge	'refs/pull/90/merge' of https://github.com/vapor/multipart-kit
 5e666ae71242efd95a49b230ed67249b24365857	not-for-merge	tag '1.0.0' of https://github.com/vapor/multipart-kit
 2ea24e535f67fd1a28ee4b3159c3d976c824f8a3	not-for-merge	tag '1.0.1' of https://github.com/vapor/multipart-kit
 17255901690084b4535dcb34f2cd4fb9784cd5cd	not-for-merge	tag '1.0.2' of https://github.com/vapor/multipart-kit
