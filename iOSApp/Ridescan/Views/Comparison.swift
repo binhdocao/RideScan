@@ -76,7 +76,7 @@ struct ComparisonView: View {
 	@State private var selectedTransportation: TransportationMode = .allS
 	@State private var showTransportationPicker: Bool = false
 	@State private var showSortingPicker: Bool = false
-    init(destination: CLLocationCoordinate2D, showBusRoute: Binding<Bool>, fromTo: Binding<FromTo>, distance: Double, bestStop: CLLocationCoordinate2D, buses: [BrazosDriver] ) {
+    init(destination: CLLocationCoordinate2D, showBusRoute: Binding<Bool>, fromTo: Binding<FromTo>, distance: Double, bestStop: CLLocationCoordinate2D, buses: [BrazosDriver], time : Double ) {
             self.destination = destination
         _showBusRoute = showBusRoute
         _fromTo = fromTo
@@ -103,7 +103,7 @@ struct ComparisonView: View {
             mydistance = distance
         }
         
-        rideServices.append(RideService(name: "Brazos Bus Service", price: 1.0, min_people: 1, max_people: 1, iconName: "bus", timeEstimate: 20, distanceEstimate: mydistance))
+        rideServices.append(RideService(name: "Brazos Bus Service", price: 1.0, min_people: 1, max_people: 1, iconName: "bus", timeEstimate: Int(time), distanceEstimate: mydistance))
         
         }
     
@@ -187,7 +187,7 @@ struct ComparisonView: View {
                                 VStack(alignment: .leading) {
                                     Text(service.name)
                                         .font(.headline)
-                                    Text("Time:\(service.timeEstimate)")
+                                    Text("Time:\(service.timeEstimate) minutes")
                                         .font(.subheadline)
                                 }
                                 
@@ -199,7 +199,7 @@ struct ComparisonView: View {
                                         .font(.body)
                                     Text("Min Passengers: \(service.min_people)")
                                         .font(.subheadline)
-                                    Text("Distance: \(service.distanceEstimate)")
+                                    Text("Distance: \(service.distanceEstimate) miles")
                                         .font(.subheadline)
                                 }
                             }

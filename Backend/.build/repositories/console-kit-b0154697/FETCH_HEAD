@@ -1,6 +1,6 @@
 74cfbea629d4aac34a97cead2447a6870af1950b	not-for-merge	branch '3' of https://github.com/vapor/console-kit
 69a0fe7e67662e400bffeb6016f7014a1714da1a	not-for-merge	branch 'hugely-improved-logger' of https://github.com/vapor/console-kit
-7d0898ed481e1855ec549924ab701bdc6f754b18	not-for-merge	branch 'main' of https://github.com/vapor/console-kit
+2e3e205e8d7563d5c1a6f1c8992616d337f632e6	not-for-merge	branch 'main' of https://github.com/vapor/console-kit
 5a3dff1bbf4f0911a31e9035948fcbf34c0800e2	not-for-merge	branch 'split-targets' of https://github.com/vapor/console-kit
 4e64182afa85200bedd718edb1fd656c7d949fa5	not-for-merge	'refs/pull/1/head' of https://github.com/vapor/console-kit
 1088e007ef3d13e9418c458ca9b59c1bcef8b41d	not-for-merge	'refs/pull/100/head' of https://github.com/vapor/console-kit
@@ -80,6 +80,7 @@ cb1bb0447bf81c9026db6a72038b41a57fd307a3	not-for-merge	'refs/pull/190/head' of h
 5a3dff1bbf4f0911a31e9035948fcbf34c0800e2	not-for-merge	'refs/pull/192/head' of https://github.com/vapor/console-kit
 30078837cf98b3310048b3a4bd21f55ed7f0012d	not-for-merge	'refs/pull/192/merge' of https://github.com/vapor/console-kit
 85e452c50ab7c7900c89190e9a45fd7fb3103949	not-for-merge	'refs/pull/193/head' of https://github.com/vapor/console-kit
+d5da1de7c5293fa7bef1905799a3a3b2f26ad632	not-for-merge	'refs/pull/194/head' of https://github.com/vapor/console-kit
 fdb65c8be213196ff2d284209087377117828593	not-for-merge	'refs/pull/2/head' of https://github.com/vapor/console-kit
 6f4f72a2170996840a3a05508c1b8cb47bf6682c	not-for-merge	'refs/pull/21/head' of https://github.com/vapor/console-kit
 89a6cbb15381e7c51e9e0dd90155154dbe4dffa7	not-for-merge	'refs/pull/23/head' of https://github.com/vapor/console-kit
@@ -216,6 +217,7 @@ de99d83c9f3c298371002729cc0601e4b5d9e0c9	not-for-merge	tag '4.0.0-rc.1' of https
 cc584bd849ef3f8c258f4f18bfcc3d5a80876d6d	not-for-merge	tag '4.10.0' of https://github.com/vapor/console-kit
 f4ef965dadd999f7e4687053153c97b8b320819c	not-for-merge	tag '4.10.1' of https://github.com/vapor/console-kit
 7d0898ed481e1855ec549924ab701bdc6f754b18	not-for-merge	tag '4.10.2' of https://github.com/vapor/console-kit
+2e3e205e8d7563d5c1a6f1c8992616d337f632e6	not-for-merge	tag '4.11.0' of https://github.com/vapor/console-kit
 310f714b4ac4032946fd2c7984e8082a99f7dd49	not-for-merge	tag '4.2.0' of https://github.com/vapor/console-kit
 7cf8185ad62d50ae9777ce78bcfde8f5c9f900e2	not-for-merge	tag '4.2.1' of https://github.com/vapor/console-kit
 f7bc0177565197091f4ddc51100beb99dd8de5fb	not-for-merge	tag '4.2.2' of https://github.com/vapor/console-kit

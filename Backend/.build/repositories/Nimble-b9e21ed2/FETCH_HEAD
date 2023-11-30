@@ -1,5 +1,6 @@
 7a46a5fc86cb917f69e3daf79fcb045283d8f008	not-for-merge	branch '8.x-branch' of https://github.com/Quick/Nimble
 0ec9cc4fe41254d3aa6957c55114ef074edced6a	not-for-merge	branch '9.x-branch' of https://github.com/Quick/Nimble
+f8e7154d437058339643dfdb9205e9176484a854	not-for-merge	branch 'dependabot/bundler/cocoapods-1.14.3' of https://github.com/Quick/Nimble
 ef552dcfc42948f29ffe50be8f935df6073df853	not-for-merge	branch 'main' of https://github.com/Quick/Nimble
 89f54792a30850930a85a2bbadb7f65b43f1b754	not-for-merge	branch 'nimble-13' of https://github.com/Quick/Nimble
 5359d306beebec808b761e8837751ae51238f954	not-for-merge	branch 'release_11.2.2' of https://github.com/Quick/Nimble
@@ -76,6 +77,8 @@ d5623c102f6bb640076ce30fad0cf2e0ed16ebab	not-for-merge	'refs/pull/1093/head' of 
 25b3c6147208f4ca98fc53869ff3b339a76e7141	not-for-merge	'refs/pull/1094/head' of https://github.com/Quick/Nimble
 3ff34fc02d5a4130d055ba731a1af27c4c304d99	not-for-merge	'refs/pull/1098/head' of https://github.com/Quick/Nimble
 f8431db2a39b7331cbf7d4da4fec8f7714ff8122	not-for-merge	'refs/pull/1098/merge' of https://github.com/Quick/Nimble
+f8e7154d437058339643dfdb9205e9176484a854	not-for-merge	'refs/pull/1100/head' of https://github.com/Quick/Nimble
+2c1d1535906779dca12bc966af19ade8b0d88639	not-for-merge	'refs/pull/1100/merge' of https://github.com/Quick/Nimble
 3e4e70acb6299124e5f79eaddcf5d012f99c4c72	not-for-merge	'refs/pull/114/head' of https://github.com/Quick/Nimble
 6a9a1036c0604119c5567e45916149e16f251152	not-for-merge	'refs/pull/118/head' of https://github.com/Quick/Nimble
 c9bbfdaf826e06ecf27eed79c8b6a37ae5c35a4b	not-for-merge	'refs/pull/120/head' of https://github.com/Quick/Nimble
