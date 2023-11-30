@@ -39,6 +39,10 @@ class TransportViewModel: ObservableObject {
     @Published var max_time: Int = 0
     @Published var max_cals: Int = 0
     
+    // veo
+    @Published var veoInfo: VEOPriceLocation = VEOPriceLocation()
+    @Published var bikesToDisplay: [BikeDistance] = [BikeDistance]()
+    
     // current transport type
     @Published var currentTransportType: MKDirectionsTransportType = .automobile
     
@@ -76,6 +80,17 @@ class TransportViewModel: ObservableObject {
     func setCaloriesBurnedEstimate(dist: Double) {
         walkCaloriesEstimate = dist * 170
         bikeCaloriesEstimate = dist * 50
+    }
+    
+    func displayBikes() {
+        // Ensure that there are enough bikes to extract the first 5
+            if veoInfo.closestBikes.count >= 5 {
+                // Get the first 5 bikes
+                bikesToDisplay = Array(veoInfo.closestBikes.prefix(5))
+            } else {
+                // If there are less than 5 bikes, take as many as available
+                bikesToDisplay = veoInfo.closestBikes
+            }
     }
     
     func updateCaloriesEstimates() {
@@ -414,9 +429,9 @@ class TransportViewModel: ObservableObject {
         let veoRequest = FindVEORequest(userLatitude: String(pickupLocation.latitude), userLongitude: String(pickupLocation.longitude), veoToken: veoToken)
         
         // send the request to backend
-        let response: VEOPriceLocation = try await HTTP.post(url: userURL, body: veoRequest)
+        veoInfo = try await HTTP.post(url: userURL, body: veoRequest)
         
-        return response
+        return veoInfo
     }
     
 }

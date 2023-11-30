@@ -27,7 +27,7 @@ struct MapView: View {
 
 	@State private var annotations: [IdentifiablePointAnnotation] = []
     @State private var annotations1: [IdentifiablePointAnnotation] = []
-    
+    @State private var veoAnnotations: [IdentifiablePointAnnotation] = []
 	
 	@State private var route: MKRoute?
 	
@@ -336,8 +336,26 @@ struct MapView: View {
                 calculateRoute(from: locationManager.region.center, to: destinationCoordinate, with: newTransportType)
             }
         }
+        .onChange(of: transportViewModel.bikesToDisplay) { bikes in
+            updateBikeAnnotations()
+        }
 		.navigationBarBackButtonHidden(true) // Hide the back button
 	}
+    
+    // Add this function inside your MapView struct
+    func updateBikeAnnotations() {
+        let bikeAnnotations = transportViewModel.bikesToDisplay.prefix(5).map { bike -> IdentifiablePointAnnotation in
+            let annotation = IdentifiablePointAnnotation()
+            annotation.coordinate = CLLocationCoordinate2D(latitude: bike.lat, longitude: bike.lng)
+            annotation.title = "Veo"
+            return annotation
+        }
+        
+        // Update your annotations state with the new bike annotations
+        // You might want to clear previous bike annotations or handle this differently based on your use case
+        self.annotations.append(contentsOf: bikeAnnotations)
+        print(self.annotations)
+    }
 	
 	init() {
 		searchCompleter.transportViewModel = transportViewModel
@@ -693,6 +711,30 @@ struct WrappedMapView: UIViewRepresentable {
 			}
 			return MKOverlayRenderer()
 		}
+        
+        func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+            guard let identifiableAnnotation = annotation as? IdentifiablePointAnnotation else { return nil }
+
+            if identifiableAnnotation.title == "Veo" {
+                let identifier = "BikeAnnotation"
+                var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
+
+                if annotationView == nil {
+                    annotationView = MKAnnotationView(annotation: identifiableAnnotation, reuseIdentifier: identifier)
+                    annotationView!.canShowCallout = true
+                } else {
+                    annotationView!.annotation = identifiableAnnotation
+                }
+
+                let bikeImage = UIImage(systemName: "bicycle.circle")
+                annotationView!.image = bikeImage
+
+                return annotationView
+            }
+
+            // Return nil to use the default annotation view
+            return nil
+        }
 	}
 }
 

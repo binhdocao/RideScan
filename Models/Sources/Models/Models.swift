@@ -373,16 +373,28 @@ public struct VEOPrice: Codable {
     public let frequency: Int
     public let unlockFee: Double
     public let freeRideMinutes: String?
+    
+    public init() {
+        self.price = 0.0
+        self.frequency = 0
+        self.unlockFee = 0.0
+        self.freeRideMinutes = ""
+    }
 }
 
 public struct VEOPriceLocation: Codable {
     public let price: VEOPrice
     public let closestBikes: [BikeDistance]
     
-    /// Initializes a new `UserLoc` instance.
+    /// Initializes a new `VEOPriceLocation` instance.
     public init(price: VEOPrice, closestBikes: [BikeDistance]) {
         self.price = price
         self.closestBikes = closestBikes
+    }
+    
+    public init() {
+        self.price = VEOPrice()
+        self.closestBikes = [BikeDistance]()
     }
 }
 
@@ -405,7 +417,7 @@ public struct VEOBikeResponse: Codable {
     public let data: VEOBikeInfo
 }
 
-public struct BikeDistance: Codable {
+public struct BikeDistance: Codable, Equatable {
     public let lat: Double
     public let lng: Double
     public let distance: Double
@@ -415,6 +427,17 @@ public struct BikeDistance: Codable {
         self.lat = lat
         self.lng = lng
         self.distance = distance
+    }
+    
+    public init() {
+        self.lat = 0.0
+        self.lng = 0.0
+        self.distance = 0.0
+    }
+    
+    // Equatable conformance
+    public static func ==(lhs: BikeDistance, rhs: BikeDistance) -> Bool {
+        return lhs.lat == rhs.lat && lhs.lng == rhs.lng && lhs.distance == rhs.distance
     }
 }
 
