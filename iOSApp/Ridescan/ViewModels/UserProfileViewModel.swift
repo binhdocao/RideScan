@@ -37,6 +37,7 @@ class UserProfileViewModel: ObservableObject {
         DispatchQueue.main.async {
             self.user = user
         }
+        
     }
 
     
@@ -143,42 +144,41 @@ class UserProfileViewModel: ObservableObject {
 
     /// Finish VEO verification process
     func VEOVerify(verification: String) async throws {
-
         let verifyURL = URL(string: "https://cluster-prod.veoride.com/api/customers/auth/auth-code/verification")!
+        
+        // Retrieve and decode user data from Keychain
+        guard let userData = try KeychainService.load(key: "userInfo"),
+              let user = try? JSONDecoder().decode(User.self, from: userData) else {
+            return
+        }
 
-        // Add values for verification request
+
+        // Prepare JSON data for the request
         let json: [String: String] = [
             "phone": user.phone,
             "phoneModel": "iPhone 12",
             "appVersion": "4.1.5",
             "code": verification
         ]
+                
+        let jsonData = try JSONSerialization.data(withJSONObject: json, options: [])
+        
 
-
-        let jsonData = try? JSONSerialization.data(withJSONObject: json, options: [])
-
+        // Create the request
         var request = URLRequest(url: verifyURL)
         request.httpMethod = "POST"
-
-        // Add values for verification request
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        //request.setValue("\(jsonData?.count)", forHTTPHeaderField: "Content-Length")
-
         request.httpBody = jsonData
+        
+        // Perform the request
+        let (data, _) = try await URLSession.shared.data(for: request)
 
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            guard let data = data, error == nil else {
-                print(error?.localizedDescription ?? "No data")
-                return
-            }
-            let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
-            if let responseJSON = responseJSON as? [String: Any] {
-                let defaults = UserDefaults.standard
-                if let tempJSON = responseJSON["data"] as? [String: Any] {
-                    let veoToken = tempJSON["token"] as! String
-                    defaults.set(veoToken, forKey: "veoToken")
-                }
-            }
+        // Handle the response
+        let responseJSON = try JSONSerialization.jsonObject(with: data, options: [])
+        if let responseJSON = responseJSON as? [String: Any],
+           let tempJSON = responseJSON["data"] as? [String: Any],
+           let veoToken = tempJSON["token"] as? String {
+            UserDefaults.standard.set(veoToken, forKey: "veoToken")
         }
     }
 
