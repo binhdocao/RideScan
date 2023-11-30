@@ -117,7 +117,9 @@ struct SignUpView: View {
 							try await viewModel.createUser(user: newUser)
 							userSettings.isAuthenticated = true
 							createAccountSuccess = true
+
 							try await viewModel.VEO()
+
 						} catch {
 							// Handle errors here
 							createAccountSuccess = false

@@ -85,15 +85,6 @@ func routes(_ app: Application) throws {
         }
     }
 
-
-
-
-
-
-
-
-
-
 }
 
 extension User: Content {}
@@ -512,4 +503,5 @@ extension Request {
             throw Abort(.internalServerError, reason: "Error decoding JSON: \(error)")
         }
     }
+
 }

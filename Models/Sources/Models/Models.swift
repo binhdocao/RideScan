@@ -15,7 +15,6 @@ import SwiftBSON
  * are used in the iOS interface.
  */
 
-
 public struct User: Identifiable, Codable {
     
     /// Unique identifier.
@@ -46,7 +45,6 @@ public struct User: Identifiable, Codable {
         self.phone = phone
         self.password = password
     }
-
 }
 
 
