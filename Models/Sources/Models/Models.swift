@@ -7,7 +7,7 @@
 
 import Foundation
 import SwiftBSON
-
+import CoreLocation
 /**
  * Represents a user.
  * This type conforms to `Codable` to allow us to serialize it to and deserialize it from extended JSON and BSON.
@@ -15,38 +15,36 @@ import SwiftBSON
  * are used in the iOS interface.
  */
 
-
 public struct User: Identifiable, Codable {
-	
-	/// Unique identifier.
-	public var id: String?
-	public var firstname: String
-	public var lastname: String
-	public var email: String
-	public var phone: String
-	public var password: String
+    
+    /// Unique identifier.
+    public var id: String?
+    public var firstname: String
+    public var lastname: String
+    public var email: String
+    public var phone: String
+    public var password: String
 
-	private enum CodingKeys: String, CodingKey {
-		case id = "_id", firstname, lastname, email, phone, password
-	}
+    private enum CodingKeys: String, CodingKey {
+        case id = "_id", firstname, lastname, email, phone, password
+    }
 
-	/// Initializes a new `User` instance. If an `id` is not provided, a new one will be generated automatically.
-	public init(
-		id: String? = nil,
-		firstname: String,
-		lastname: String,
-		email: String,
-		phone: String,
-		password: String
-	) {
-		self.id = id ?? BSONObjectID().hex
-		self.firstname = firstname
-		self.lastname = lastname
-		self.email = email
-		self.phone = phone
-		self.password = password
-	}
-
+    /// Initializes a new `User` instance. If an `id` is not provided, a new one will be generated automatically.
+    public init(
+        id: String? = nil,
+        firstname: String,
+        lastname: String,
+        email: String,
+        phone: String,
+        password: String
+    ) {
+        self.id = id ?? BSONObjectID().hex
+        self.firstname = firstname
+        self.lastname = lastname
+        self.email = email
+        self.phone = phone
+        self.password = password
+    }
 }
 
 
@@ -186,13 +184,13 @@ public struct AddUserResponse: Codable {
  * This type conforms to `Codable` to allow us to serialize it to and deserialize it from extended JSON and BSON.
  */
 public struct UpdateUserResponse: Codable {
-	public let id: String // Use String instead of BSONObjectID
-	public let message: String
+    public let id: String // Use String instead of BSONObjectID
+    public let message: String
 
-	public init(id: String, message: String) {
-		self.id = id
-		self.message = message
-	}
+    public init(id: String, message: String) {
+        self.id = id
+        self.message = message
+    }
 }
 
 
@@ -298,12 +296,36 @@ public struct BrazosDriver: Codable {
     public let RouteId: Int
     public let lat: Double
     public let lng: Double
+    public var stops: [CLLocationCoordinate2D] = [] // stops is not decodable. hardcoded instead
     
-    public init(RouteId: Int, lat: Double, lng: Double) {
+    public init(RouteId: Int, lat: Double, lng: Double, stops: [CLLocationCoordinate2D] = [] ) {
         self.RouteId = RouteId
         self.lat = lat
         self.lng = lng
+        self.stops = stops
     }
+    
+    private enum CodingKeys: String, CodingKey {
+        case RouteId, lat, lng
+        // Exclude 'stops' from coding
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        RouteId = try container.decode(Int.self, forKey: .RouteId)
+        lat = try container.decode(Double.self, forKey: .lat)
+        lng = try container.decode(Double.self, forKey: .lng)
+        // Do not decode stops
+    }
+        
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(RouteId, forKey: .RouteId)
+        try container.encode(lat, forKey: .lat)
+        try container.encode(lng, forKey: .lng)
+        // Do not encode stops
+    }
+    
 }
 //
 public struct BrazosVehicleType: Codable {
@@ -311,3 +333,103 @@ public struct BrazosVehicleType: Codable {
     public let top_image: String
 }
 ///
+///
+public struct VEOVerificationRequest: Codable {
+    public let msg: String
+    public let code: Int
+    public let data: String
+}
+
+public struct VEOVerificationResponseData: Codable {
+    public let token: String
+    public let isLogin: Bool
+}
+
+public struct VEOVerificationResponse: Codable {
+    public let msg: String
+    public let code: Int
+    public let data: VEOVerificationResponseData
+}
+
+public struct VEOPrice: Codable {
+    public let price: Double
+    public let frequency: Int
+    public let unlockFee: Double
+    public let freeRideMinutes: String?
+}
+
+public struct VEOPriceLocation: Codable {
+    public let price: VEOPrice
+    public let closestBikes: [BikeDistance]
+    
+    /// Initializes a new `UserLoc` instance.
+    public init(price: VEOPrice, closestBikes: [BikeDistance]) {
+        self.price = price
+        self.closestBikes = closestBikes
+    }
+}
+
+public struct VEOBikeInfo: Codable {
+    public let vehicleNumber: Int
+    public let vehicleType: Int
+    public let vehicleVersion: String
+    public let locked: Bool
+    public let chainLocked: String?
+    public let mac: String
+    public let connected: Bool
+    public let vehicleBattery: Int
+    public let price: VEOPrice
+    public let chainLock: String?
+}
+
+public struct VEOBikeResponse: Codable {
+    public let msg: String
+    public let code: Int
+    public let data: VEOBikeInfo
+}
+
+public struct BikeDistance: Codable {
+    public let lat: Double
+    public let lng: Double
+    public let distance: Double
+    
+    /// Initializes a new `UserLoc` instance.
+    public init(lat: Double, lng: Double, distance: Double) {
+        self.lat = lat
+        self.lng = lng
+        self.distance = distance
+    }
+}
+
+public struct BikeLoc: Codable {
+    public let lat: Double
+    public let lng: Double
+}
+
+public struct FindVEORequest: Codable {
+    public let userLatitude: String
+    public let userLongitude: String
+    public let veoToken: String
+    
+    /// Initializes a new `UserLoc` instance.
+    public init(userLatitude: String, userLongitude: String, veoToken: String) {
+        self.userLatitude = userLatitude
+        self.userLongitude = userLongitude
+        self.veoToken = veoToken
+    }
+}
+
+public struct FindVEOResponseData: Codable {
+    public let vehicleNumber: Int
+    public let vehicleType: Int
+    public let vehicleVersion: String
+    public let iotBattery: Int
+    public let vehicleBattery: Int
+    public let location: BikeLoc
+}
+
+public struct FindVEOResponse: Codable {
+    public let msg: String
+    public let code: Int
+    public let data: [FindVEOResponseData]
+}

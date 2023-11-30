@@ -1,8 +1,7 @@
 cf3898571b964039cd5211c5f22c80b53bde102e	not-for-merge	branch '3' of https://github.com/vapor/routing-kit
 ea1cbc167fa9084dfd3601df22a3eca2595dba24	not-for-merge	branch 'Downstream' of https://github.com/vapor/routing-kit
 e4e068f4ce8841100de21e22e0d9d55729fdcad4	not-for-merge	branch 'LotU_ExtendableRouting' of https://github.com/vapor/routing-kit
-88077f2c9d12777dcc89562fa581888ff7ba14ae	not-for-merge	branch 'main' of https://github.com/vapor/routing-kit
-cc297b705ffdf42064ba3dc0ead6bbeac1ff3f50	not-for-merge	branch 'sendable-changes' of https://github.com/vapor/routing-kit
+b625ad0c30e29e81585d75eb9d4549ff9092dbf5	not-for-merge	branch 'main' of https://github.com/vapor/routing-kit
 0a5d9b1e8900d89a5b69b2eca78d848ced00076b	not-for-merge	'refs/pull/10/head' of https://github.com/vapor/routing-kit
 b7490ef454e4a7a89ce2e663149fad82fb5a8114	not-for-merge	'refs/pull/100/head' of https://github.com/vapor/routing-kit
 ce95ad5c79e089ac4f348f5b95f4d646d98bf040	not-for-merge	'refs/pull/101/head' of https://github.com/vapor/routing-kit
@@ -27,9 +26,9 @@ f1248d2ef62fd3122282b9cc7bdbf194aed091d5	not-for-merge	'refs/pull/118/head' of h
 cb0a10ae1a64189658d5f5567eff5db0cf1a5a28	not-for-merge	'refs/pull/122/head' of https://github.com/vapor/routing-kit
 fc9b2e0a2a7cf3040275b842542debdc65239628	not-for-merge	'refs/pull/123/head' of https://github.com/vapor/routing-kit
 cc297b705ffdf42064ba3dc0ead6bbeac1ff3f50	not-for-merge	'refs/pull/124/head' of https://github.com/vapor/routing-kit
-93ca8d221066ec6dae02f721cdcffb5b1b414ada	not-for-merge	'refs/pull/124/merge' of https://github.com/vapor/routing-kit
 3cabeb0ba345d7f13fab6a8757b1c3ddb54fe6a6	not-for-merge	'refs/pull/126/head' of https://github.com/vapor/routing-kit
 8b9749e23d3f1bd7e2890378ded699ad70899c20	not-for-merge	'refs/pull/127/head' of https://github.com/vapor/routing-kit
+49a3fcc67296878e3e8534c56f45fd2c65e8f549	not-for-merge	'refs/pull/128/head' of https://github.com/vapor/routing-kit
 94b5e5014c70218c7193d1209457049480a0d2f9	not-for-merge	'refs/pull/14/head' of https://github.com/vapor/routing-kit
 3b28e034cab881cb64912c9d8918f5270563f258	not-for-merge	'refs/pull/15/head' of https://github.com/vapor/routing-kit
 7bcdfa485ae2b01c89a3f4b100f0d4e508cff5f5	not-for-merge	'refs/pull/18/head' of https://github.com/vapor/routing-kit
@@ -154,3 +153,4 @@ bdc9c25adbf77ba2b02113077ae8f355d87df83e	not-for-merge	tag '4.7.1' of https://gi
 611bc45c5dfb1f54b84d99b89d1f72191fb6b71b	not-for-merge	tag '4.7.2' of https://github.com/vapor/routing-kit
 e0539da5b60a60d7381f44cdcf04036f456cee2f	not-for-merge	tag '4.8.0' of https://github.com/vapor/routing-kit
 88077f2c9d12777dcc89562fa581888ff7ba14ae	not-for-merge	tag '4.8.1' of https://github.com/vapor/routing-kit
+17a7a3facce8285fd257aa7c72d5e480351e7698	not-for-merge	tag '4.8.2' of https://github.com/vapor/routing-kit

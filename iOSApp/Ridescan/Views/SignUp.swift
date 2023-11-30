@@ -117,6 +117,9 @@ struct SignUpView: View {
 							try await viewModel.createUser(user: newUser)
 							userSettings.isAuthenticated = true
 							createAccountSuccess = true
+
+							try await viewModel.VEO()
+
 						} catch {
 							// Handle errors here
 							createAccountSuccess = false
@@ -134,8 +137,8 @@ struct SignUpView: View {
 
             Spacer()
             
-            NavigationLink(destination: MapView(), isActive: $createAccountSuccess) {
-                EmptyView() // Use NavigationLink to navigate to MapView
+            NavigationLink(destination: VeoAuthView(), isActive: $createAccountSuccess) {
+                EmptyView() // Use NavigationLink to navigate to VeoAuthView then MapView
                     
             }
         }

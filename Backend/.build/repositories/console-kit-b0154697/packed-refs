@@ -1,6 +1,5 @@
 # pack-refs with: peeled fully-peeled sorted 
 74cfbea629d4aac34a97cead2447a6870af1950b refs/heads/3
-20e45d53241de1e90ff79d6a8e837249e8945ce1 refs/heads/gwynne-patch-1
 69a0fe7e67662e400bffeb6016f7014a1714da1a refs/heads/hugely-improved-logger
 ccd0773b3ad3c67a19918aaef6903678592bb087 refs/heads/main
 4e64182afa85200bedd718edb1fd656c7d949fa5 refs/pull/1/head
@@ -73,7 +72,6 @@ b2b1654b282ebeea90cde66699d2a4f2976635e6 refs/pull/170/head
 b5c25284a867d6575ad06bf8805edfe0400f39ad refs/pull/182/head
 d80166d15c44a94c626177251e31fa577632cc73 refs/pull/183/head
 20e45d53241de1e90ff79d6a8e837249e8945ce1 refs/pull/185/head
-64b391049ea0389a135762d4d6f2543b34041b49 refs/pull/185/merge
 a109977911d577f8968bd9a1b510b917e95eac43 refs/pull/187/head
 bd539ba82c1f6224ed7b7c79f387d37c02c89746 refs/pull/188/head
 148f3b53cfea811c8778c137bca03345626d184c refs/pull/19/head
