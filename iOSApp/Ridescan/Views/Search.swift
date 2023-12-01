@@ -42,11 +42,11 @@ struct SearchSheetView: View {
 					}
 				}
 			}
+            .padding(.top)
 			.padding(.horizontal)
 		}
-		.background(maroonColor.opacity(0.8)) 
+		.background(maroonColor.opacity(0.8))
 		.cornerRadius(20, corners: [.topLeft, .topRight])
-		.frame(maxHeight: UIScreen.main.bounds.height / 3)
 		.edgesIgnoringSafeArea(.all)
 		
 	}
