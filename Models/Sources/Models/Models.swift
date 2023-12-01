@@ -268,9 +268,16 @@ public struct LocateFetiiResponse: Codable {
     public let message: String
     public let msg: String
     public let data: [Driver]
+    
+    public init() {
+        self.status = 0
+        self.message = ""
+        self.msg = ""
+        self.data = []
+    }
 }
 
-public struct Driver: Codable {
+public struct Driver: Codable, Equatable {
     public let id: Int
     public let lat: Double
     public let lng: Double
@@ -279,7 +286,7 @@ public struct Driver: Codable {
     public let vehicle_type: Vehicletype
 }
 
-public struct Vehicletype: Codable {
+public struct Vehicletype: Codable, Equatable {
     public let id: Int
     public let top_image: String
 }

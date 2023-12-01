@@ -195,7 +195,7 @@ struct MapView: View {
 					if isRouteDisplayed && isRouteCalculationComplete {
                         
 						HStack(spacing: 50) {
-							Text("Distance: \(routeDistance)")
+							Text("\(routeDistance)")
 								.padding(25)
 								.background(Color.white)
 								.cornerRadius(15)
@@ -339,6 +339,9 @@ struct MapView: View {
         .onChange(of: transportViewModel.bikesToDisplay) { bikes in
             updateBikeAnnotations()
         }
+        .onChange(of: transportViewModel.fetiiRidesToDisplay) { rides in
+            updateFetiiAnnotations()
+        }
 		.navigationBarBackButtonHidden(true) // Hide the back button
 	}
     
@@ -354,6 +357,21 @@ struct MapView: View {
         // Update your annotations state with the new bike annotations
         // You might want to clear previous bike annotations or handle this differently based on your use case
         self.annotations.append(contentsOf: bikeAnnotations)
+        print(self.annotations)
+    }
+    
+    // Add this function inside your MapView struct
+    func updateFetiiAnnotations() {
+        let fetiiAnnotations = transportViewModel.fetiiRidesToDisplay.prefix(5).map { fetii -> IdentifiablePointAnnotation in
+            let annotation = IdentifiablePointAnnotation()
+            annotation.coordinate = CLLocationCoordinate2D(latitude: fetii.lat, longitude: fetii.lng)
+            annotation.title = "Fetii"
+            return annotation
+        }
+        
+        // Update your annotations state with the new bike annotations
+        // You might want to clear previous bike annotations or handle this differently based on your use case
+        self.annotations.append(contentsOf: fetiiAnnotations)
         print(self.annotations)
     }
 	
@@ -550,7 +568,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 	private var locationManager = CLLocationManager()
 
 	@Published var region = MKCoordinateRegion(
-		center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
+		center: CLLocationCoordinate2D(latitude: 30.625005, longitude: -96.345856),
 		span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
 	)
 
@@ -727,6 +745,21 @@ struct WrappedMapView: UIViewRepresentable {
                 }
 
                 let bikeImage = UIImage(systemName: "bicycle.circle")
+                annotationView!.image = bikeImage
+
+                return annotationView
+            } else if identifiableAnnotation.title == "Fetii" {
+                let identifier = "FetiiAnnotation"
+                var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
+
+                if annotationView == nil {
+                    annotationView = MKAnnotationView(annotation: identifiableAnnotation, reuseIdentifier: identifier)
+                    annotationView!.canShowCallout = true
+                } else {
+                    annotationView!.annotation = identifiableAnnotation
+                }
+
+                let bikeImage = UIImage(systemName: "bus.doubledecker")
                 annotationView!.image = bikeImage
 
                 return annotationView

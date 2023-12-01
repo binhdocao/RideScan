@@ -239,6 +239,9 @@ struct ComparisonView: View {
                                     transportViewModel.currentTransportType = .walking
                                 } else if service.ride_method == "driving" {
                                     transportViewModel.currentTransportType = .automobile
+                                    if service.name == "Fetii" {
+                                        transportViewModel.displayFetii()
+                                    }
                                 } else if service.ride_method == "biking" {
                                     // using .any for biking right now
                                     if service.name == "VeoRide" {
@@ -278,6 +281,10 @@ struct ComparisonView: View {
                                                 .foregroundColor(.black)
                                         } else if service.name == "Biking" {
                                             Text("Time: \(transportViewModel.bikeTimeEstimate) minutes")
+                                                .font(.subheadline)
+                                                .foregroundColor(.black)
+                                        } else if service.name == "Fetii" {
+                                            Text("Time: \(service.criteria.time + Int(transportViewModel.carRoute.expectedTravelTime / 60)) minutes")
                                                 .font(.subheadline)
                                                 .foregroundColor(.black)
                                         } else {
