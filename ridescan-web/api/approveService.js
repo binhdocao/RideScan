@@ -1,14 +1,20 @@
 const mongoose = require('mongoose');
-const ProposedService = require('../models/ProposedService'); // Adjust path as necessary
-const TransportationService = require('../models/TransportationService'); // Adjust path as necessary
+const ProposedService = require('../models/ProposedService');
+const TransportationService = require('../models/TransportationService');
 require('dotenv').config();
 
-mongoose.connect(process.env.MONGO_CONNECT, { useNewUrlParser: true, useUnifiedTopology: true });
+let db = mongoose.connection;
 
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+// Function to handle database connection
+async function connectToDatabase() {
+  if (db.readyState === 0) {
+    await mongoose.connect(process.env.MONGO_CONNECT, { useNewUrlParser: true, useUnifiedTopology: true });
+  }
+}
 
 module.exports = async (req, res) => {
+    // Ensure database connection is established
+    await connectToDatabase();
     if (req.method === 'POST') {
         const serviceId = req.query.id; // Adjust according to how you pass the ID
 

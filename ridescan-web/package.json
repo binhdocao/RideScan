@@ -19,6 +19,7 @@
     "react-router": "^6.20.0",
     "react-router-dom": "^6.20.0",
     "react-scripts": "5.0.1",
+    "vercel": "^32.6.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -26,7 +27,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
-},
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
