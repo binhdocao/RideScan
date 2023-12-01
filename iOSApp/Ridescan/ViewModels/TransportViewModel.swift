@@ -39,6 +39,10 @@ class TransportViewModel: ObservableObject {
     @Published var max_time: Int = 0
     @Published var max_cals: Int = 0
     
+    // Fetii
+    @Published var fetiiInfo: LocateFetiiResponse = LocateFetiiResponse()
+    @Published var fetiiRidesToDisplay: [Driver] = [Driver]()
+    
     // veo
     @Published var veoInfo: VEOPriceLocation = VEOPriceLocation()
     @Published var bikesToDisplay: [BikeDistance] = [BikeDistance]()
@@ -90,6 +94,17 @@ class TransportViewModel: ObservableObject {
             } else {
                 // If there are less than 5 bikes, take as many as available
                 bikesToDisplay = veoInfo.closestBikes
+            }
+    }
+    
+    func displayFetii() {
+        // Ensure that there are enough bikes to extract the first 5
+            if fetiiInfo.data.count >= 5 {
+                // Get the first 5 bikes
+                fetiiRidesToDisplay = Array(fetiiInfo.data.prefix(5))
+            } else {
+                // If there are less than 5 rides, take as many as available
+                fetiiRidesToDisplay = fetiiInfo.data
             }
     }
     
@@ -220,7 +235,7 @@ class TransportViewModel: ObservableObject {
     }
     
     func fetchServices() async throws {
-        let route = "api/services/"
+        var route = "api/services/"
         
         var urlComponents = URLComponents(string: HTTP.baseURL.appendingPathComponent(route).absoluteString)
     
@@ -241,6 +256,28 @@ class TransportViewModel: ObservableObject {
         }
 
         let servicesResponse = try await HTTP.get(url: urlWithQuery, dataType: [Service].self)
+        
+        route = "api/fetii/locate"
+        
+        urlComponents = URLComponents(string: HTTP.baseURL.appendingPathComponent(route).absoluteString)
+        
+        // Pickup location and destination information
+        urlComponents?.queryItems = [
+            URLQueryItem(name: "userLatitude", value: String(pickupLocation.latitude)),
+            URLQueryItem(name: "userLongitude", value: String(pickupLocation.longitude)),
+            URLQueryItem(name: "pickup_long_address", value: pickup_long_address),
+            URLQueryItem(name: "pickup_short_address", value: pickup_short_address),
+            URLQueryItem(name: "destLatitude", value: String(dropoffLocation.latitude)),
+            URLQueryItem(name: "destLongitude", value: String(dropoffLocation.longitude)),
+            URLQueryItem(name: "dropoff_long_address", value: dropoff_long_address),
+            URLQueryItem(name: "dropoff_short_address", value: dropoff_short_address)
+        ]
+
+        guard let urlWithQuery = urlComponents?.url else {
+            throw ServiceError.badRequest(reason: "Invalid URL for fetching services")
+        }
+        
+        fetiiInfo = try await HTTP.get(url: urlWithQuery, dataType: LocateFetiiResponse.self)
 
         // Now that we have the services, we need to calculate the scores
         
