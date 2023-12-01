@@ -177,6 +177,9 @@ struct MapView: View {
             }*/
 			WrappedMapView(region: $locationManager.region,shouldAdjustZoom: $shouldAdjustZoom, annotations: annotations, route: route)
 				.edgesIgnoringSafeArea(.all)
+                .onTapGesture {
+                    self.showResults = false
+                }
 			SideMenu(isSidebarVisible: $isSideMenuOpened)
             
 			VStack(alignment: .leading) {
@@ -187,125 +190,123 @@ struct MapView: View {
 						.fontWeight(.bold)
 				}
 
-        if showBusRoute && !isRouteDisplayed && !isRouteCalculationComplete {
-            var status = calculateRoute(from: fromTo.from , to: fromTo.to, with: .transit, forBus: true)
-        }
+            if showBusRoute && !isRouteDisplayed && !isRouteCalculationComplete {
+                var status = calculateRoute(from: fromTo.from , to: fromTo.to, with: .transit, forBus: true)
+            }
 
             if !showComparisonSheet {
-					if isRouteDisplayed && isRouteCalculationComplete {
+                if isRouteDisplayed && isRouteCalculationComplete {
                         
-						HStack(spacing: 50) {
-							Text("\(routeDistance)")
-								.padding(25)
-								.background(Color.white)
-								.cornerRadius(15)
-								.shadow(radius: 5)
-							VStack {
-								Button(action: {
-									confirmRoute()
-                  fromTo.from = self.annotations[0].coordinate
-                  isRouteDisplayed = false
-                  isRouteCalculationComplete = false
-                                    
-                                    
-								}) {
-									Image(systemName: "checkmark.circle.fill")
-										.font(.largeTitle)
-										.foregroundColor(.green)
-								}
-								.padding()
-								.background(Color.white)
-								.cornerRadius(15)
-								.shadow(radius: 5)
-								Text("Confirm")
-									.font(.headline)
-							}
-							
-							VStack {
-								Button(action: {
-									denyRoute()
-                                    isRouteDisplayed = false
-                                    isRouteCalculationComplete = false
-								}) {
-									Image(systemName: "xmark.circle.fill")
-										.font(.largeTitle)
-										.foregroundColor(.red)
-								}
-								.padding()
-								.background(Color.white)
-								.cornerRadius(15)
-								.shadow(radius: 5)
-								Text("Deny")
-									.font(.headline)
-							}
-						}
-						.padding()
-					}
-                    
-                    
-          else {
-						HStack {
-							TextField("Enter destination...", text: $destination)
-							.padding(.horizontal)
-							
-							Button(action: {
-								// Implement search action here
-								
-								showResults = false
-								searchCompleter.search(query: destination)
-								DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-									if let firstResult = searchCompleter.results.first {
-										searchCompleter.fetchDetails(for: firstResult)
-										
-										// Calculate the route to the selected location
-										if let destinationCoordinate = searchCompleter.transportViewModel?.dropoffLocation {
-
-                        let transport_types: [MKDirectionsTransportType] = [.walking, .automobile]
-
-                        for trans_type in transport_types {
-                            calculateRoute(from: locationManager.region.center, to: destinationCoordinate, with: trans_type)
+                    HStack(spacing: 50) {
+                        Text("Distance: \(routeDistance)")
+                            .padding(25)
+                            .background(Color.white)
+                            .cornerRadius(15)
+                            .shadow(radius: 5)
+                        VStack {
+                            Button(action: {
+                                confirmRoute()
+                                  fromTo.from = self.annotations[0].coordinate
+                                  isRouteDisplayed = false
+                                  isRouteCalculationComplete = false
+                                                    
+                                
+                            }) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.largeTitle)
+                                    .foregroundColor(.green)
+                            }
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(15)
+                            .shadow(radius: 5)
+                            Text("Confirm")
+                                .font(.headline)
                         }
+							
+                        VStack {
+                            Button(action: {
+                                denyRoute()
+                                isRouteDisplayed = false
+                                isRouteCalculationComplete = false
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.largeTitle)
+                                    .foregroundColor(.red)
+                            }
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(15)
+                            .shadow(radius: 5)
+                            Text("Deny")
+                                .font(.headline)
+                        }
+                    }
+                    .padding()
+                } else {
+                    HStack {
+                        TextField("Enter destination...", text: $destination)
+                        .padding(.horizontal)
+                        
+                        Button(action: {
+                            // Implement search action here
+                            
+                            showResults = false
+                            searchCompleter.search(query: destination)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                if let firstResult = searchCompleter.results.first {
+                                    searchCompleter.fetchDetails(for: firstResult)
+                                    
+                                    // Calculate the route to the selected location
+                                    if let destinationCoordinate = searchCompleter.transportViewModel?.dropoffLocation {
 
-                        fetchBikingTimeEstimate(from: locationManager.region.center, to: destinationCoordinate)
+                                        let transport_types: [MKDirectionsTransportType] = [.walking, .automobile]
+
+                                        for trans_type in transport_types {
+                                            calculateRoute(from: locationManager.region.center, to: destinationCoordinate, with: trans_type)
+                                        }
+
+                                        fetchBikingTimeEstimate(from: locationManager.region.center, to: destinationCoordinate)
+                                                            
+                //                        buses = fetchBusData()
+                //                        newbuses = readInputFromFile(filePath: "/data/bus_stops", buses: &buses)
+                //
+                //                        bestroute = findBestRoute(buses: newbuses, destination: self.annotations[1].coordinate)
+                //
+                //                        var status = addpins(pin1: bestroute.busStop2, pin2: self.annotations[1].coordinate)
+
+                                        self.shouldAdjustZoom = true
+
+                                        isRouteCalculationComplete = true
+
+                                        isRouteDisplayed = true
                                             
-//                        buses = fetchBusData()
-//                        newbuses = readInputFromFile(filePath: "/data/bus_stops", buses: &buses)
-//
-//                        bestroute = findBestRoute(buses: newbuses, destination: self.annotations[1].coordinate)
-//
-//                        var status = addpins(pin1: bestroute.busStop2, pin2: self.annotations[1].coordinate)
-
-                        self.shouldAdjustZoom = true
-
-                        isRouteCalculationComplete = true
-
-                        isRouteDisplayed = true
-                                            
-										}
-										
-										// Update the search bar with the selected address
-										destination = "\(firstResult.title)"
-									}
-								}
-							}) {
-								Image(systemName: "magnifyingglass")
-									.padding()
-									.font(.system(size: 20, weight: .bold))
-									.foregroundColor(maroonColor)
-									.background(Circle().fill(Color.white))
-							}
-						}
-						.background(Color.white)
-						.cornerRadius(8)
-						.padding(.horizontal, 16)
-						.onChange(of: destination) { newValue in
-							searchCompleter.search(query: newValue)
-							showResults = !newValue.isEmpty
-						}
+                                    }
+                                        
+                                    // Update the search bar with the selected address
+                                    destination = "\(firstResult.title)"
+                                }
+                            }
+                        }) {
+                            Image(systemName: "magnifyingglass")
+                                .padding()
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundColor(maroonColor)
+                                .background(Circle().fill(Color.white))
+                        }
+                        }
+                        .background(Color.white)
+                        .cornerRadius(8)
+                        .padding(.horizontal, 16)
+                        .onChange(of: destination) { newValue in
+                            searchCompleter.search(query: newValue)
+                            showResults = !newValue.isEmpty
+                        }
 					}
 					if destination.count > 0 && showResults {
 						SearchSheetView(destination: $destination, searchCompleter: searchCompleter)
 							.transition(.move(edge: .bottom))
+                            .frame(height: UIScreen.main.bounds.height / 3)
 							.animation(.spring())
 							.edgesIgnoringSafeArea(.all)
 					}
