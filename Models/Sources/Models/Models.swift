@@ -60,6 +60,11 @@ public struct Service: Identifiable, Codable {
     public var user_proposed: Bool
     public var send_to_application: Bool
     
+    // Contact details
+    public var contactName: String?
+    public var phoneNumber: String?
+    public var email: String?
+
     // Reviews is an array of Review objects
     public var reviews: [Review]
     
@@ -74,6 +79,9 @@ public struct Service: Identifiable, Codable {
         case ride_method
         case user_proposed
         case send_to_application
+        case contactName
+        case phoneNumber
+        case email
         case reviews
         case criteria
         case name
@@ -84,6 +92,9 @@ public struct Service: Identifiable, Codable {
         ride_method: String,
         user_proposed: Bool,
         send_to_application: Bool,
+        contactName: String?,
+        phoneNumber: String?,
+        email: String?,
         reviews: [Review],
         criteria: Criteria,
         name: String
@@ -92,6 +103,9 @@ public struct Service: Identifiable, Codable {
         self.ride_method = ride_method
         self.user_proposed = user_proposed
         self.send_to_application = send_to_application
+        self.contactName = contactName
+        self.phoneNumber = phoneNumber
+        self.email = email
         self.reviews = reviews
         self.criteria = criteria
         self.name = name
@@ -102,6 +116,9 @@ public struct Service: Identifiable, Codable {
         ride_method: String,
         user_proposed: Bool,
         send_to_application: Bool,
+        contactName: String?,
+        phoneNumber: String?,
+        email: String?,
         reviews: [Review],
         criteria: Criteria,
         name: String
@@ -111,9 +128,25 @@ public struct Service: Identifiable, Codable {
         self.ride_method = ride_method
         self.user_proposed = user_proposed
         self.send_to_application = send_to_application
+        self.contactName = contactName
+        self.phoneNumber = phoneNumber
+        self.email = email
         self.reviews = reviews
         self.criteria = criteria
         self.name = name
+    }
+    
+    public init() {
+        self.id = BSONObjectID() // Generate a new ID
+        self.ride_method = "" // Default value
+        self.user_proposed = false // Default value
+        self.send_to_application = false // Default value
+        self.contactName = nil // Default value
+        self.phoneNumber = nil // Default value
+        self.email = nil // Default value
+        self.reviews = [] // Default empty array
+        self.criteria = Criteria() // Assume Criteria has a default initializer
+        self.name = "" // Default value
     }
 }
 
@@ -126,9 +159,17 @@ public struct RideService: Identifiable, Codable {
 
 // Review struct as seen in the MongoDB document
 public struct Review: Codable {
+    public var id: String
     public var date: String
     public var rating: Int
     public var text: String
+    
+    public init(id: String, date: String, rating: Int, text: String) {
+            self.id = id
+            self.date = date
+            self.rating = rating
+            self.text = text
+        }
 }
 
 // Criteria struct based on the MongoDB document
@@ -141,6 +182,39 @@ public struct Criteria: Codable {
     public var `public`: Bool
     public var small_business: Bool
     public var safety_rating: Int
+    
+    public init() {
+        self.price = 0.0 // Default value
+        self.time = 0 // Default value
+        self.calories_burned = 0 // Default value
+        self.carbon_emissions = 0 // Default value
+        self.experience = false // Default value
+        self.`public` = false // Default value
+        self.small_business = false // Default value
+        self.safety_rating = 0 // Default value
+    }
+}
+
+// Define a struct for the review request body
+public struct ReviewRequest: Codable {
+    public let serviceId: String
+    public let review: Review
+    
+    public init(serviceId: String, review: Review) {
+        self.serviceId = serviceId
+        self.review = review
+    }
+}
+
+// Define a struct for the review response (adjust according to your API's response format)
+public struct ReviewResponse: Codable {
+    public let success: Bool
+    public let message: String
+
+    public init(success: Bool, message: String) {
+        self.success = success
+        self.message = message
+    }
 }
 
 public struct BikeDirectionsResponse: Decodable {
