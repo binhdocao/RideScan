@@ -28,9 +28,8 @@ function Form() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5500/proposedServices', serviceData);
-            setServiceData({ ...serviceData, [e.target.name]: e.target.value });
-            navigate('/submission-confirmation'); // Redirect to success page
+            await axios.post('/api/proposedServices', serviceData); // Updated endpoint
+            navigate('/submission-confirmation');
         } catch (error) {
             console.error('Error submitting data', error);
         }
