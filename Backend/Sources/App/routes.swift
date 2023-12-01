@@ -2,6 +2,8 @@ import Models
 import MongoDBVapor
 import Vapor
 
+extension ReviewResponse: Content {}
+
 // Adds API routes to the application.
 func routes(_ app: Application) throws {
     /// Handles a request to load the list of users.
@@ -12,6 +14,24 @@ func routes(_ app: Application) throws {
 	/// Handles a request to load the list of services.
     app.get("api", "services") { req async throws -> [Service] in
         try await req.findServices(req: req)
+    }
+
+	// Route to handle review submission
+    app.post("api", "services", "review") { req -> EventLoopFuture<ReviewResponse> in
+        let reviewSubmission = try req.content.decode(ReviewRequest.self)
+        guard let serviceObjectId = try? BSONObjectID(reviewSubmission.serviceId) else {
+            throw Abort(.badRequest, reason: "Invalid service ID")
+        }
+
+        let filter: BSONDocument = ["_id": .objectID(serviceObjectId)]
+        let update: BSONDocument = ["$push": ["reviews": .document(try BSONEncoder().encode(reviewSubmission.review))]]
+
+        return req.serviceCollection.updateOne(filter: filter, update: update).flatMapThrowing { updateResult in
+        guard let result = updateResult, result.modifiedCount == 1 else {
+                throw Abort(.notFound, reason: "Service not found or no update made")
+            }
+			return ReviewResponse(success: true, message: "Service review updated successfully")
+        }
     }
 
     /// Handles a request to load info about a particular user.
@@ -169,7 +189,20 @@ extension Request {
                     }
 
                     services[index] = service
-                }
+                } else {
+					// // Calculate the average rating for user-proposed services
+					// let totalRating = service.reviews.reduce(0) { $0 + $1.rating }
+					// let averageRating = service.reviews.isEmpty ? 5 : Double(totalRating) / Double(service.reviews.count)
+
+					// // Filter out services with an average rating less than 2
+					// if !service.reviews.isEmpty && averageRating >= 2.0 {
+					// 	// ... you might want to set other criteria here ...
+					// 	services[index] = service
+					// } else {
+					// 	// Remove the service with an average rating below 2
+					// 	services.remove(at: index)
+					// }
+				}
             }
 
             return services

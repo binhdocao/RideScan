@@ -86,7 +86,11 @@ struct ComparisonView: View {
 
     @State private var showTransportationPicker: Bool = false
     @State private var showSortingPicker: Bool = false
+    @State private var showUserProposedPop: Bool = false
     @State private var isAscendingOrder = true
+    
+    // Review info
+    @State private var showingReviewSheet = false
     
     @State private var isLoading = true
   
@@ -235,30 +239,32 @@ struct ComparisonView: View {
                     VStack(spacing: 10) {
                         ForEach(filteredServices, id: \.0.id) { (service, score) in
                             Button(action: {
-                                if service.ride_method == "walking" {
-                                    transportViewModel.currentTransportType = .walking
-                                } else if service.ride_method == "driving" {
-                                    transportViewModel.currentTransportType = .automobile
-                                    if service.name == "Fetii" {
-                                        transportViewModel.displayFetii()
-                                    }
-                                } else if service.ride_method == "biking" {
-                                    // using .any for biking right now
-                                    if service.name == "VeoRide" {
-                                        transportViewModel.displayBikes()
-                                    } else {
-                                        transportViewModel.currentTransportType = .walking
-                                    }
-                                    
+                                if service.user_proposed {
+                                    transportViewModel.popoverService = service
+                                    showUserProposedPop = true
                                 } else {
-                                    // default will be car for now
-                                    transportViewModel.currentTransportType = .automobile
-                                }
-                                
-                                if service.name == "Brazos Bus Service" && self.buses.count != 0 {
+                                    if service.ride_method == "walking" {
+                                        transportViewModel.currentTransportType = .walking
+                                    } else if service.ride_method == "driving" {
+                                        transportViewModel.currentTransportType = .automobile
+                                    } else if service.ride_method == "biking" {
+                                        // using .any for biking right now
+                                        if service.name == "VeoRide" {
+                                            transportViewModel.displayBikes()
+                                        } else {
+                                            transportViewModel.currentTransportType = .walking
+                                        }
+                                        
+                                    } else {
+                                        // default will be car for now
+                                        transportViewModel.currentTransportType = .automobile
+                                    }
                                     
-                                    fromTo.to = BusStop1
-                                    changeShowBusRoute()
+                                    if service.name == "Brazos Bus Service" && self.buses.count != 0 {
+                                        
+                                        fromTo.to = BusStop1
+                                        changeShowBusRoute()
+                                    }
                                 }
                             }) {
                                 HStack {
@@ -344,6 +350,90 @@ struct ComparisonView: View {
                 .onChange(of: isAscendingOrder) { _ in
                     filteredServices = transportViewModel.sortServices(services: filteredServices, for: selectedSortOption, isAscending: isAscendingOrder)
                 }
+                .popover(isPresented: $showUserProposedPop, arrowEdge: .bottom) {
+                    // Popover content
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Service: \(transportViewModel.popoverService.name)")
+                            .fontWeight(.bold)
+
+                        Text("Contact Name: \(transportViewModel.popoverService.contactName!)")
+                        Text("Phone Number: \(transportViewModel.popoverService.phoneNumber!)")
+                        Text("Email: \(transportViewModel.popoverService.email!)")
+
+                        Divider()
+
+                        Text("Reviews")
+                            .fontWeight(.bold)
+
+                        // Check if reviews are empty
+                        if !transportViewModel.popoverService.reviews.isEmpty {
+                            ForEach(transportViewModel.popoverService.reviews, id: \.id) { review in
+                                VStack(alignment: .leading) {
+                                    Text("Date: \(review.date)")
+                                        .font(.caption)
+                                        .bold()
+                                    Text("Rating: \(String(review.rating))/5")
+                                        .font(.caption)
+                                    Text("Review: \(review.text)")
+                                        .font(.caption)
+                                        .italic()
+                                }
+                                .padding(.bottom, 5)
+                            }
+                        } else {
+                            Text("No reviews available.")
+                                .italic()
+                        }
+                        
+                        Button("Add Review") {
+                            showUserProposedPop = false
+                            showingReviewSheet = true
+                        }
+                        
+                        Spacer()
+                    }
+                    .padding()
+                    .frame(width: 300)
+                    .fixedSize(horizontal: false, vertical: true)
+                
+                }
+                .sheet(isPresented: $showingReviewSheet) {
+                    NavigationView {
+                        Form {
+                            Section(header: Text("Your Review")) {
+                                TextEditor(text: $transportViewModel.reviewText)
+                                    .frame(minHeight: 100)
+                            }
+                            Section(header: Text("Rating")) {
+                                Picker("Rating", selection: $transportViewModel.reviewRating) {
+                                    ForEach(1...5, id: \.self) { rating in
+                                        Text("\(rating) Star\(rating > 1 ? "s" : "")").tag(rating)
+                                    }
+                                }
+                                .pickerStyle(SegmentedPickerStyle())
+                            }
+                            Section {
+                                    Button("Submit Review") {
+                                        Task {
+                                            do {
+                                                let response: ReviewResponse = try await transportViewModel.submitReview()
+                                                                                                
+                                                showingReviewSheet = false
+                                                showUserProposedPop = true
+                                            } catch {
+                                                print("Error updating review")
+                                            }
+                                        }
+                                    }
+                            }
+                        }
+                        .navigationBarTitle("Add Review", displayMode: .inline)
+                        .navigationBarItems(trailing: Button("Cancel") {
+                            showingReviewSheet = false
+                            showUserProposedPop = true
+                        })
+                    }
+                }
             }
         }
         .frame(maxWidth: .infinity)
@@ -385,6 +475,7 @@ struct ComparisonView: View {
             }
         }
     }
+    
     
     /*func updateBusService(min_people: Int, max_people: Int, timeEstimate: Int,distanceEstimate: Double ) {
         if let index = rideServices.firstIndex(where: { $0.name == "Brazos Bus Service" }) {

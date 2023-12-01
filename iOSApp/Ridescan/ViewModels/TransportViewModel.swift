@@ -47,6 +47,11 @@ class TransportViewModel: ObservableObject {
     @Published var veoInfo: VEOPriceLocation = VEOPriceLocation()
     @Published var bikesToDisplay: [BikeDistance] = [BikeDistance]()
     
+    // Reviews
+    @Published var popoverService: Service = Service()
+    @Published var reviewText: String = ""
+    @Published var reviewRating: Int = 3 // Assuming a 5-star rating system
+    
     // current transport type
     @Published var currentTransportType: MKDirectionsTransportType = .automobile
     
@@ -166,6 +171,39 @@ class TransportViewModel: ObservableObject {
         self.image_url = image_url
     }
     
+    func submitReview() async throws -> ReviewResponse {
+        // Create the review object
+        let newReview = Review(
+            id: UUID().uuidString, // Generate a new ID for the review
+            date: Date().formatted(), // Use the current date
+            rating: reviewRating,
+            text: reviewText
+        )
+
+        popoverService.reviews.append(newReview)
+
+        // Update the corresponding service in the services array
+        if let index = services.firstIndex(where: { $0.0.id == popoverService.id }) {
+            services[index].0 = popoverService
+        }
+        
+        let route = "api/services/review"
+        let reviewURL = HTTP.baseURL.appendingPathComponent(route)
+
+        // Prepare the request body
+        let requestBody: ReviewRequest = ReviewRequest(serviceId: popoverService.id.hex, review: newReview)
+        
+        // Perform the API call to submit the review
+        // This might be a POST request, but adjust according to your API's specification
+        let response: ReviewResponse = try await HTTP.post(url: reviewURL, body: requestBody)
+        
+        // Clear the input fields
+        reviewText = ""
+        reviewRating = 3
+        
+        return response
+    }
+    
     func filterServices(modes: Set<TransportationMode>, sorting_options: Set<SortingFilters>) -> [(Service, Double)] {
         var filteredServices = services
 
@@ -257,27 +295,27 @@ class TransportViewModel: ObservableObject {
 
         let servicesResponse = try await HTTP.get(url: urlWithQuery, dataType: [Service].self)
         
-        route = "api/fetii/locate"
-        
-        urlComponents = URLComponents(string: HTTP.baseURL.appendingPathComponent(route).absoluteString)
-        
-        // Pickup location and destination information
-        urlComponents?.queryItems = [
-            URLQueryItem(name: "userLatitude", value: String(pickupLocation.latitude)),
-            URLQueryItem(name: "userLongitude", value: String(pickupLocation.longitude)),
-            URLQueryItem(name: "pickup_long_address", value: pickup_long_address),
-            URLQueryItem(name: "pickup_short_address", value: pickup_short_address),
-            URLQueryItem(name: "destLatitude", value: String(dropoffLocation.latitude)),
-            URLQueryItem(name: "destLongitude", value: String(dropoffLocation.longitude)),
-            URLQueryItem(name: "dropoff_long_address", value: dropoff_long_address),
-            URLQueryItem(name: "dropoff_short_address", value: dropoff_short_address)
-        ]
-
-        guard let urlWithQuery = urlComponents?.url else {
-            throw ServiceError.badRequest(reason: "Invalid URL for fetching services")
-        }
-        
-        fetiiInfo = try await HTTP.get(url: urlWithQuery, dataType: LocateFetiiResponse.self)
+//        route = "api/fetii/locate"
+//        
+//        urlComponents = URLComponents(string: HTTP.baseURL.appendingPathComponent(route).absoluteString)
+//        
+//        // Pickup location and destination information
+//        urlComponents?.queryItems = [
+//            URLQueryItem(name: "userLatitude", value: String(pickupLocation.latitude)),
+//            URLQueryItem(name: "userLongitude", value: String(pickupLocation.longitude)),
+//            URLQueryItem(name: "pickup_long_address", value: pickup_long_address),
+//            URLQueryItem(name: "pickup_short_address", value: pickup_short_address),
+//            URLQueryItem(name: "destLatitude", value: String(dropoffLocation.latitude)),
+//            URLQueryItem(name: "destLongitude", value: String(dropoffLocation.longitude)),
+//            URLQueryItem(name: "dropoff_long_address", value: dropoff_long_address),
+//            URLQueryItem(name: "dropoff_short_address", value: dropoff_short_address)
+//        ]
+//
+//        guard let urlWithQuery = urlComponents?.url else {
+//            throw ServiceError.badRequest(reason: "Invalid URL for fetching services")
+//        }
+//        
+//        fetiiInfo = try await HTTP.get(url: urlWithQuery, dataType: LocateFetiiResponse.self)
 
         // Now that we have the services, we need to calculate the scores
         
