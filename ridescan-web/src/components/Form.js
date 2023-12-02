@@ -28,12 +28,18 @@ function Form() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('/api/proposedServices', serviceData); // Updated endpoint
+            await axios.post('./api/proposedServices', serviceData); // Updated endpoint
             navigate('/submission-confirmation');
         } catch (error) {
             console.error('Error submitting data', error);
         }
+        
+    axios.get('/api/proposedServices') // Updated endpoint
+        .then(response => setProposedServices(response.data))
+        .catch(error => console.error('Error fetching proposed services', error));
+
     };
+
 
     const formStyle = {
         display: 'flex',
