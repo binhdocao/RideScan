@@ -13,7 +13,7 @@ function AdminPage() {
 
     const handleApprove = (id) => {
         // Approve service
-        axios.post(`/api/approveService/${id}`) // Updated endpoint
+        axios.post(`/api/approveService?id=${id}`)
             .then(() => {
                 setProposedServices(proposedServices.filter(service => service._id !== id));
             })
