@@ -8,7 +8,7 @@ export default async function handler(req, res) {
         try {
             const { database } = await connectToDatabase();
             const proposedServicesCollection = database.collection('proposedServices');
-            const transportationServicesCollection = database.collection('transportationServices');
+            const transportationServicesCollection = database.collection('transportation');
 
             const proposedService = await proposedServicesCollection.findOne({ _id: new ObjectId(serviceId) });
             if (!proposedService) {
