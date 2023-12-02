@@ -16,6 +16,7 @@ const transporter = nodemailer.createTransport({
 
 export default async function handler(req, res) {
     if (req.method === 'POST') {
+        // Existing POST request handling
         try {
             const { database } = await connectToDatabase();
             const proposedServicesCollection = database.collection('proposedServices');
@@ -38,8 +39,21 @@ export default async function handler(req, res) {
             console.error('Error occurred:', error);
             res.status(500).send('Error processing request');
         }
+    } else if (req.method === 'GET') {
+        // Handling GET request
+        try {
+            const { database } = await connectToDatabase();
+            const proposedServicesCollection = database.collection('proposedServices');
+
+            // Fetch all proposed services
+            const services = await proposedServicesCollection.find({}).toArray();
+            res.status(200).json(services);
+        } catch (error) {
+            console.error('Error occurred:', error);
+            res.status(500).send('Error processing request');
+        }
     } else {
-        // Handle non-POST requests
+        // Handle other non-supported methods
         res.status(405).send('Method Not Allowed');
     }
 }
