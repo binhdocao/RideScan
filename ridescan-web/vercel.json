@@ -1,11 +1,4 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "ridescan-web/lib/api/**/*.js",
-        "use": "@vercel/node"
-      }
-    ],
     "routes": [
       {
         "src": "/api/(.*)",
