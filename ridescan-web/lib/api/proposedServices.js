@@ -1,4 +1,4 @@
-import { connectToDatabase } from '../lib/mongodb';
+import { connectToDatabase } from '../mongodb';
 import nodemailer from 'nodemailer';
 require('dotenv').config();
 

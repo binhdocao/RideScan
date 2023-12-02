@@ -9,7 +9,7 @@ const options = {
 let mongoClient = null;
 let database = null;
 
-if (!process.env.NEXT_ATLAS_URI) {
+if (!process.env.MONGO_CONNECT) {
     throw new Error('Please add your Mongo URI to .env.local')
 }
 
