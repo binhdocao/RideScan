@@ -12,13 +12,15 @@ function AdminPage() {
     }, []);
 
     const handleApprove = (id) => {
-        // Approve service
-        axios.post(`/api/approveService?id=${id}`)
+        // Approve service by sending ID in the URL path
+        axios.post(`/api/approveService/${id}`)
             .then(() => {
+                // Filter out the approved service from the state
                 setProposedServices(proposedServices.filter(service => service._id !== id));
             })
             .catch(error => console.error('Error approving service', error));
     };
+    
 
     const adminPageStyle = {
         padding: '20px',
