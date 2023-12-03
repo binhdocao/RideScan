@@ -262,7 +262,8 @@ struct ComparisonView: View {
                                     
                                     if service.name == "Brazos Bus Service" && self.buses.count != 0 {
                                         
-                                        fromTo.to = BusStop1
+                                        fromTo.toLat = BusStop1.latitude
+                                        fromTo.toLong = BusStop1.longitude
                                         changeShowBusRoute()
                                     }
                                 }
@@ -486,7 +487,7 @@ struct ComparisonView: View {
     }*/
     
     func fetchBusData() -> [BrazosDriver]{
-        var newBuses : [BrazosDriver] = [BrazosDriver(RouteId: 40, lat: 30.00, lng: -97.32,stops: [CLLocationCoordinate2D(latitude: 29.749907, longitude: -95.358421)])]
+        var newBuses : [BrazosDriver] = [BrazosDriver(RouteId: 40, lat: 30.00, lng: -97.32,stops: [(29.749907, -95.358421)])]
         /* idea: have users enter their location. after they hit enter, do algorithm below on background. when options are displayed, only displayed best time. if they press on bus option. show the bus route in red or green and show in blue how to get to the bus stop.
          approach for bus routes:
                 var best_route
@@ -582,15 +583,15 @@ struct ComparisonView: View {
             print("My route id", bus.RouteId)
             for stop in bus.stops {
                 print(stop)
-                if distance(from: coordinates, to: stop) < currToStop {
-                    currToStop = distance(from : coordinates, to: stop)
-                    coordinatesStop1 = stop
+                if distance(from: coordinates, to: CLLocationCoordinate2D(latitude: stop.0, longitude: stop.1)) < currToStop {
+                    currToStop = distance(from : coordinates, to: CLLocationCoordinate2D(latitude: stop.0, longitude: stop.1))
+                    coordinatesStop1 = CLLocationCoordinate2D(latitude: stop.0, longitude: stop.1)
                     
                     print("goes in")
                 }
-                if distance(from : stop, to : destination) < StopToDest {
-                    StopToDest = distance(from: stop, to: destination)
-                    coordinatesStop2 = stop
+                if distance(from : CLLocationCoordinate2D(latitude: stop.0, longitude: stop.1), to : destination) < StopToDest {
+                    StopToDest = distance(from: CLLocationCoordinate2D(latitude: stop.0, longitude: stop.1), to: destination)
+                    coordinatesStop2 = CLLocationCoordinate2D(latitude: stop.0, longitude: stop.1)
                     
                     print("goes in")
                 }
@@ -656,7 +657,7 @@ struct ComparisonView: View {
                     for i in 0..<buses.count {
                         
                         if buses[i].RouteId == id {
-                            buses[i].stops.append(CLLocationCoordinate2D(latitude: lat, longitude: lon))
+                            buses[i].stops.append((lat, lon))
                         }
                     }
                 }

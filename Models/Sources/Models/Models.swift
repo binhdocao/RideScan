@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftBSON
-import CoreLocation
 /**
  * Represents a user.
  * This type conforms to `Codable` to allow us to serialize it to and deserialize it from extended JSON and BSON.
@@ -217,6 +216,80 @@ public struct ReviewResponse: Codable {
     }
 }
 
+//
+public struct FromTo {
+    public var fromLat: Double
+    public var fromLong: Double
+    public var toLat: Double
+    public var toLong: Double
+    
+    // Public initializer
+    public init(fromLat: Double, fromLong: Double, toLat: Double, toLong: Double) {
+        self.fromLat = fromLat
+        self.fromLong = fromLong
+        self.toLat = toLat
+        self.toLong = toLong
+    }
+    
+    // Public initializer without parameters
+    public init() {
+        self.fromLat = 0.0
+        self.fromLong = 0.0
+        self.toLat = 0.0
+        self.toLong = 0.0
+    }
+}
+
+public struct BrazosDriver: Codable {
+    public let RouteId: Int
+    public let lat: Double
+    public let lng: Double
+    public var stops: [(Double, Double)] = [] // stops is not decodable. hardcoded instead
+    
+    public init(RouteId: Int, lat: Double, lng: Double, stops: [(Double, Double)] = [] ) {
+        self.RouteId = RouteId
+        self.lat = lat
+        self.lng = lng
+        self.stops = stops
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case RouteId, lat, lng
+        // Exclude 'stops' from coding
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        RouteId = try container.decode(Int.self, forKey: .RouteId)
+        lat = try container.decode(Double.self, forKey: .lat)
+        lng = try container.decode(Double.self, forKey: .lng)
+        // Do not decode stops
+    }
+        
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(RouteId, forKey: .RouteId)
+        try container.encode(lat, forKey: .lat)
+        try container.encode(lng, forKey: .lng)
+        // Do not encode stops
+    }
+    
+}
+
+public struct BrazosAPIResponse: Codable {
+    public let status: Int
+    public let message: String
+    public let msg: String
+    public var data: [BrazosDriver]
+}
+
+public struct BrazosVehicleType: Codable {
+    public let id: Int
+    public let top_image: String
+}
+//
+
+
 public struct BikeDirectionsResponse: Decodable {
     // Define your properties here
     // For example:
@@ -364,74 +437,7 @@ public struct Vehicletype: Codable, Equatable {
     public let id: Int
     public let top_image: String
 }
-///
-///
-public struct FromTo {
-    public var from: CLLocationCoordinate2D = CLLocationCoordinate2D()
-    public var to: CLLocationCoordinate2D = CLLocationCoordinate2D()
-    
-    // Public initializer
-    public init(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D) {
-        self.from = from
-        self.to = to
-    }
-    
-    // Public initializer without parameters
-    public init() {
-        self.from = CLLocationCoordinate2D()
-        self.to = CLLocationCoordinate2D()
-    }
-}
 
-public struct BrazosAPIResponse: Codable {
-    public let status: Int
-    public let message: String
-    public let msg: String
-    public var data: [BrazosDriver]
-}
-//
-public struct BrazosDriver: Codable {
-    public let RouteId: Int
-    public let lat: Double
-    public let lng: Double
-    public var stops: [CLLocationCoordinate2D] = [] // stops is not decodable. hardcoded instead
-    
-    public init(RouteId: Int, lat: Double, lng: Double, stops: [CLLocationCoordinate2D] = [] ) {
-        self.RouteId = RouteId
-        self.lat = lat
-        self.lng = lng
-        self.stops = stops
-    }
-    
-    private enum CodingKeys: String, CodingKey {
-        case RouteId, lat, lng
-        // Exclude 'stops' from coding
-    }
-    
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        RouteId = try container.decode(Int.self, forKey: .RouteId)
-        lat = try container.decode(Double.self, forKey: .lat)
-        lng = try container.decode(Double.self, forKey: .lng)
-        // Do not decode stops
-    }
-        
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(RouteId, forKey: .RouteId)
-        try container.encode(lat, forKey: .lat)
-        try container.encode(lng, forKey: .lng)
-        // Do not encode stops
-    }
-    
-}
-//
-public struct BrazosVehicleType: Codable {
-    public let id: Int
-    public let top_image: String
-}
-///
-///
 public struct VEOVerificationRequest: Codable {
     public let msg: String
     public let code: Int
