@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb'; // Required to handle _id correctly
 export default async function handler(req, res) {
     if (req.method === 'POST') {
         // Extract ID from the URL path
-        const serviceId = req.params.id;
+        const serviceId = req.query.id;
 
         try {
             const { database } = await connectToDatabase();
