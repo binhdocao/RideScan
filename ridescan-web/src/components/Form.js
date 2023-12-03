@@ -24,10 +24,10 @@ function Form() {
         let tempErrors = {};
         tempErrors.contactName = serviceData.contactName ? "" : "Contact Name is required";
         tempErrors.email = serviceData.email ? "" : "Email is required";
-        tempErrors.phoneNumber = serviceData.phoneNumber ? "" : "Phone Number is required";
+        tempErrors.phoneNumber = /^[0-9]{10}$/.test(serviceData.phoneNumber) ? "" : "Phone Number must be 10 digits";
         tempErrors.serviceName = serviceData.serviceName ? "" : "Service Name is required";
         tempErrors.address = serviceData.address ? "" : "Address is required";
-        tempErrors.radius = serviceData.radius ? "" : "Operational Radius is required";
+        tempErrors.radius = /^\d+$/.test(serviceData.radius) ? "" : "Operational Radius must be an integer";
         tempErrors.comments = serviceData.comments ? "" : "Comments are required";
         setErrors(tempErrors);
         return Object.values(tempErrors).every(x => x === "");
