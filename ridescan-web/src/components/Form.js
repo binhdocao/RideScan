@@ -3,7 +3,6 @@ import axios from 'axios';
 import logo from '../images/ridescan-logo.png';
 import { useNavigate } from "react-router-dom";
 
-
 function Form() {
     const navigate = useNavigate(); 
 
@@ -19,22 +18,35 @@ function Form() {
         comments: ''
     });
 
+    const [errors, setErrors] = useState({});
+
+    const validate = () => {
+        let tempErrors = {};
+        tempErrors.contactName = serviceData.contactName ? "" : "Contact Name is required";
+        tempErrors.email = serviceData.email ? "" : "Email is required";
+        tempErrors.phoneNumber = serviceData.phoneNumber ? "" : "Phone Number is required";
+        tempErrors.serviceName = serviceData.serviceName ? "" : "Service Name is required";
+        tempErrors.address = serviceData.address ? "" : "Address is required";
+        tempErrors.radius = serviceData.radius ? "" : "Operational Radius is required";
+        tempErrors.comments = serviceData.comments ? "" : "Comments are required";
+        setErrors(tempErrors);
+        return Object.values(tempErrors).every(x => x === "");
+    };
 
     const handleChange = (e) => {
         setServiceData({ ...serviceData, [e.target.name]: e.target.value });
     };
-    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            await axios.post('/api/proposedServices', serviceData); // Updated endpoint
-            navigate('/submission-confirmation');
-        } catch (error) {
-            console.error('Error submitting data', error);
+        if (validate()) {
+            try {
+                await axios.post('/api/proposedServices', serviceData);
+                navigate('/submission-confirmation');
+            } catch (error) {
+                console.error('Error submitting data', error);
+            }
         }
-
-        
     };
 
 
@@ -85,14 +97,8 @@ function Form() {
                     onChange={handleChange}
                     placeholder="Contact Name"
                 />
-                <input
-                    style={inputStyle}
-                    type="text"
-                    name="serviceName"
-                    value={serviceData.serviceName}
-                    onChange={handleChange}
-                    placeholder="Service Name"
-                />
+                {errors.contactName && <div style={{ color: 'red' }}>{errors.contactName}</div>}
+
                 <input
                     style={inputStyle}
                     type="email"
@@ -101,6 +107,8 @@ function Form() {
                     onChange={handleChange}
                     placeholder="Email"
                 />
+                {errors.email && <div style={{ color: 'red' }}>{errors.email}</div>}
+
                 <input
                     style={inputStyle}
                     type="text"
@@ -109,6 +117,18 @@ function Form() {
                     onChange={handleChange}
                     placeholder="Phone Number"
                 />
+                {errors.phoneNumber && <div style={{ color: 'red' }}>{errors.phoneNumber}</div>}
+
+                <input
+                    style={inputStyle}
+                    type="text"
+                    name="serviceName"
+                    value={serviceData.serviceName}
+                    onChange={handleChange}
+                    placeholder="Service Name"
+                />
+                {errors.serviceName && <div style={{ color: 'red' }}>{errors.serviceName}</div>}
+
                 <input
                     style={inputStyle}
                     type="text"
@@ -117,6 +137,8 @@ function Form() {
                     onChange={handleChange}
                     placeholder="Based Address"
                 />
+                {errors.address && <div style={{ color: 'red' }}>{errors.address}</div>}
+
                 <input
                     style={inputStyle}
                     type="text"
@@ -125,6 +147,8 @@ function Form() {
                     onChange={handleChange}
                     placeholder="Operational Radius"
                 />
+                {errors.radius && <div style={{ color: 'red' }}>{errors.radius}</div>}
+
                 <textarea
                     style={{ ...inputStyle, height: '100px' }} 
                     name="comments"
@@ -132,6 +156,8 @@ function Form() {
                     onChange={handleChange}
                     placeholder="Additional Comments"
                 />
+                {errors.comments && <div style={{ color: 'red' }}>{errors.comments}</div>}
+
                 <button style={buttonStyle} type="submit">Submit Proposal</button>
             </form>
         </div>
