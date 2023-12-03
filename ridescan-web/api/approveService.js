@@ -5,6 +5,12 @@ export default async function handler(req, res) {
     if (req.method === 'POST') {
         // Extract ID from the request body
         const { serviceId } = req.body;
+        console.log("serviceId: ", serviceId);
+        if (!serviceId) {
+            return res.status(400).send('Service ID is required');
+          }
+
+
 
 
         try {
