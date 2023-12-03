@@ -68,16 +68,16 @@ func routes(_ app: Application) throws {
         try await req.updateUser()
     }
 
-    // app.post("api", "fetii", "find") { req async throws -> FindFetiiResponse in
-    //     try await req.findFetii(req: req)
-    // }
+    app.post("api", "fetii", "find") { req async throws -> FindFetiiResponse in
+        try await req.findFetii(req: req)
+    }
 
     app.get("api", "fetii", "locate") { req async throws -> LocateFetiiResponse in
         try await req.locateFetii(req: req)
     }
 
     app.post("api", "veoride", "find") { req async throws -> VEOPriceLocation in
-        try await req.findVEO()
+        try await req.findVEO(req: req)
     }
 
     // Apple Login Stuff
@@ -152,9 +152,6 @@ extension Request {
 
     func findServices(req: Request) async throws -> [Service] {
         do {
-
-            let locationInfo = try req.query.decode(LocationInformation.self)
-
             var services = try await self.serviceCollection.find().toArray()
             
             // Loop through each service and call a different function
@@ -167,17 +164,17 @@ extension Request {
                     // Fetii information
                     if service.name == "Fetii" {
 						
-                        let findFetiiResponse = try await findFetii(locationInfo: locationInfo)
+                        let findFetiiResponse = try await findFetii(req: req)
 
-						// set price
-						service.criteria.price = findFetiiResponse.data.first!.min_charge_per_person
+                        // set price
+                        service.criteria.price = findFetiiResponse.data.first!.min_charge_per_person
 
-						// set time
-						if let max_time = findFetiiResponse.data.first!.arriveIn_max_time, let min_time = findFetiiResponse.data.first!.arriveIn_min_time {
-							if max_time != 0 && min_time != 0 {
-								service.criteria.time = (max_time + min_time) / 2
-							}
-						}
+                        // set time
+                        if let max_time = findFetiiResponse.data.first!.arriveIn_max_time, let min_time = findFetiiResponse.data.first!.arriveIn_min_time {
+                          if max_time != 0 && min_time != 0 {
+                            service.criteria.time = (max_time + min_time) / 2
+                          }
+                        }
                         
                     }
 
@@ -417,7 +414,9 @@ extension Request {
         return String(string[extractionStart..<endIndex!])
 	  }
 
-    func findFetii(locationInfo: LocationInformation) async throws -> FindFetiiResponse {
+    func findFetii(req: Request) async throws -> FindFetiiResponse {
+
+        let locationInfo = try req.query.decode(LocationInformation.self)
         
         let baseURL = "https://www.fetii.com/api/v29/vehicle-types-list"
 
@@ -439,36 +438,31 @@ extension Request {
             URLQueryItem(name: "ride_type", value: "normal")
         ]
 
-        guard let url = urlComponents.url else {
-          throw Abort(.internalServerError, reason: "Failed to compose url with parameters")
+         guard let url = urlComponents.url else {
+            throw Abort(.internalServerError, reason: "Failed to compose url with parameters")
         }
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        // Replace with your bearer token
-            request.addValue("Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImNlNjA5MDY2ZDZjZTc3OTkyZDgxYjZhZDEwNWQyZDBkN2Q0NGQ1MjIxNDQyMTU1NThlZTc2ZmVmMTJjYjQwMzcwOTIzODNlOWIxMWM4MTI1In0.eyJhdWQiOiIzIiwianRpIjoiY2U2MDkwNjZkNmNlNzc5OTJkODFiNmFkMTA1ZDJkMGQ3ZDQ0ZDUyMjE0NDIxNTU1OGVlNzZmZWYxMmNiNDAzNzA5MjM4M2U5YjExYzgxMjUiLCJpYXQiOjE2OTQ3Mzg5MzYsIm5iZiI6MTY5NDczODkzNiwiZXhwIjoxNzI2MzYxMzM2LCJzdWIiOiIxOTY0NjIiLCJzY29wZXMiOltdfQ.cfLhUNZr95dy_QxDAb82AXvE2XtgVqwrQK0EOg_Uaa3NgiMqDV-F0z14ecSXWkm9ALYobzmZqpp68uXzoEsIsQW6yNrqcCYulrIBGFy0tZtObuaeOpmzKV8rEqq2lXWxzxFDpvNd678QIOH2LIpE_Gr1VlrAWGeA6rj9JV6boAaqfpPpDddeT-ThbXecNehsSyUeS_lbmkKSzFMjbeFiX6WP4TbR7ozeJokv47GHJkhJyZoQodpoWPlOCFmy9U7l1JHH4PvQxmvrdYscetPp-d_bQgNn59W9QN-EZUaiSQ5E-mUsTp6ZP320vgG5eOKpTgvANjiUd9bZ17eyQ8160LzDOmnDdynBvjBYLUmIJaRQ2xVnR5TL7XsFkdak0xfIYYWQNpIM4cEsvXyey9Hya7yRf06ZdIDeWnxT5YcIi4PDOMU8JQ38RLRSDCNUTS1x5_qQvcPGuirIbPStNlnIPfoNdAg_GpKuBH931LpzEtD7I6AX-p8DtIuXx1CkKHHTkbviK0CSgkLM2mxVPpCNMGxP5rUVIDL3KRzUvYqyGjFJilWX4fL8Fv5rXWXF8F5T0YWbWLAO5TEn6IMqawaFzzAjAcQnopbG1Tiq9gBF0ZPZCmoOgS54af2IBW_XC9NQyDFqNp_wV_XgKH9GD89ANXElaedhmB5yDtnwGQ0oWW0", forHTTPHeaderField: "Authorization")
+        // Convert URL to URI
+        let uri = URI(string: url.absoluteString)
 
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-          throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
+        // Use Vapor's HTTP client
+        let clientResponse = try await req.client.get(uri) { getReq in
+            // Set the Authorization header
+            getReq.headers.bearerAuthorization = BearerAuthorization(token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImNlNjA5MDY2ZDZjZTc3OTkyZDgxYjZhZDEwNWQyZDBkN2Q0NGQ1MjIxNDQyMTU1NThlZTc2ZmVmMTJjYjQwMzcwOTIzODNlOWIxMWM4MTI1In0.eyJhdWQiOiIzIiwianRpIjoiY2U2MDkwNjZkNmNlNzc5OTJkODFiNmFkMTA1ZDJkMGQ3ZDQ0ZDUyMjE0NDIxNTU1OGVlNzZmZWYxMmNiNDAzNzA5MjM4M2U5YjExYzgxMjUiLCJpYXQiOjE2OTQ3Mzg5MzYsIm5iZiI6MTY5NDczODkzNiwiZXhwIjoxNzI2MzYxMzM2LCJzdWIiOiIxOTY0NjIiLCJzY29wZXMiOltdfQ.cfLhUNZr95dy_QxDAb82AXvE2XtgVqwrQK0EOg_Uaa3NgiMqDV-F0z14ecSXWkm9ALYobzmZqpp68uXzoEsIsQW6yNrqcCYulrIBGFy0tZtObuaeOpmzKV8rEqq2lXWxzxFDpvNd678QIOH2LIpE_Gr1VlrAWGeA6rj9JV6boAaqfpPpDddeT-ThbXecNehsSyUeS_lbmkKSzFMjbeFiX6WP4TbR7ozeJokv47GHJkhJyZoQodpoWPlOCFmy9U7l1JHH4PvQxmvrdYscetPp-d_bQgNn59W9QN-EZUaiSQ5E-mUsTp6ZP320vgG5eOKpTgvANjiUd9bZ17eyQ8160LzDOmnDdynBvjBYLUmIJaRQ2xVnR5TL7XsFkdak0xfIYYWQNpIM4cEsvXyey9Hya7yRf06ZdIDeWnxT5YcIi4PDOMU8JQ38RLRSDCNUTS1x5_qQvcPGuirIbPStNlnIPfoNdAg_GpKuBH931LpzEtD7I6AX-p8DtIuXx1CkKHHTkbviK0CSgkLM2mxVPpCNMGxP5rUVIDL3KRzUvYqyGjFJilWX4fL8Fv5rXWXF8F5T0YWbWLAO5TEn6IMqawaFzzAjAcQnopbG1Tiq9gBF0ZPZCmoOgS54af2IBW_XC9NQyDFqNp_wV_XgKH9GD89ANXElaedhmB5yDtnwGQ0oWW0")
         }
 
-        do {
-          let decodedData = try JSONDecoder().decode(FindFetiiResponse.self, from: data)
-          print(decodedData)
-          if decodedData.status == 200 {
-            return decodedData
-          } else {
-            throw Abort(.notFound, reason: "No drivers found")
-          }
-        } catch {
-          throw Abort(.internalServerError, reason: "Error decoding JSON: \(error)")
+        guard clientResponse.status == .ok else {
+            throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
         }
+
+        // Decode the response
+        let decodedData = try clientResponse.content.decode(FindFetiiResponse.self)
+        return decodedData
 	  }
 
 	  func locateFetii(req: Request) async throws -> LocateFetiiResponse {
 
-		let locationInfo = try req.query.decode(LocationInformation.self)
+		    let locationInfo = try req.query.decode(LocationInformation.self)
 
         // Replace with your endpoint
         let baseURL = "https://www.fetii.com/api/v29/nearest-drivers-list"
@@ -488,27 +482,22 @@ extension Request {
           throw Abort(.internalServerError, reason: "Failed to compose url with parameters")
         }
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        // Replace with your bearer token
-        request.addValue("Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImNlNjA5MDY2ZDZjZTc3OTkyZDgxYjZhZDEwNWQyZDBkN2Q0NGQ1MjIxNDQyMTU1NThlZTc2ZmVmMTJjYjQwMzcwOTIzODNlOWIxMWM4MTI1In0.eyJhdWQiOiIzIiwianRpIjoiY2U2MDkwNjZkNmNlNzc5OTJkODFiNmFkMTA1ZDJkMGQ3ZDQ0ZDUyMjE0NDIxNTU1OGVlNzZmZWYxMmNiNDAzNzA5MjM4M2U5YjExYzgxMjUiLCJpYXQiOjE2OTQ3Mzg5MzYsIm5iZiI6MTY5NDczODkzNiwiZXhwIjoxNzI2MzYxMzM2LCJzdWIiOiIxOTY0NjIiLCJzY29wZXMiOltdfQ.cfLhUNZr95dy_QxDAb82AXvE2XtgVqwrQK0EOg_Uaa3NgiMqDV-F0z14ecSXWkm9ALYobzmZqpp68uXzoEsIsQW6yNrqcCYulrIBGFy0tZtObuaeOpmzKV8rEqq2lXWxzxFDpvNd678QIOH2LIpE_Gr1VlrAWGeA6rj9JV6boAaqfpPpDddeT-ThbXecNehsSyUeS_lbmkKSzFMjbeFiX6WP4TbR7ozeJokv47GHJkhJyZoQodpoWPlOCFmy9U7l1JHH4PvQxmvrdYscetPp-d_bQgNn59W9QN-EZUaiSQ5E-mUsTp6ZP320vgG5eOKpTgvANjiUd9bZ17eyQ8160LzDOmnDdynBvjBYLUmIJaRQ2xVnR5TL7XsFkdak0xfIYYWQNpIM4cEsvXyey9Hya7yRf06ZdIDeWnxT5YcIi4PDOMU8JQ38RLRSDCNUTS1x5_qQvcPGuirIbPStNlnIPfoNdAg_GpKuBH931LpzEtD7I6AX-p8DtIuXx1CkKHHTkbviK0CSgkLM2mxVPpCNMGxP5rUVIDL3KRzUvYqyGjFJilWX4fL8Fv5rXWXF8F5T0YWbWLAO5TEn6IMqawaFzzAjAcQnopbG1Tiq9gBF0ZPZCmoOgS54af2IBW_XC9NQyDFqNp_wV_XgKH9GD89ANXElaedhmB5yDtnwGQ0oWW0", forHTTPHeaderField: "Authorization")
+        // Convert URL to URI
+        let uri = URI(string: url.absoluteString)
 
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-          throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
+        // Use Vapor's HTTP client
+        let clientResponse = try await req.client.get(uri) { getReq in
+            // Set the Authorization header
+            getReq.headers.bearerAuthorization = BearerAuthorization(token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImNlNjA5MDY2ZDZjZTc3OTkyZDgxYjZhZDEwNWQyZDBkN2Q0NGQ1MjIxNDQyMTU1NThlZTc2ZmVmMTJjYjQwMzcwOTIzODNlOWIxMWM4MTI1In0.eyJhdWQiOiIzIiwianRpIjoiY2U2MDkwNjZkNmNlNzc5OTJkODFiNmFkMTA1ZDJkMGQ3ZDQ0ZDUyMjE0NDIxNTU1OGVlNzZmZWYxMmNiNDAzNzA5MjM4M2U5YjExYzgxMjUiLCJpYXQiOjE2OTQ3Mzg5MzYsIm5iZiI6MTY5NDczODkzNiwiZXhwIjoxNzI2MzYxMzM2LCJzdWIiOiIxOTY0NjIiLCJzY29wZXMiOltdfQ.cfLhUNZr95dy_QxDAb82AXvE2XtgVqwrQK0EOg_Uaa3NgiMqDV-F0z14ecSXWkm9ALYobzmZqpp68uXzoEsIsQW6yNrqcCYulrIBGFy0tZtObuaeOpmzKV8rEqq2lXWxzxFDpvNd678QIOH2LIpE_Gr1VlrAWGeA6rj9JV6boAaqfpPpDddeT-ThbXecNehsSyUeS_lbmkKSzFMjbeFiX6WP4TbR7ozeJokv47GHJkhJyZoQodpoWPlOCFmy9U7l1JHH4PvQxmvrdYscetPp-d_bQgNn59W9QN-EZUaiSQ5E-mUsTp6ZP320vgG5eOKpTgvANjiUd9bZ17eyQ8160LzDOmnDdynBvjBYLUmIJaRQ2xVnR5TL7XsFkdak0xfIYYWQNpIM4cEsvXyey9Hya7yRf06ZdIDeWnxT5YcIi4PDOMU8JQ38RLRSDCNUTS1x5_qQvcPGuirIbPStNlnIPfoNdAg_GpKuBH931LpzEtD7I6AX-p8DtIuXx1CkKHHTkbviK0CSgkLM2mxVPpCNMGxP5rUVIDL3KRzUvYqyGjFJilWX4fL8Fv5rXWXF8F5T0YWbWLAO5TEn6IMqawaFzzAjAcQnopbG1Tiq9gBF0ZPZCmoOgS54af2IBW_XC9NQyDFqNp_wV_XgKH9GD89ANXElaedhmB5yDtnwGQ0oWW0")
         }
 
-        do {
-          let decodedData = try JSONDecoder().decode(LocateFetiiResponse.self, from: data)
-          print(decodedData)
-          if decodedData.status == 200 {
-            return decodedData
-          } else {
-            throw Abort(.notFound, reason: "No drivers found")
-          }
-        } catch {
-          throw Abort(.internalServerError, reason: "Error decoding JSON: \(error)")
+        guard clientResponse.status == .ok else {
+            throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
         }
+
+        // Decode the response
+        let decodedData = try clientResponse.content.decode(LocateFetiiResponse.self)
+        return decodedData
 	  }
     
     func findDistance(userLat: Double, userLng: Double, bikeLat: Double, bikeLng: Double) -> Double {
@@ -518,26 +507,41 @@ extension Request {
         return sqrt(sumSquares)
     }
 
-    func findVEO() async throws -> VEOPriceLocation {
+    func findVEO(req: Request) async throws -> VEOPriceLocation {
         
-        let findVEO = try self.content.decode(FindVEORequest.self)
-        print(findVEO)
+        let findVEO = try req.content.decode(FindVEORequest.self)
 
-        let baseURL = URL(string: "https://cluster-prod.veoride.com/api/customers/vehicles?lat=\(findVEO.userLatitude)&lng=\(findVEO.userLongitude)")!
- 
-        var request = URLRequest(url: baseURL)
-        request.httpMethod = "GET"
+        // Construct the base URL for the first request
+        let baseURL = "https://cluster-prod.veoride.com/api/customers/vehicles"
+        
+        guard var urlComponents = URLComponents(string: baseURL) else {
+            throw Abort(.internalServerError, reason: "Invalid URL")
+        }
 
-        // Replace with your bearer token
-        request.addValue("Bearer \(findVEO.veoToken)", forHTTPHeaderField: "Authorization")
+        // Add query parameters for the first request
+        urlComponents.queryItems = [
+            URLQueryItem(name: "lat", value: findVEO.userLatitude),
+            URLQueryItem(name: "lng", value: findVEO.userLongitude)
+        ]
 
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+        guard let url = urlComponents.url else {
+            throw Abort(.internalServerError, reason: "Failed to compose URL with parameters")
+        }
+
+        let uri = URI(string: url.absoluteString)
+
+        // Make the first request
+        let clientResponse = try await req.client.get(uri) { getReq in
+            getReq.headers.bearerAuthorization = BearerAuthorization(token: findVEO.veoToken)
+        }
+
+        guard clientResponse.status == .ok else {
             throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
         }
 
+        let decodedData = try clientResponse.content.decode(FindVEOResponse.self)
+
         do {
-            let decodedData = try JSONDecoder().decode(FindVEOResponse.self, from: data)
             if decodedData.msg == "Request Success" {
                 // sort bikes by distance to user
                 var bikeLocations = [BikeDistance]()
@@ -556,30 +560,24 @@ extension Request {
                 bikeLocations = bikeLocations.sorted(by:{$0.distance < $1.distance})
                 
                 // after sorting bikes, make request for closest bike
-                let bikeURL = URL(string: "https://cluster-prod.veoride.com/api/customers/vehicles/number/\(decodedData.data.first!.vehicleNumber)")!
- 
-                var bike_request = URLRequest(url: bikeURL)
-                bike_request.httpMethod = "GET"
+                let bikeURL = "https://cluster-prod.veoride.com/api/customers/vehicles/number/\(decodedData.data.first!.vehicleNumber)"
+                let bikeUri = URI(string: bikeURL)
 
-                // Replace with your bearer token
-                bike_request.addValue("Bearer \(findVEO.veoToken)", forHTTPHeaderField: "Authorization")
-
-                let (data2, response2) = try await URLSession.shared.data(for: bike_request)
-                guard let httpResponse = response2 as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                        throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
-                    }
-                
-                do {
-                   let bikeData = try JSONDecoder().decode(VEOBikeResponse.self, from: data2)
-                   if bikeData.msg == "Request Success" {
-                       let finalData = VEOPriceLocation(price: bikeData.data.price, closestBikes: bikeLocations)
-                       return finalData
-                   } else {
-                            throw Abort(.notFound, reason: "No bikes found")
-                   }
-                   } catch {
-                        throw Abort(.internalServerError, reason: "Error decoding JSON: \(error)")
+                // Make the second request
+                let bikeClientResponse = try await req.client.get(bikeUri) { getReq in
+                    getReq.headers.bearerAuthorization = BearerAuthorization(token: findVEO.veoToken)
                 }
+
+                guard bikeClientResponse.status == .ok else {
+                    throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
+                }
+
+                let bikeData = try bikeClientResponse.content.decode(VEOBikeResponse.self)
+
+                // Assuming you process this response to create your final data
+                let finalData = VEOPriceLocation(price: bikeData.data.price, closestBikes: bikeLocations)
+
+                return finalData
 
             } else {
                 throw Abort(.notFound, reason: "No bikes found")

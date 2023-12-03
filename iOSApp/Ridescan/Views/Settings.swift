@@ -93,7 +93,8 @@ struct SettingsView: View {
                     }
                 }
                 .environment(\.editMode, $editMode) /// bind it here!
-//                .listStyle(InsetListStyle())
+                .listStyle(InsetListStyle())
+                .frame(width: .infinity, height: 500)
             }
             
         }

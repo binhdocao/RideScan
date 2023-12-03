@@ -191,7 +191,7 @@ struct MapView: View {
 				}
 
             if showBusRoute && !isRouteDisplayed && !isRouteCalculationComplete {
-                var status = calculateRoute(from: fromTo.from , to: fromTo.to, with: .transit, forBus: true)
+                var status = calculateRoute(from: CLLocationCoordinate2D(latitude: fromTo.fromLat, longitude: fromTo.fromLong), to: CLLocationCoordinate2D(latitude: fromTo.toLat, longitude: fromTo.toLong), with: .transit, forBus: true)
             }
 
             if !showComparisonSheet {
@@ -206,7 +206,8 @@ struct MapView: View {
                         VStack {
                             Button(action: {
                                 confirmRoute()
-                                  fromTo.from = self.annotations[0].coordinate
+                                fromTo.fromLat = self.annotations[0].coordinate.latitude
+                                fromTo.fromLong = self.annotations[0].coordinate.longitude
                                   isRouteDisplayed = false
                                   isRouteCalculationComplete = false
                                                     
@@ -471,14 +472,14 @@ struct MapView: View {
             //print("My route id", bus.RouteId)
             for stop in bus.stops {
                 //print(stop)
-                if distance(from: coordinates, to: stop) < currToStop {
-                    currToStop = distance(from : coordinates, to: stop)
-                    coordinatesStop1 = stop
+                if distance(from: coordinates, to: CLLocationCoordinate2D(latitude: stop.0, longitude: stop.1)) < currToStop {
+                    currToStop = distance(from : coordinates, to: CLLocationCoordinate2D(latitude: stop.0, longitude: stop.1))
+                    coordinatesStop1 = CLLocationCoordinate2D(latitude: stop.0, longitude: stop.1)
                     
                 }
-                if distance(from : stop, to : destination) < StopToDest {
-                    StopToDest = distance(from: stop, to: destination)
-                    coordinatesStop2 = stop
+                if distance(from : CLLocationCoordinate2D(latitude: stop.0, longitude: stop.1), to : destination) < StopToDest {
+                    StopToDest = distance(from: CLLocationCoordinate2D(latitude: stop.0, longitude: stop.1), to: destination)
+                    coordinatesStop2 = CLLocationCoordinate2D(latitude: stop.0, longitude: stop.1)
                     
                 }
             }
@@ -523,7 +524,7 @@ struct MapView: View {
                     for i in 0..<buses.count {
                         
                         if buses[i].RouteId == id {
-                            buses[i].stops.append(CLLocationCoordinate2D(latitude: lat, longitude: lon))
+                            buses[i].stops.append((lat, lon))
                         }
                     }
                 }
