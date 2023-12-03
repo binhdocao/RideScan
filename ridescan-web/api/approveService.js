@@ -1,4 +1,4 @@
-import { connectToDatabase } from '../mongodb';
+import { connectToDatabase } from '../lib/mongodb';
 import { ObjectId } from 'mongodb'; // Required to handle _id correctly
 require('dotenv').config();
 
