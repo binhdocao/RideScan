@@ -2,108 +2,136 @@ import Models
 import MongoDBVapor
 import Vapor
 
+extension ReviewResponse: Content {}
+
 // Adds API routes to the application.
 func routes(_ app: Application) throws {
-	/// Handles a request to load the list of kittens.
-	app.get { req async throws -> [User] in
-		try await req.findUsers()
-	}
+    /// Handles a request to load the list of users.
+    app.get { req async throws -> [User] in
+        try await req.findUsers()
+    }
 
-	/// Handles a request to load info about a particular kitten.
-	app.get(":_id") { req async throws -> User in
-		try await req.findUser()
-	}
+	/// Handles a request to load the list of services.
+    app.get("api", "services") { req async throws -> [Service] in
+        try await req.findServices(req: req)
+    }
 
-	app.delete(":_id") { req async throws -> Response in
-		try await req.delUser()
-	}
+	// Route to handle review submission
+    app.post("api", "services", "review") { req -> EventLoopFuture<ReviewResponse> in
+        let reviewSubmission = try req.content.decode(ReviewRequest.self)
+        guard let serviceObjectId = try? BSONObjectID(reviewSubmission.serviceId) else {
+            throw Abort(.badRequest, reason: "Invalid service ID")
+        }
 
-	app.get("api", "user", "login", ":emailOrPhone", ":password") { req async throws -> User in
-		try await req.userExists()
-	}
+        let filter: BSONDocument = ["_id": .objectID(serviceObjectId)]
+        let update: BSONDocument = ["$push": ["reviews": .document(try BSONEncoder().encode(reviewSubmission.review))]]
 
+        return req.serviceCollection.updateOne(filter: filter, update: update).flatMapThrowing { updateResult in
+        guard let result = updateResult, result.modifiedCount == 1 else {
+                throw Abort(.notFound, reason: "Service not found or no update made")
+            }
+			return ReviewResponse(success: true, message: "Service review updated successfully")
+        }
+    }
 
-	app.post("api", "user", "create") { req async throws -> AddUserResponse in
-		let newUser = try req.content.decode(User.self)
-		
-		// Check for existing user by Apple Identifier
-		let filter: BSONDocument = ["_id": .string(newUser.id ?? "")]
-		if let existingUser = try await req.userCollection.findOne(filter) {
-			// User already exists, return their ID
-			return AddUserResponse(id: existingUser.id ?? "Unknown ID")
-		} else {
-			// Proceed with creating a new user
-			try await req.userCollection.insertOne(newUser)
-			return AddUserResponse(id: newUser.id ?? "Unknown ID")
-		}
-	}
+    /// Handles a request to load info about a particular user.
+    app.get(":_id") { req async throws -> User in
+        try await req.findUser()
+    }
 
+    app.delete(":_id") { req async throws -> Response in
+        try await req.delUser()
+    }
 
-	app.patch("api", "user", "update") { req async throws -> UpdateUserResponse in
-		try await req.updateUser()
-	}
-
-	app.post("api", "fetii", "find") { req async throws -> FindFetiiResponse in
-		try await req.findFetii()
-	}
-
-	app.post("api", "fetii", "locate") { req async throws -> LocateFetiiResponse in
-		try await req.locateFetii()
-	}
-
-	// Apple Login Stuff
-	// Apple Login Stuff
-	app.get("api", "user", "apple-login", ":appleIdentifier") { req async throws -> User in
-		print("Apple Login Request Received")
-
-		guard let appleIdentifier = req.parameters.get("appleIdentifier", as: String.self) else {
-			print("Apple Login: Bad Request - Missing Apple Identifier")
-			throw Abort(.badRequest)
-		}
-
-		print("Apple Login: Received Apple Identifier - \(appleIdentifier)")
+    app.get("api", "user", "login", ":emailOrPhone", ":password") { req async throws -> User in
+        try await req.userExists()
+    }
 
 
-		do {
-			// Check if a user with the given Apple Identifier exists
-			let user = try await req.findUserByAppleIdentifier(appleIdentifier)
-
-			if let user = user {
-				print("Apple Login: User Found - \(user)")
-				return user
-			} else {
-				// If user not found, you can throw a notFound error or handle it as needed
-				throw Abort(.notFound, reason: "User not found")
-			}
-		} catch {
-			// Handle errors
-			throw error
-		}
-	}
+    app.post("api", "user", "create") { req async throws -> AddUserResponse in
+        let newUser = try req.content.decode(User.self)
+        
+        // Check for existing user by Apple Identifier
+        let filter: BSONDocument = ["_id": .string(newUser.id ?? "")]
+        if let existingUser = try await req.userCollection.findOne(filter) {
+            // User already exists, return their ID
+            return AddUserResponse(id: existingUser.id ?? "Unknown ID")
+        } else {
+            // Proceed with creating a new user
+            try await req.userCollection.insertOne(newUser)
+            return AddUserResponse(id: newUser.id ?? "Unknown ID")
+        }
+    }
 
 
+    app.patch("api", "user", "update") { req async throws -> UpdateUserResponse in
+        try await req.updateUser()
+    }
+
+    app.post("api", "fetii", "find") { req async throws -> FindFetiiResponse in
+        try await req.findFetii(req: req)
+    }
+
+    app.get("api", "fetii", "locate") { req async throws -> LocateFetiiResponse in
+        try await req.locateFetii(req: req)
+    }
+
+    app.post("api", "veoride", "find") { req async throws -> VEOPriceLocation in
+        try await req.findVEO(req: req)
+    }
+
+    // Apple Login Stuff
+    // Apple Login Stuff
+    app.get("api", "user", "apple-login", ":appleIdentifier") { req async throws -> User in
+        print("Apple Login Request Received")
+
+        guard let appleIdentifier = req.parameters.get("appleIdentifier", as: String.self) else {
+            print("Apple Login: Bad Request - Missing Apple Identifier")
+            throw Abort(.badRequest)
+        }
+
+        print("Apple Login: Received Apple Identifier - \(appleIdentifier)")
 
 
+        do {
+            // Check if a user with the given Apple Identifier exists
+            let user = try await req.findUserByAppleIdentifier(appleIdentifier)
 
-
-
-
-
-
+            if let user = user {
+                print("Apple Login: User Found - \(user)")
+                return user
+            } else {
+                // If user not found, you can throw a notFound error or handle it as needed
+                throw Abort(.notFound, reason: "User not found")
+            }
+        } catch {
+            // Handle errors
+            throw error
+        }
+    }
 }
 
 extension User: Content {}
+extension Service: Content {}
 extension FindFetiiResponse: Content {}
 extension LocateFetiiResponse: Content {}
 extension AddUserResponse: Content {}
 extension UpdateUserResponse: Content {}
+extension FindVEOResponse: Content {}
+extension VEOBikeResponse: Content {}
+extension BikeDistance: Content {}
+extension VEOPriceLocation: Content {}
 
 extension Request {
-	/// Convenience extension for obtaining a collection.
+    /// Convenience extension for obtaining a collection.
 
-	var userCollection: MongoCollection<User> {
-		self.application.mongoDB.client.db("ridescan").collection("users", withType: User.self)
-	}
+    var userCollection: MongoCollection<User> {
+        self.application.mongoDB.client.db("ridescan").collection("users", withType: User.self)
+    }
+
+    var serviceCollection: MongoCollection<Service> {
+        self.application.mongoDB.client.db("ridescan").collection("transportation", withType: Service.self)
+    }
 
 	/// Constructs a document using the _id from this request which can be used a filter for MongoDB
 	/// reads/updates/deletions.
@@ -121,6 +149,65 @@ extension Request {
 			throw Abort(.internalServerError, reason: "Failed to load users: \(error)")
 		}
 	}
+
+    func findServices(req: Request) async throws -> [Service] {
+        do {
+            var services = try await self.serviceCollection.find().toArray()
+            
+            // Loop through each service and call a different function
+            for index in services.indices {
+                var service = services[index]
+
+                // We can assume that we only need to obtain data for non-user proposed services
+                if service.user_proposed == false {
+
+                    // Fetii information
+                    if service.name == "Fetii" {
+						
+                        let findFetiiResponse = try await findFetii(req: req)
+
+                        // set price
+                        service.criteria.price = findFetiiResponse.data.first!.min_charge_per_person
+
+                        // set time
+                        if let max_time = findFetiiResponse.data.first!.arriveIn_max_time, let min_time = findFetiiResponse.data.first!.arriveIn_min_time {
+                          if max_time != 0 && min_time != 0 {
+                            service.criteria.time = (max_time + min_time) / 2
+                          }
+                        }
+                        
+                    }
+
+                    // set calories burned
+                    if service.ride_method == "walking" {
+                        service.criteria.calories_burned = service.criteria.time * 5
+                    } else if service.ride_method == "biking" {
+                        service.criteria.calories_burned = service.criteria.time * 10
+                    }
+
+                    services[index] = service
+                } else {
+					// // Calculate the average rating for user-proposed services
+					// let totalRating = service.reviews.reduce(0) { $0 + $1.rating }
+					// let averageRating = service.reviews.isEmpty ? 5 : Double(totalRating) / Double(service.reviews.count)
+
+					// // Filter out services with an average rating less than 2
+					// if !service.reviews.isEmpty && averageRating >= 2.0 {
+					// 	// ... you might want to set other criteria here ...
+					// 	services[index] = service
+					// } else {
+					// 	// Remove the service with an average rating below 2
+					// 	services.remove(at: index)
+					// }
+				}
+            }
+
+            return services
+
+        } catch {
+            throw Abort(.internalServerError, reason: "Failed to load services: \(error)")
+        }
+    }
 	
 	func appleUserExists(appleIdentifier: String) async throws -> Bool {
 		let filter: BSONDocument = [
@@ -270,160 +357,245 @@ extension Request {
 
 
 
-	func updateUser() async throws -> UpdateUserResponse {
-		// Decode the User from the request's JSON body
-		let userToUpdate = try self.content.decode(User.self)
+	    func updateUser() async throws -> UpdateUserResponse {
+        // Decode the User from the request's JSON body
+        let userToUpdate = try self.content.decode(User.self)
 
-		guard let userId = userToUpdate.id else {
-			throw Abort(.badRequest, reason: "User ID is missing")
-		}
+        guard let userId = userToUpdate.id else {
+          throw Abort(.badRequest, reason: "User ID is missing")
+        }
 
-		do {
-			// Create a filter based on the _id format
-			let filter: BSONDocument
-			if userId.hasPrefix("ObjectId('") && userId.hasSuffix("')") {
-				// If the userId is in ObjectId format, extract the ObjectId value
-				let startIndex = userId.index(userId.startIndex, offsetBy: 11)
-				let endIndex = userId.index(userId.endIndex, offsetBy: -2)
-				let objectIdString = String(userId[startIndex..<endIndex])
-				if let objectId = try? BSONObjectID(objectIdString) {
-					filter = ["_id": .objectID(objectId)]
-				} else {
-					throw Abort(.badRequest, reason: "Invalid ObjectId format")
-				}
-			} else {
-				// If the userId is not in ObjectId format, treat it as a string
-				filter = ["_id": .string(userId)]
-			}
+        do {
+          // Create a filter based on the _id format
+          let filter: BSONDocument
+          if userId.hasPrefix("ObjectId('") && userId.hasSuffix("')") {
+            // If the userId is in ObjectId format, extract the ObjectId value
+            let startIndex = userId.index(userId.startIndex, offsetBy: 11)
+            let endIndex = userId.index(userId.endIndex, offsetBy: -2)
+            let objectIdString = String(userId[startIndex..<endIndex])
+            if let objectId = try? BSONObjectID(objectIdString) {
+              filter = ["_id": .objectID(objectId)]
+            } else {
+              throw Abort(.badRequest, reason: "Invalid ObjectId format")
+            }
+          } else {
+            // If the userId is not in ObjectId format, treat it as a string
+            filter = ["_id": .string(userId)]
+          }
 
-			// Create an update document with the fields you want to update
-			let updateDocument: BSONDocument = [
-				"$set": .document(try BSONEncoder().encode(userToUpdate))
-			]
+          // Create an update document with the fields you want to update
+          let updateDocument: BSONDocument = [
+            "$set": .document(try BSONEncoder().encode(userToUpdate))
+          ]
 
-			// Update the user in MongoDB
-			let result = try await self.userCollection.updateOne(filter: filter, update: updateDocument)
+          // Update the user in MongoDB
+          let result = try await self.userCollection.updateOne(filter: filter, update: updateDocument)
 
-			// Check if a document was actually updated
-			guard let matchedCount = result?.matchedCount, matchedCount > 0 else {
-				throw Abort(.notFound, reason: "No user with matching _id")
-			}
+          // Check if a document was actually updated
+          guard let matchedCount = result?.matchedCount, matchedCount > 0 else {
+            throw Abort(.notFound, reason: "No user with matching _id")
+          }
 
-			// You can create a custom response or return a success message
-			// For simplicity, let's just return a success message with the updated user's ID
-			return UpdateUserResponse(id: userId, message: "User updated successfully")
-		} catch {
-			// If something goes wrong, throw an internal server error
-			throw Abort(.internalServerError, reason: "Failed to update user: \(error)")
-		}
-	}
-
-
+          // You can create a custom response or return a success message
+          // For simplicity, let's just return a success message with the updated user's ID
+          return UpdateUserResponse(id: userId, message: "User updated successfully")
+        } catch {
+          // If something goes wrong, throw an internal server error
+          throw Abort(.internalServerError, reason: "Failed to update user: \(error)")
+        }
+	  }
 
 
+	  func extractStringInParentheses(string: String) -> String {
+        let startIndex = string.firstIndex(of: "(")
+        let endIndex = string.firstIndex(of: ")")
 
-	func extractStringInParentheses(string: String) -> String {
-		let startIndex = string.firstIndex(of: "(")
-		let endIndex = string.firstIndex(of: ")")
+        let extractionStart = string.index(after: startIndex!)
+        return String(string[extractionStart..<endIndex!])
+	  }
 
-		let extractionStart = string.index(after: startIndex!)
-		return String(string[extractionStart..<endIndex!])
-	}
+    func findFetii(req: Request) async throws -> FindFetiiResponse {
 
-	func findFetii() async throws -> FindFetiiResponse {
+        let locationInfo = try req.query.decode(LocationInformation.self)
+        
+        let baseURL = "https://www.fetii.com/api/v29/vehicle-types-list"
 
-		let findFetii = try self.content.decode(FindFetiiRequest.self)
-		print(findFetii)
+        guard var urlComponents = URLComponents(string: baseURL) else {
+          throw Abort(.internalServerError, reason: "Invalid URL")
+        }
 
-		// Replace with your endpoint
-		let baseURL = "https://www.fetii.com/api/v29/vehicle-types-list"
+        // Add query parameters
+        urlComponents.queryItems = [
+            URLQueryItem(name: "pickup_latitude", value: "\(locationInfo.userLatitude)"),
+            URLQueryItem(name: "pickup_longitude", value: "\(locationInfo.userLongitude)"),
+            URLQueryItem(name: "dropoff_latitude", value: "\(locationInfo.destLatitude)"),
+            URLQueryItem(name: "dropoff_longitude", value: "\(locationInfo.destLongitude)"),
+            URLQueryItem(name: "dropoff_long_address", value: "\(locationInfo.dropoff_long_address)"),
+            URLQueryItem(name: "dropoff_short_address", value: "\(locationInfo.dropoff_short_address)"),
+            URLQueryItem(name: "pickup_long_address", value: "\(locationInfo.pickup_long_address)"),
+            URLQueryItem(name: "pickup_short_address", value: "\(locationInfo.pickup_short_address)"),
+            URLQueryItem(name: "radius_id", value: "1"),
+            URLQueryItem(name: "ride_type", value: "normal")
+        ]
 
-		guard var urlComponents = URLComponents(string: baseURL) else {
-			throw Abort(.internalServerError, reason: "Invalid URL")
-		}
+         guard let url = urlComponents.url else {
+            throw Abort(.internalServerError, reason: "Failed to compose url with parameters")
+        }
 
-		// Add query parameters
-		urlComponents.queryItems = [
-			URLQueryItem(name: "pickup_latitude", value: "\(findFetii.userLatitude)"),
-			URLQueryItem(name: "pickup_longitude", value: "\(findFetii.userLongitude)"),
-			URLQueryItem(name: "dropoff_latitude", value: "\(findFetii.destLatitude)"),
-			URLQueryItem(name: "dropoff_longitude", value: "\(findFetii.destLongitude)"),
-			URLQueryItem(name: "dropoff_long_address", value: "\(findFetii.dropoff_long_address)"),
-			URLQueryItem(name: "dropoff_short_address", value: "\(findFetii.dropoff_short_address)"),
-			URLQueryItem(name: "pickup_long_address", value: "\(findFetii.pickup_long_address)"),
-			URLQueryItem(name: "pickup_short_address", value: "\(findFetii.pickup_short_address)"),
-			URLQueryItem(name: "radius_id", value: "1"),
-			URLQueryItem(name: "ride_type", value: "normal")
-		]
+        // Convert URL to URI
+        let uri = URI(string: url.absoluteString)
 
-		guard let url = urlComponents.url else {
-			throw Abort(.internalServerError, reason: "Failed to compose url with parameters")
-		}
+        // Use Vapor's HTTP client
+        let clientResponse = try await req.client.get(uri) { getReq in
+            // Set the Authorization header
+            getReq.headers.bearerAuthorization = BearerAuthorization(token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImNlNjA5MDY2ZDZjZTc3OTkyZDgxYjZhZDEwNWQyZDBkN2Q0NGQ1MjIxNDQyMTU1NThlZTc2ZmVmMTJjYjQwMzcwOTIzODNlOWIxMWM4MTI1In0.eyJhdWQiOiIzIiwianRpIjoiY2U2MDkwNjZkNmNlNzc5OTJkODFiNmFkMTA1ZDJkMGQ3ZDQ0ZDUyMjE0NDIxNTU1OGVlNzZmZWYxMmNiNDAzNzA5MjM4M2U5YjExYzgxMjUiLCJpYXQiOjE2OTQ3Mzg5MzYsIm5iZiI6MTY5NDczODkzNiwiZXhwIjoxNzI2MzYxMzM2LCJzdWIiOiIxOTY0NjIiLCJzY29wZXMiOltdfQ.cfLhUNZr95dy_QxDAb82AXvE2XtgVqwrQK0EOg_Uaa3NgiMqDV-F0z14ecSXWkm9ALYobzmZqpp68uXzoEsIsQW6yNrqcCYulrIBGFy0tZtObuaeOpmzKV8rEqq2lXWxzxFDpvNd678QIOH2LIpE_Gr1VlrAWGeA6rj9JV6boAaqfpPpDddeT-ThbXecNehsSyUeS_lbmkKSzFMjbeFiX6WP4TbR7ozeJokv47GHJkhJyZoQodpoWPlOCFmy9U7l1JHH4PvQxmvrdYscetPp-d_bQgNn59W9QN-EZUaiSQ5E-mUsTp6ZP320vgG5eOKpTgvANjiUd9bZ17eyQ8160LzDOmnDdynBvjBYLUmIJaRQ2xVnR5TL7XsFkdak0xfIYYWQNpIM4cEsvXyey9Hya7yRf06ZdIDeWnxT5YcIi4PDOMU8JQ38RLRSDCNUTS1x5_qQvcPGuirIbPStNlnIPfoNdAg_GpKuBH931LpzEtD7I6AX-p8DtIuXx1CkKHHTkbviK0CSgkLM2mxVPpCNMGxP5rUVIDL3KRzUvYqyGjFJilWX4fL8Fv5rXWXF8F5T0YWbWLAO5TEn6IMqawaFzzAjAcQnopbG1Tiq9gBF0ZPZCmoOgS54af2IBW_XC9NQyDFqNp_wV_XgKH9GD89ANXElaedhmB5yDtnwGQ0oWW0")
+        }
 
-		var request = URLRequest(url: url)
-		request.httpMethod = "GET"
-		// Replace with your bearer token
-		request.addValue("Bearer <#YourBearerToken#>", forHTTPHeaderField: "Authorization")
+        guard clientResponse.status == .ok else {
+            throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
+        }
 
-		let (data, response) = try await URLSession.shared.data(for: request)
-		guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-			throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
-		}
+        // Decode the response
+        let decodedData = try clientResponse.content.decode(FindFetiiResponse.self)
+        return decodedData
+	  }
 
-		do {
-			let decodedData = try JSONDecoder().decode(FindFetiiResponse.self, from: data)
-			print(decodedData)
-			if decodedData.status == 200 {
-				return decodedData
-			} else {
-				throw Abort(.notFound, reason: "No drivers found")
-			}
-		} catch {
-			throw Abort(.internalServerError, reason: "Error decoding JSON: \(error)")
-		}
-	}
+	  func locateFetii(req: Request) async throws -> LocateFetiiResponse {
 
-	func locateFetii() async throws -> LocateFetiiResponse {
+		    let locationInfo = try req.query.decode(LocationInformation.self)
 
-		// Replace with your endpoint
-		let baseURL = "https://www.fetii.com/api/v29/nearest-drivers-list"
-		let userLocation = try self.content.decode(UserLoc.self)
+        // Replace with your endpoint
+        let baseURL = "https://www.fetii.com/api/v29/nearest-drivers-list"
 
-		guard var urlComponents = URLComponents(string: baseURL) else {
-			throw Abort(.internalServerError, reason: "Invalid URL")
-		}
+        guard var urlComponents = URLComponents(string: baseURL) else {
+          throw Abort(.internalServerError, reason: "Invalid URL")
+        }
 
-		// Add query parameters
-		urlComponents.queryItems = [
-			URLQueryItem(name: "latitude", value: "\(userLocation.lat)"),
-			URLQueryItem(name: "longitude", value: "\(userLocation.lng)"),
-			URLQueryItem(name: "radius_id", value: "1")
-		]
+        // Add query parameters
+        urlComponents.queryItems = [
+          URLQueryItem(name: "latitude", value: "\(locationInfo.userLatitude)"),
+          URLQueryItem(name: "longitude", value: "\(locationInfo.userLongitude)"),
+          URLQueryItem(name: "radius_id", value: "1")
+        ]
 
-		guard let url = urlComponents.url else {
-			throw Abort(.internalServerError, reason: "Failed to compose url with parameters")
-		}
+        guard let url = urlComponents.url else {
+          throw Abort(.internalServerError, reason: "Failed to compose url with parameters")
+        }
 
-		var request = URLRequest(url: url)
-		request.httpMethod = "GET"
-		// Replace with your bearer token
-		request.addValue("Bearer <#YourBearerToken#>", forHTTPHeaderField: "Authorization")
+        // Convert URL to URI
+        let uri = URI(string: url.absoluteString)
 
-		let (data, response) = try await URLSession.shared.data(for: request)
-		guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-			throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
-		}
+        // Use Vapor's HTTP client
+        let clientResponse = try await req.client.get(uri) { getReq in
+            // Set the Authorization header
+            getReq.headers.bearerAuthorization = BearerAuthorization(token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImNlNjA5MDY2ZDZjZTc3OTkyZDgxYjZhZDEwNWQyZDBkN2Q0NGQ1MjIxNDQyMTU1NThlZTc2ZmVmMTJjYjQwMzcwOTIzODNlOWIxMWM4MTI1In0.eyJhdWQiOiIzIiwianRpIjoiY2U2MDkwNjZkNmNlNzc5OTJkODFiNmFkMTA1ZDJkMGQ3ZDQ0ZDUyMjE0NDIxNTU1OGVlNzZmZWYxMmNiNDAzNzA5MjM4M2U5YjExYzgxMjUiLCJpYXQiOjE2OTQ3Mzg5MzYsIm5iZiI6MTY5NDczODkzNiwiZXhwIjoxNzI2MzYxMzM2LCJzdWIiOiIxOTY0NjIiLCJzY29wZXMiOltdfQ.cfLhUNZr95dy_QxDAb82AXvE2XtgVqwrQK0EOg_Uaa3NgiMqDV-F0z14ecSXWkm9ALYobzmZqpp68uXzoEsIsQW6yNrqcCYulrIBGFy0tZtObuaeOpmzKV8rEqq2lXWxzxFDpvNd678QIOH2LIpE_Gr1VlrAWGeA6rj9JV6boAaqfpPpDddeT-ThbXecNehsSyUeS_lbmkKSzFMjbeFiX6WP4TbR7ozeJokv47GHJkhJyZoQodpoWPlOCFmy9U7l1JHH4PvQxmvrdYscetPp-d_bQgNn59W9QN-EZUaiSQ5E-mUsTp6ZP320vgG5eOKpTgvANjiUd9bZ17eyQ8160LzDOmnDdynBvjBYLUmIJaRQ2xVnR5TL7XsFkdak0xfIYYWQNpIM4cEsvXyey9Hya7yRf06ZdIDeWnxT5YcIi4PDOMU8JQ38RLRSDCNUTS1x5_qQvcPGuirIbPStNlnIPfoNdAg_GpKuBH931LpzEtD7I6AX-p8DtIuXx1CkKHHTkbviK0CSgkLM2mxVPpCNMGxP5rUVIDL3KRzUvYqyGjFJilWX4fL8Fv5rXWXF8F5T0YWbWLAO5TEn6IMqawaFzzAjAcQnopbG1Tiq9gBF0ZPZCmoOgS54af2IBW_XC9NQyDFqNp_wV_XgKH9GD89ANXElaedhmB5yDtnwGQ0oWW0")
+        }
 
-		do {
-			let decodedData = try JSONDecoder().decode(LocateFetiiResponse.self, from: data)
-			print(decodedData)
-			if decodedData.status == 200 {
-				return decodedData
-			} else {
-				throw Abort(.notFound, reason: "No drivers found")
-			}
-		} catch {
-			throw Abort(.internalServerError, reason: "Error decoding JSON: \(error)")
-		}
-	}
+        guard clientResponse.status == .ok else {
+            throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
+        }
+
+        // Decode the response
+        let decodedData = try clientResponse.content.decode(LocateFetiiResponse.self)
+        return decodedData
+	  }
+    
+    func findDistance(userLat: Double, userLng: Double, bikeLat: Double, bikeLng: Double) -> Double {
+        let xDist = userLat - bikeLat
+        let yDist = userLng - bikeLng
+        let sumSquares = (xDist * xDist) + (yDist * yDist)
+        return sqrt(sumSquares)
+    }
+
+    func findVEO(req: Request) async throws -> VEOPriceLocation {
+        
+        let findVEO = try req.content.decode(FindVEORequest.self)
+
+        // Construct the base URL for the first request
+        let baseURL = "https://cluster-prod.veoride.com/api/customers/vehicles"
+        
+        guard var urlComponents = URLComponents(string: baseURL) else {
+            throw Abort(.internalServerError, reason: "Invalid URL")
+        }
+
+        // Add query parameters for the first request
+        urlComponents.queryItems = [
+            URLQueryItem(name: "lat", value: findVEO.userLatitude),
+            URLQueryItem(name: "lng", value: findVEO.userLongitude)
+        ]
+
+        guard let url = urlComponents.url else {
+            throw Abort(.internalServerError, reason: "Failed to compose URL with parameters")
+        }
+
+        let uri = URI(string: url.absoluteString)
+
+        // Make the first request
+        let clientResponse = try await req.client.get(uri) { getReq in
+            getReq.headers.bearerAuthorization = BearerAuthorization(token: findVEO.veoToken)
+        }
+
+        guard clientResponse.status == .ok else {
+            throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
+        }
+
+        let decodedData = try clientResponse.content.decode(FindVEOResponse.self)
+
+        do {
+            if decodedData.msg == "Request Success" {
+                // sort bikes by distance to user
+                var bikeLocations = [BikeDistance]()
+                let userLat = Double(findVEO.userLatitude)!
+                let userLng = Double(findVEO.userLongitude)!
+                
+                for bike in decodedData.data {
+                    let bikeLat = bike.location.lat
+                    let bikeLng = bike.location.lng
+                    let bikeDist = findDistance(userLat: userLat, userLng: userLng, bikeLat: bikeLat, bikeLng: bikeLng)
+                                        
+                    let bikeLocation = BikeDistance(lat: bikeLat, lng: bikeLng, distance: bikeDist)
+                    bikeLocations.append(bikeLocation)
+                }
+                
+                bikeLocations = bikeLocations.sorted(by:{$0.distance < $1.distance})
+                
+                // after sorting bikes, make request for closest bike
+                let bikeURL = "https://cluster-prod.veoride.com/api/customers/vehicles/number/\(decodedData.data.first!.vehicleNumber)"
+                let bikeUri = URI(string: bikeURL)
+
+                // Make the second request
+                let bikeClientResponse = try await req.client.get(bikeUri) { getReq in
+                    getReq.headers.bearerAuthorization = BearerAuthorization(token: findVEO.veoToken)
+                }
+
+                guard bikeClientResponse.status == .ok else {
+                    throw Abort(.internalServerError, reason: "Failed to get a valid response from the server")
+                }
+
+                let bikeData = try bikeClientResponse.content.decode(VEOBikeResponse.self)
+
+                // Assuming you process this response to create your final data
+                let finalData = VEOPriceLocation(price: bikeData.data.price, closestBikes: bikeLocations)
+
+                return finalData
+
+            } else {
+                throw Abort(.notFound, reason: "No bikes found")
+            }
+        } catch {
+            throw Abort(.internalServerError, reason: "Error decoding JSON: \(error)")
+        }
+    }
+}
+
+// Define a structure that matches the expected query parameters
+struct LocationInformation: Content {
+    var userLatitude: String
+    var userLongitude: String
+    var pickup_long_address: String
+    var pickup_short_address: String
+    var destLatitude: String
+    var destLongitude: String
+    var dropoff_long_address: String
+    var dropoff_short_address: String
 }

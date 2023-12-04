@@ -25,8 +25,11 @@
 		9B281C572AEDE6040004D677 /* URLImage in Frameworks */ = {isa = PBXBuildFile; productRef = 9B281C562AEDE6040004D677 /* URLImage */; };
 		9B281C592AEDE6040004D677 /* URLImageStore in Frameworks */ = {isa = PBXBuildFile; productRef = 9B281C582AEDE6040004D677 /* URLImageStore */; };
 		9B7ABBE62AD5B9D100A822BA /* UserProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7ABBE52AD5B9D100A822BA /* UserProfileViewModel.swift */; };
+		9B89F2122B1882BB00A3C369 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 9B89F2112B1882BB00A3C369 /* Alamofire */; };
 		9B9EC71A2AEA0A94007DDADB /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9EC7192AEA0A94007DDADB /* KeychainService.swift */; };
 		9BCC6B242AEAE4EB000BEF81 /* TransportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BCC6B232AEAE4EB000BEF81 /* TransportViewModel.swift */; };
+		DFA39C962B156390003A7B14 /* VeoAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFA39C952B156390003A7B14 /* VeoAuth.swift */; };
+		E61154FB2B0F0F6B003F4CB0 /* data in Resources */ = {isa = PBXBuildFile; fileRef = E61154FA2B0F0F6B003F4CB0 /* data */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +53,8 @@
 		9B9EC7192AEA0A94007DDADB /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
 		9BCC6B222AEAC000000BEF81 /* Ridescan.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Ridescan.entitlements; sourceTree = "<group>"; };
 		9BCC6B232AEAE4EB000BEF81 /* TransportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransportViewModel.swift; sourceTree = "<group>"; };
+		DFA39C952B156390003A7B14 /* VeoAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VeoAuth.swift; path = Ridescan/Views/VeoAuth.swift; sourceTree = "<group>"; };
+		E61154FA2B0F0F6B003F4CB0 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +63,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9B281C592AEDE6040004D677 /* URLImageStore in Frameworks */,
+				9B89F2122B1882BB00A3C369 /* Alamofire in Frameworks */,
 				8BC62A4727CEF38B0015343B /* Models in Frameworks */,
 				9B281C572AEDE6040004D677 /* URLImage in Frameworks */,
 			);
@@ -69,6 +75,7 @@
 		8B20582527BEFFDF00A9E2A1 = {
 			isa = PBXGroup;
 			children = (
+				DFA39C952B156390003A7B14 /* VeoAuth.swift */,
 				8BE0611927CEF13500D5E981 /* Packages */,
 				8B20583027BEFFDF00A9E2A1 /* Ridescan */,
 				8B20582F27BEFFDF00A9E2A1 /* Products */,
@@ -87,6 +94,7 @@
 		8B20583027BEFFDF00A9E2A1 /* Ridescan */ = {
 			isa = PBXGroup;
 			children = (
+				E61154FA2B0F0F6B003F4CB0 /* data */,
 				9BCC6B222AEAC000000BEF81 /* Ridescan.entitlements */,
 				15CB3D672AE1740300000F7C /* Assets.xcassets */,
 				8BE0611127C7119200D5E981 /* Utilities.swift */,
@@ -160,6 +168,7 @@
 				8BC62A4627CEF38B0015343B /* Models */,
 				9B281C562AEDE6040004D677 /* URLImage */,
 				9B281C582AEDE6040004D677 /* URLImageStore */,
+				9B89F2112B1882BB00A3C369 /* Alamofire */,
 			);
 			productName = Kittens;
 			productReference = 8B20582E27BEFFDF00A9E2A1 /* Ridescan.app */;
@@ -191,6 +200,7 @@
 			mainGroup = 8B20582527BEFFDF00A9E2A1;
 			packageReferences = (
 				9B281C552AEDE6040004D677 /* XCRemoteSwiftPackageReference "url-image" */,
+				9B89F2102B1882BB00A3C369 /* XCRemoteSwiftPackageReference "Alamofire" */,
 			);
 			productRefGroup = 8B20582F27BEFFDF00A9E2A1 /* Products */;
 			projectDirPath = "";
@@ -206,6 +216,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E61154FB2B0F0F6B003F4CB0 /* data in Resources */,
 				15CB3D682AE1740300000F7C /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -217,6 +228,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DFA39C962B156390003A7B14 /* VeoAuth.swift in Sources */,
 				15718CBC2AF28687003B2B5B /* MyAccount.swift in Sources */,
 				8BE0611227C7119200D5E981 /* Utilities.swift in Sources */,
 				8B20583227BEFFDF00A9E2A1 /* RideScanApp.swift in Sources */,
@@ -291,7 +303,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -347,7 +359,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -467,6 +479,14 @@
 				minimumVersion = 3.1.1;
 			};
 		};
+		9B89F2102B1882BB00A3C369 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.8.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -483,6 +503,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9B281C552AEDE6040004D677 /* XCRemoteSwiftPackageReference "url-image" */;
 			productName = URLImageStore;
+		};
+		9B89F2112B1882BB00A3C369 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9B89F2102B1882BB00A3C369 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

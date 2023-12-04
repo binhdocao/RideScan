@@ -11,6 +11,9 @@ try configure(app)
 // Configure the app for using a MongoDB server at the provided connection string.
 try app.mongoDB.configure(Environment.get("MONGODB_URI") ?? "mongodb://localhost:27017")
 
+app.http.server.configuration.hostname = "0.0.0.0" // allow connections from any IP
+app.http.server.configuration.port = 8081  // backend running on port 8080 on linux server, so development application binds to 8081 instead 
+
 defer {
     // Cleanup the application's MongoDB data.
     app.mongoDB.cleanup()
