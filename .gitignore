@@ -17,6 +17,7 @@ xcuserdata/
 .build/
 
 
+
 ### react ###
 .DS_*
 *.log
@@ -33,6 +34,7 @@ psd
 thumb
 sketch
 
+build/
 DerivedData/
 *.moved-aside
 *.pbxuser
@@ -67,6 +69,7 @@ playground.xcworkspace
 # .swiftpm
 
 .build/
+Config.plist
 
 # CocoaPods
 # We recommend against adding the Pods directory to your .gitignore. However
@@ -88,8 +91,6 @@ Dependencies/
 
 
 .env
-
-.build/
 
 # fastlane
 # It is recommended to not store the screenshots in the git repo.
