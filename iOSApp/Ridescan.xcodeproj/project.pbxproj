@@ -44,6 +44,7 @@
 		15718CC12AF2868B003B2B5B /* SignUp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUp.swift; sourceTree = "<group>"; };
 		15718CC22AF2868B003B2B5B /* LogIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogIn.swift; sourceTree = "<group>"; };
 		15718CC62AF28723003B2B5B /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
+		15A3EDA72B1E883D00611EB9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		15CB3D672AE1740300000F7C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8B20582E27BEFFDF00A9E2A1 /* Ridescan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ridescan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B20583127BEFFDF00A9E2A1 /* RideScanApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RideScanApp.swift; sourceTree = "<group>"; };
@@ -94,6 +95,7 @@
 		8B20583027BEFFDF00A9E2A1 /* Ridescan */ = {
 			isa = PBXGroup;
 			children = (
+				15A3EDA72B1E883D00611EB9 /* Info.plist */,
 				E61154FA2B0F0F6B003F4CB0 /* data */,
 				9BCC6B222AEAC000000BEF81 /* Ridescan.entitlements */,
 				15CB3D672AE1740300000F7C /* Assets.xcassets */,
@@ -380,6 +382,7 @@
 				DEVELOPMENT_TEAM = PZWB43AU2U;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Ridescan/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = RideScan;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to show it on the map.\n";
@@ -392,7 +395,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
-				ITSAppUsesNonExemptEncryption = No;
+				ITSAppUsesNonExemptEncryption = false;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -419,6 +422,7 @@
 				DEVELOPMENT_TEAM = PZWB43AU2U;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Ridescan/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = RideScan;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to show it on the map.\n";
@@ -431,7 +435,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
-				ITSAppUsesNonExemptEncryption = No;
+				ITSAppUsesNonExemptEncryption = false;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
