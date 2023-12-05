@@ -52,7 +52,7 @@ struct ComparisonView: View {
     @ObservedObject var locationManager = LocationManager()
     @State private var showAlert = false
     @State var current_veo_price = 0.5
-    
+    var timebus : Double = 99
     // BTD Bus info
     @State var has_bus_data = "No data"
 	    
@@ -94,14 +94,14 @@ struct ComparisonView: View {
     
     @State private var isLoading = true
   
-    init(viewModel: TransportViewModel, destination: CLLocationCoordinate2D, showBusRoute: Binding<Bool>, fromTo: Binding<FromTo>, distance: Double, bestStop: CLLocationCoordinate2D, buses: [BrazosDriver]) {
+    init(viewModel: TransportViewModel, destination: CLLocationCoordinate2D, showBusRoute: Binding<Bool>, fromTo: Binding<FromTo>, distance: Double, bestStop: CLLocationCoordinate2D, buses: [BrazosDriver], timebus: Double) {
         self.transportViewModel = viewModel
         self.destination = destination
         _showBusRoute = showBusRoute
         _fromTo = fromTo
         self.buses = buses
         self.BusStop1 = bestStop
-
+        self.timebus = timebus
         // Initialize rideServices after all properties are initialized
         var rideServices: [RideService] = [
             RideService(name: "Uber", price: 10.0, min_people: 1, max_people: 4,iconName: "car",timeEstimate: 6),
@@ -261,10 +261,13 @@ struct ComparisonView: View {
                                     }
                                     
                                     if service.name == "Brazos Bus Service" && self.buses.count != 0 {
-                                        
+                                        showAlert = false
                                         fromTo.toLat = BusStop1.latitude
                                         fromTo.toLong = BusStop1.longitude
                                         changeShowBusRoute()
+                                    }
+                                    else if self.buses.count == 0 {
+                                        showAlert = true
                                     }
                                 }
                             }) {
@@ -294,7 +297,13 @@ struct ComparisonView: View {
                                             Text("Time: \(service.criteria.time + Int(transportViewModel.carRoute.expectedTravelTime / 60)) minutes")
                                                 .font(.subheadline)
                                                 .foregroundColor(.black)
-                                        } else {
+                                        }
+                                        else if service.name == "Brazos Bus Service"{
+                                            Text("Time: \(timebus) minutes")
+                                                .font(.subheadline)
+                                                .foregroundColor(.black)
+                                        }
+                                        else {
                                             Text("Time: \(service.criteria.time) minutes")
                                                 .font(.subheadline)
                                                 .foregroundColor(.black)
@@ -309,9 +318,17 @@ struct ComparisonView: View {
                                     // Cost per person and minimum number of passengers on the right
                                     VStack(alignment: .trailing) {
                                         // Format the price and timeEstimate as needed
-                                        Text(String(format: "%.2f /person", service.criteria.price))
-                                            .font(.body)
-                                            .foregroundColor(.black)
+                                        if service.name == "Brazos Bus Service" {
+                                            Text(String(format: "%.2f /person", service.criteria.price + 1))
+                                                .font(.body)
+                                                .foregroundColor(.black)
+                                        }
+                                        else {
+                                            Text(String(format: "%.2f /person", service.criteria.price))
+                                                .font(.body)
+                                                .foregroundColor(.black)
+                                        }
+                                        
                                         Text("Carbon emissions: \(service.criteria.carbon_emissions) g/km") // Adjust based on actual data
                                             .font(.subheadline)
                                             .foregroundColor(.black)
