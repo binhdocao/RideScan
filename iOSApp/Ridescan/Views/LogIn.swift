@@ -57,7 +57,6 @@ struct LogInView: View {
 						try await viewModel.login(emailOrPhone: emailOrPhone, password: password)
 						userSettings.isAuthenticated = true
 						loginSuccess = true
-						try await viewModel.VEO()
 					} catch {
 						// Handle errors here (loginSuccess will be set in the ViewModel)
 						loginSuccess = false
@@ -75,7 +74,7 @@ struct LogInView: View {
 			}
 			Spacer()
 			
-			NavigationLink(destination: VeoAuthView(), isActive: $loginSuccess) {
+			NavigationLink(destination: MapView(), isActive: $loginSuccess) {
 				EmptyView() // Use NavigationLink to navigate to VeoAuth View then MapView
 			}
 		}

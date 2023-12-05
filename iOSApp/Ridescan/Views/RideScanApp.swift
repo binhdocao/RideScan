@@ -16,17 +16,12 @@ struct RideScanApp: App {
 
 	var body: some Scene {
 		WindowGroup {
-			if userSettings.isVerified {
+            if userSettings.isAuthenticated {
                 NavigationView {
-				MapView()
-					.environmentObject(userSettings)
+                    MapView()
+                        .environmentObject(userSettings)
                 }
-			} else if userSettings.isAuthenticated {
-                NavigationView {
-				VeoAuthView()
-					.environmentObject(userSettings)
-                }
-			} else {
+            } else {
 				NavigationView {
 					HomeScreen()
 //					MapView()
