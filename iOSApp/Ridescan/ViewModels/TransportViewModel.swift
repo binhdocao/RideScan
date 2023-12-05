@@ -503,7 +503,7 @@ class TransportViewModel: ObservableObject {
         let route = "api/veoride/find/"
         let userURL = HTTP.baseURL.appendingPathComponent(route)
         
-        let veoRequest = FindVEORequest(userLatitude: String(pickupLocation.latitude), userLongitude: String(pickupLocation.longitude), veoToken: veoToken)
+        let veoRequest = FindVEORequest(userLatitude: String(pickupLocation.latitude), userLongitude: String(pickupLocation.longitude))
         
         // send the request to backend
         veoInfo = try await HTTP.post(url: userURL, body: veoRequest)
