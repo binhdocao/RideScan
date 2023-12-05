@@ -24,11 +24,11 @@ struct MapView: View {
 	@ObservedObject var searchCompleter = SearchCompleter()
 	@State private var showResults: Bool = false
 	@State private var shouldAdjustZoom: Bool = false
-
+    @State private var destinationCoordinates: CLLocationCoordinate2D = CLLocationCoordinate2D()
 	@State private var annotations: [IdentifiablePointAnnotation] = []
     @State private var annotations1: [IdentifiablePointAnnotation] = []
     @State private var veoAnnotations: [IdentifiablePointAnnotation] = []
-	
+    @State var timeAll : Double = 0
 	@State private var route: MKRoute?
 	
 	@State private var showComparisonSheet: Bool = false
@@ -101,7 +101,7 @@ struct MapView: View {
           self.isRouteCalculationComplete = true
 
           isRouteDisplayed = true
-            //showBusRoute = false
+          showBusRoute = false
           }
       }
 		  return 1
@@ -191,7 +191,7 @@ struct MapView: View {
 				}
 
             if showBusRoute && !isRouteDisplayed && !isRouteCalculationComplete {
-                var status = calculateRoute(from: CLLocationCoordinate2D(latitude: fromTo.fromLat, longitude: fromTo.fromLong), to: CLLocationCoordinate2D(latitude: fromTo.toLat, longitude: fromTo.toLong), with: .transit, forBus: true)
+                var status = calculateRoute(from: CLLocationCoordinate2D(latitude: fromTo.fromLat, longitude: fromTo.fromLong), to: CLLocationCoordinate2D(latitude: fromTo.toLat, longitude: fromTo.toLong), with: .automobile, forBus: true)
             }
 
             if !showComparisonSheet {
@@ -210,6 +210,7 @@ struct MapView: View {
                                 fromTo.fromLong = self.annotations[0].coordinate.longitude
                                   isRouteDisplayed = false
                                   isRouteCalculationComplete = false
+                                destinationCoordinates = self.annotations[1].coordinate
                                                     
                                 
                             }) {
@@ -269,12 +270,10 @@ struct MapView: View {
 
                                         fetchBikingTimeEstimate(from: locationManager.region.center, to: destinationCoordinate)
                                                             
-                //                        buses = fetchBusData()
-                //                        newbuses = readInputFromFile(filePath: "/data/bus_stops", buses: &buses)
-                //
-                //                        bestroute = findBestRoute(buses: newbuses, destination: self.annotations[1].coordinate)
-                //
-                //                        var status = addpins(pin1: bestroute.busStop2, pin2: self.annotations[1].coordinate)
+                                        buses = fetchBusData()
+                                        newbuses = readInputFromFile(filePath: "/data/bus_stops", buses: &buses)
+                                      //bestroute = findBestRoute(buses: newbuses, destination: self.annotations[1].coordinate)
+                                     //var status = addpins(pin1: bestroute.busStop2, pin2: self.annotations[1].coordinate)
 
                                         self.shouldAdjustZoom = true
 
@@ -314,8 +313,23 @@ struct MapView: View {
                 }
             }
             .sheet(isPresented: $showComparisonSheet) {
+                var bestroute = findBestRoute(buses: newbuses, destination: destinationCoordinates)
+               var status = addpins(pin1: bestroute.busStop2, pin2: destinationCoordinates)
                 
-                ComparisonView(viewModel: transportViewModel, destination: self.annotations[1].coordinate,showBusRoute: $showBusRoute, fromTo: $fromTo, distance: bestroute.totalDistance,bestStop: bestroute.busStop1, buses: newbuses)
+                
+                
+                var epp = calculateDistanceAndTimeBetweenPoints(coordinates : [CLLocationCoordinate2D(latitude: 30.601389, longitude: -96.314445), bestroute.busStop1, bestroute.busStop2, destinationCoordinates]) { result in
+                //var epp = calculateDistanceAndTimeBetweenPoints(coordinates : [locationManager.region.center, bestroute.busStop1, bestroute.busStop2, destinationCoordinates]) { result in
+                    if let result = result {
+                        DispatchQueue.main.async {
+                            timeAll = result.time
+                            //distanceAll = result.distance
+                        }
+                    }
+                    
+                }
+                
+                ComparisonView(viewModel: transportViewModel, destination: destinationCoordinates,showBusRoute: $showBusRoute, fromTo: $fromTo, distance: bestroute.totalDistance,bestStop: bestroute.busStop1, buses: newbuses, timebus: timeAll)
                     .presentationDetents(
                         [.medium, .large, .fraction(0.3)],
                         selection: $settingsDetent
@@ -346,7 +360,54 @@ struct MapView: View {
         }
 		.navigationBarBackButtonHidden(true) // Hide the back button
 	}
-    
+    func calculateDistanceAndTimeBetweenPoints(coordinates: [CLLocationCoordinate2D], currentIndex: Int = 0, totalDistance: CLLocationDistance = 0.0, totalTime: TimeInterval = 0.0, completion: @escaping ((distance: CLLocationDistance, time: TimeInterval)?) -> Void) {
+        guard currentIndex < coordinates.count - 1 else {
+            // When all segments have been processed
+            let result = (distance: totalDistance / 1609.344, time: totalTime / 60.0) // Convert meters to miles, seconds to minutes
+            completion(result)
+            return
+        }
+
+        let sourceCoordinate = coordinates[currentIndex]
+        let destinationCoordinate = coordinates[currentIndex + 1]
+
+        let sourcePlacemark = MKPlacemark(coordinate: sourceCoordinate)
+        let destinationPlacemark = MKPlacemark(coordinate: destinationCoordinate)
+
+        let sourceMapItem = MKMapItem(placemark: sourcePlacemark)
+        let destinationMapItem = MKMapItem(placemark: destinationPlacemark)
+
+        let directionRequest = MKDirections.Request()
+        directionRequest.source = sourceMapItem
+        directionRequest.destination = destinationMapItem
+
+        if currentIndex == 0 || currentIndex == 2 {
+            directionRequest.transportType = .walking
+        } else if currentIndex == 1 {
+            directionRequest.transportType = .automobile
+        }
+
+        let directions = MKDirections(request: directionRequest)
+
+        directions.calculate { response, error in
+            guard let route = response?.routes.first else {
+                completion(nil)
+                return
+            }
+
+            let updatedTotalDistance = totalDistance + route.distance
+            let updatedTotalTime = totalTime + route.expectedTravelTime
+
+            // Calculate next segment recursively
+            calculateDistanceAndTimeBetweenPoints(
+                coordinates: coordinates,
+                currentIndex: currentIndex + 1,
+                totalDistance: updatedTotalDistance,
+                totalTime: updatedTotalTime,
+                completion: completion
+            )
+        }
+    }
     // Add this function inside your MapView struct
     func updateBikeAnnotations() {
         let bikeAnnotations = transportViewModel.bikesToDisplay.prefix(5).map { bike -> IdentifiablePointAnnotation in
@@ -389,7 +450,7 @@ struct MapView: View {
     func fetchBusData() -> [BrazosDriver] {
         var newBuses : [BrazosDriver] = []
         //var newBuses : [BrazosDriver] = [BrazosDriver(RouteId: 48, lat: 30.00, lng: -97.32)]
-
+        let semaphore = DispatchSemaphore(value: 0)
         let baseURL = "https://www.ridebtd.org/Services/JSONPRelay.svc/GetMapVehiclePoints?apiKey=8882812681"
         guard let url = URL(string: baseURL) else {
             has_bus_data = "Invalid URL"
@@ -402,6 +463,10 @@ struct MapView: View {
         // request.addValue("Bearer YOUR_BEARER_TOKEN", forHTTPHeaderField: "Authorization")
         
         URLSession.shared.dataTask(with: request) { data, response, error in
+            
+            defer {
+                        semaphore.signal() // Release the semaphore when the task completes
+                    }
             if let error = error {
                 DispatchQueue.main.async {
                     has_bus_data = "Network error: \(error.localizedDescription)"
@@ -447,6 +512,7 @@ struct MapView: View {
                 }
             }
         }.resume()
+        semaphore.wait()
         return newBuses
     }
     
@@ -458,7 +524,7 @@ struct MapView: View {
             print( "error - no buses nearby")
         }
         
-        let coordinates = locationManager.region.center
+        let coordinates = CLLocationCoordinate2D(latitude: 30.601389, longitude: -96.314445)//locationManager.region.center
         var totalDistance: Double  = 10000 // miles
         var busStop1 : CLLocationCoordinate2D = CLLocationCoordinate2D()
         var busStop2 : CLLocationCoordinate2D = CLLocationCoordinate2D()

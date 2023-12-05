@@ -358,11 +358,13 @@ class TransportViewModel: ObservableObject {
         
         // Sort the services by score in descending order
         scoredServices.sort { $0.1 > $1.1 }
+        self.services = scoredServices
         
-        // Update the UI on the main thread with sorted services
-        DispatchQueue.main.async {
-            self.services = scoredServices
-        }
+            // Update the UI on the main thread with sorted services
+            /*DispatchQueue.main.async {
+                self.services = scoredServices
+            } */
+        
 
     }
     
