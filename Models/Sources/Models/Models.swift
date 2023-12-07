@@ -536,13 +536,11 @@ public struct BikeLoc: Codable {
 public struct FindVEORequest: Codable {
     public let userLatitude: String
     public let userLongitude: String
-    public let veoToken: String
     
     /// Initializes a new `UserLoc` instance.
     public init(userLatitude: String, userLongitude: String, veoToken: String) {
         self.userLatitude = userLatitude
         self.userLongitude = userLongitude
-        self.veoToken = veoToken
     }
 }
 

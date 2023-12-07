@@ -75,7 +75,7 @@ func routes(_ app: Application) throws {
     app.get("api", "fetii", "locate") { req async throws -> LocateFetiiResponse in
         try await req.locateFetii(req: req)
     }
-
+    // Route to grab veoride information
     app.post("api", "veoride", "find") { req async throws -> VEOPriceLocation in
         try await req.findVEO(req: req)
     }
@@ -165,6 +165,11 @@ extension Request {
                     if service.name == "Fetii" {
 						
                         let findFetiiResponse = try await findFetii(req: req)
+
+                        if findFetiiResponse.no_vehicles_available {
+                            services.remove(at: index)
+                            break
+                        }
 
                         // set price
                         service.criteria.price = findFetiiResponse.data.first!.min_charge_per_person
@@ -532,7 +537,7 @@ extension Request {
 
         // Make the first request
         let clientResponse = try await req.client.get(uri) { getReq in
-            getReq.headers.bearerAuthorization = BearerAuthorization(token: findVEO.veoToken)
+            getReq.headers.bearerAuthorization = BearerAuthorization(token: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOjc1MjYiLCJpYXQiOjE3MDE3NjQ1NzUsImV4cCI6MTcwOTU0MDU3NX0.7-2ykZIgAnWfE9SeHqXyc-thw3PB0ig0zPAPiL96oivN_pyo2sYzESnuXbOfV2THFXvjUp1NsXfyujOyLK_oLw")
         }
 
         guard clientResponse.status == .ok else {
@@ -565,7 +570,7 @@ extension Request {
 
                 // Make the second request
                 let bikeClientResponse = try await req.client.get(bikeUri) { getReq in
-                    getReq.headers.bearerAuthorization = BearerAuthorization(token: findVEO.veoToken)
+                    getReq.headers.bearerAuthorization = BearerAuthorization(token: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOjc1MjYiLCJpYXQiOjE3MDE3NjQ1NzUsImV4cCI6MTcwOTU0MDU3NX0.7-2ykZIgAnWfE9SeHqXyc-thw3PB0ig0zPAPiL96oivN_pyo2sYzESnuXbOfV2THFXvjUp1NsXfyujOyLK_oLw")
                 }
 
                 guard bikeClientResponse.status == .ok else {
