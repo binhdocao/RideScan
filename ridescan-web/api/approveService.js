@@ -6,6 +6,8 @@ export default async function handler(req, res) {
     if (req.method === 'POST') {
         // Extract ID from the request body
         const { serviceId } = req.body;
+        const { price, pricingUnit } = req.body;
+
         console.log("serviceId:", serviceId);
         if (!serviceId) {
             console.error("Error: Service ID is required in the request body");
@@ -32,8 +34,15 @@ export default async function handler(req, res) {
                 send_to_application: true, // Assuming approval means it should be sent to application
                 reviews: [], // Initialize with empty array
                 criteria: {
-                    // Set default values or derive from proposedService data
-                    // ...
+                    price: price || 0,
+                    pricingUnit: pricingUnit,
+                    time: 0,
+                    experience: true,
+                    public: true,
+                    small_business: true,
+                    safety_rating: 10,
+                    carbon_emissions: 0,
+                    calories_burned: 5
                 },
                 name: proposedService.serviceName, // Derived from proposedService
                 contactName: proposedService.contactName,

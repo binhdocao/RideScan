@@ -15,7 +15,9 @@ function Form() {
         serviceName: '',
         address: '',
         radius: '',
-        comments: ''
+        comments: '',
+        price: '', 
+        pricingUnit: 'mile' 
     });
 
     const [errors, setErrors] = useState({});
@@ -28,7 +30,6 @@ function Form() {
         tempErrors.serviceName = serviceData.serviceName ? "" : "Service Name is required";
         tempErrors.address = serviceData.address ? "" : "Address is required";
         tempErrors.radius = /^\d+$/.test(serviceData.radius) ? "" : "Operational Radius must be an integer";
-        tempErrors.comments = serviceData.comments ? "" : "Comments are required";
         setErrors(tempErrors);
         return Object.values(tempErrors).every(x => x === "");
     };
@@ -69,11 +70,11 @@ function Form() {
         padding: '10px',
         width: '100%',
         borderRadius: '5px',
-        border: '1px solid #800000', // Maroon color
+        border: '1px solid #800000', 
     };
 
     const buttonStyle = {
-        backgroundColor: '#800000', // Maroon color
+        backgroundColor: '#800000', 
         color: 'white',
         padding: '10px 20px',
         border: 'none',
@@ -82,6 +83,28 @@ function Form() {
         marginTop: '20px',
         width: '100%',
     };
+
+    const flexContainerStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        margin: '10px 0',
+        width: '105%', 
+    };
+
+    const priceInputStyle = {
+        ...inputStyle,
+        flex: 6, 
+        marginRight: '10px', 
+    };
+
+    // Style for the dropdown
+    const dropdownStyle = {
+        ...inputStyle,
+        flex: 2, 
+        width: 'auto',
+    };
+
     
 
     return (
@@ -149,6 +172,28 @@ function Form() {
                 />
                 {errors.radius && <div style={{ color: 'red' }}>{errors.radius}</div>}
 
+                <div style={flexContainerStyle}>
+                <input
+                    style={priceInputStyle}
+                    type="number"
+                    name="price"
+                    value={serviceData.price}
+                    onChange={handleChange}
+                    placeholder="Price"
+                />
+                {errors.price && <div style={{ color: 'red' }}>{errors.price}</div>}
+
+                <select
+                    style={dropdownStyle}
+                    name="pricingUnit"
+                    value={serviceData.pricingUnit}
+                    onChange={handleChange}
+                >
+                    <option value="mile">Per Mile</option>
+                    <option value="ride">Per Ride</option>
+                </select>
+            </div>
+
                 <textarea
                     style={{ ...inputStyle, height: '100px' }} 
                     name="comments"
@@ -156,7 +201,6 @@ function Form() {
                     onChange={handleChange}
                     placeholder="Additional Comments"
                 />
-                {errors.comments && <div style={{ color: 'red' }}>{errors.comments}</div>}
 
                 <button style={buttonStyle} type="submit">Submit Proposal</button>
             </form>
