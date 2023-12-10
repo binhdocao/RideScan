@@ -18,8 +18,8 @@ struct MenuItem: Identifiable {
 
 var userActions: [MenuItem] = [
     MenuItem(id: 4001, icon: "person.circle.fill", text: "My Account"),
-    MenuItem(id: 4002, icon: "car.fill", text: "Recent trips"),
-    MenuItem(id: 4003, icon: "seal.fill", text: "Other"),
+//    MenuItem(id: 4002, icon: "car.fill", text: "Recent trips"),
+//    MenuItem(id: 4003, icon: "seal.fill", text: "Other"),
 ]
 
 var profileActions: [MenuItem] = [
@@ -207,8 +207,8 @@ struct menuLink: View {
 		switch text {
 		case "Settings":
 			return AnyView(SettingsView())
-		case "Recent trips":
-			return AnyView(RecentTripsView())
+//		case "Recent trips":
+//			return AnyView(RecentTripsView())
 		case "My Account":
             return AnyView(NavigationView {
                 MyAccountView()
