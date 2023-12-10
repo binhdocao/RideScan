@@ -29,6 +29,7 @@ class TransportViewModel: ObservableObject {
     @Published var carRoute: MKRoute = MKRoute()
     @Published var walkRoute: MKRoute = MKRoute()
     @Published var bikeTimeEstimate: Int = 0
+    @Published var walkTimeEstimate: Int = 0
     
     // Calorie estimates
     @Published var walkCaloriesEstimate: Double = 0.0
@@ -46,6 +47,10 @@ class TransportViewModel: ObservableObject {
     // veo
     @Published var veoInfo: VEOPriceLocation = VEOPriceLocation()
     @Published var bikesToDisplay: [BikeDistance] = [BikeDistance]()
+    
+    // bus
+    @Published var busTimeEstimate: Double = 0
+    @Published var has_bus_data: Bool = true
     
     // Reviews
     @Published var popoverService: Service = Service()
@@ -141,11 +146,12 @@ class TransportViewModel: ObservableObject {
     }
     
     func updateWalkServiceTime(time: Int) {
+        walkTimeEstimate = time
         for (index, serviceTuple) in services.enumerated() {
             var service = serviceTuple.0
             if service.ride_method == "walking" {
                 // Update the time criteria for the biking service
-                service.criteria.time = time
+                service.criteria.time = walkTimeEstimate
                 services[index] = (service, serviceTuple.1)
             }
         }
@@ -293,29 +299,73 @@ class TransportViewModel: ObservableObject {
             throw ServiceError.badRequest(reason: "Invalid URL for fetching services")
         }
 
-        let servicesResponse = try await HTTP.get(url: urlWithQuery, dataType: [Service].self)
+        var servicesResponse = try await HTTP.get(url: urlWithQuery, dataType: [Service].self)
         
-//        route = "api/fetii/locate"
-//        
-//        urlComponents = URLComponents(string: HTTP.baseURL.appendingPathComponent(route).absoluteString)
-//        
-//        // Pickup location and destination information
-//        urlComponents?.queryItems = [
-//            URLQueryItem(name: "userLatitude", value: String(pickupLocation.latitude)),
-//            URLQueryItem(name: "userLongitude", value: String(pickupLocation.longitude)),
-//            URLQueryItem(name: "pickup_long_address", value: pickup_long_address),
-//            URLQueryItem(name: "pickup_short_address", value: pickup_short_address),
-//            URLQueryItem(name: "destLatitude", value: String(dropoffLocation.latitude)),
-//            URLQueryItem(name: "destLongitude", value: String(dropoffLocation.longitude)),
-//            URLQueryItem(name: "dropoff_long_address", value: dropoff_long_address),
-//            URLQueryItem(name: "dropoff_short_address", value: dropoff_short_address)
-//        ]
-//
-//        guard let urlWithQuery = urlComponents?.url else {
-//            throw ServiceError.badRequest(reason: "Invalid URL for fetching services")
-//        }
-//        
-//        fetiiInfo = try await HTTP.get(url: urlWithQuery, dataType: LocateFetiiResponse.self)
+        
+        // update time and calories for biking and walking
+        var index = servicesResponse.count - 1
+        while index >= 0 {
+            var service = servicesResponse[index]
+
+            if service.ride_method == "biking" {
+                if service.name == "VeoRide" {
+                    // veo ride
+                    let defaults = UserDefaults.standard
+                    let veoToken = defaults.string(forKey: "veoToken")
+                    let veo_result = try await findVEO(veoToken: veoToken ?? "none")
+                    
+                    service.criteria.time = bikeTimeEstimate + 5
+                    service.criteria.price = veo_result.price.unlockFee + (veo_result.price.price * (veo_result.closestBikes.first?.distance ?? 0))
+                    servicesResponse[index] = service
+                } else {
+                    // Update the calories burned criteria for the biking service
+                    service.criteria.calories_burned = Int(bikeCaloriesEstimate)
+                    service.criteria.time = bikeTimeEstimate
+                    servicesResponse[index] = service
+                }
+            } else if service.ride_method == "walking" {
+                // Update the calories burned criteria for the walking service
+                service.criteria.calories_burned = Int(walkCaloriesEstimate)
+                service.criteria.time = walkTimeEstimate
+                servicesResponse[index] = service
+            } else if service.name == "Fetii" {
+                service.criteria.time = service.criteria.time + Int(carRoute.expectedTravelTime / 60)
+                servicesResponse[index] = service
+            } else if service.name == "Brazos Bus Service" && !has_bus_data {
+                servicesResponse.remove(at: index)
+            } else if service.name == "Brazos Bus Service" {
+                service.criteria.time = Int(busTimeEstimate)
+                servicesResponse[index] = service
+            }
+
+            index -= 1
+        }
+        
+        route = "api/fetii/locate"
+        
+        urlComponents = URLComponents(string: HTTP.baseURL.appendingPathComponent(route).absoluteString)
+        
+        // Pickup location and destination information
+        urlComponents?.queryItems = [
+            URLQueryItem(name: "userLatitude", value: String(pickupLocation.latitude)),
+            URLQueryItem(name: "userLongitude", value: String(pickupLocation.longitude)),
+            URLQueryItem(name: "pickup_long_address", value: pickup_long_address),
+            URLQueryItem(name: "pickup_short_address", value: pickup_short_address),
+            URLQueryItem(name: "destLatitude", value: String(dropoffLocation.latitude)),
+            URLQueryItem(name: "destLongitude", value: String(dropoffLocation.longitude)),
+            URLQueryItem(name: "dropoff_long_address", value: dropoff_long_address),
+            URLQueryItem(name: "dropoff_short_address", value: dropoff_short_address)
+        ]
+
+        guard let urlWithQuery = urlComponents?.url else {
+            throw ServiceError.badRequest(reason: "Invalid URL for fetching services")
+        }
+        
+        do {
+            fetiiInfo = try await HTTP.get(url: urlWithQuery, dataType: LocateFetiiResponse.self)
+        } catch {
+            print("Error fetching Fetii information: \(error.localizedDescription)")
+        }
 
         // Now that we have the services, we need to calculate the scores
         
@@ -352,6 +402,7 @@ class TransportViewModel: ObservableObject {
         
         // Calculate the score for each service
         var scoredServices = servicesResponse.map { service -> (Service, Double) in
+            print("Calculating score for: \(service.name)")
             let score = calculateScore(for: service.criteria, with: multipliers)
             return (service, score)
         }
@@ -385,7 +436,7 @@ class TransportViewModel: ObservableObject {
     func calculateScore(for serviceCriteria: Models.Criteria, with multipliers: [Criteria]?) -> Double {
         
         // Constants for standardizing carbon emissions
-        let carbonEmissionsMax = 500.0
+        let carbonEmissionsMax = 800.0
         
         // Constants for safety_rating
         let safetyRatingMax = 100.0
@@ -405,68 +456,78 @@ class TransportViewModel: ObservableObject {
         // Use reflection to iterate over the properties of `serviceCriteria`
         let mirror = Mirror(reflecting: serviceCriteria)
         var score = 0.0
+        var max_score = 0.0
         for case let (label?, value) in mirror.children {
             if let multiplier = multipliersDictionary[nameMappings[label]!] {
                 // Standardize carbon emissions
                 if label == "price" {
                     let price = value as? Double ?? 0
                     let scoreContribution = selectedValDictionary[nameMappings[label]!] == "Lowest" ? (1 - price / max_price) : (price / max_price)
-                    score += scoreContribution * Double(multiplier)
+                    score += scoreContribution * exp(Double(multiplier))
+                    max_score += exp(Double(multiplier))
 //                    print("Adding \(scoreContribution * Double(multiplier)) for price")
                 } else if label == "time" {
-                    let time = value as? Double ?? 0
-                    let scoreContribution = selectedValDictionary[nameMappings[label]!] == "Lowest" ? (1 - time / Double(max_time)) : (time / Double(max_time))
-                    score += scoreContribution * Double(multiplier)
+                    let time = value as? Int ?? 0
+                    let scoreContribution = selectedValDictionary[nameMappings[label]!] == "Lowest" ? (1 - Double(time) / Double(max_time)) : (Double(time) / Double(max_time))
+                    score += scoreContribution * exp(Double(multiplier))
+                    max_score += exp(Double(multiplier))
 //                    print("Adding \(scoreContribution * Double(multiplier)) for time")
 
                 } else if label == "calories_burned" {
-                    let calories = value as? Double ?? 0
-                    let scoreContribution = selectedValDictionary[nameMappings[label]!] == "Lowest" ? (1 - calories / Double(max_cals)) : (calories / Double(max_cals))
-                    score += scoreContribution * Double(multiplier)
+                    let calories = value as? Int ?? 0
+                    let scoreContribution = selectedValDictionary[nameMappings[label]!] == "Lowest" ? (1 - Double(calories) / Double(max_cals)) : (Double(calories) / Double(max_cals))
+                    score += scoreContribution * exp(Double(multiplier))
+                    max_score += exp(Double(multiplier))
 //                    print("Adding \(scoreContribution * Double(multiplier)) for calories_burned")
 
                 } else if label == "experience" {
                     let experience = value as? Bool ?? false
                     let selectedVal = selectedValDictionary[nameMappings[label]!] == "True"
                     let scoreContribution = (selectedVal && experience) || (!selectedVal && !experience) ? 0.7 : 0
-                    score += scoreContribution * Double(multiplier)
+                    score += scoreContribution * exp(Double(multiplier))
+                    max_score += 0.7 * exp(Double(multiplier))
 //                    print("Adding \(scoreContribution * Double(multiplier)) for experience")
 
                 } else if label == "small_business" {
                     let small_business = value as? Bool ?? false
                     let selectedVal = selectedValDictionary[nameMappings[label]!] == "True"
                     let scoreContribution = (selectedVal && small_business) || (!selectedVal && !small_business) ? 0.7 : 0
-                    score += scoreContribution * Double(multiplier)
+                    score += scoreContribution * exp(Double(multiplier))
+                    max_score += 0.7 * exp(Double(multiplier))
 //                    print("Adding \(scoreContribution * Double(multiplier)) for small_business")
 
                 } else if label == "public" {
                     let is_public = value as? Bool ?? false
                     let selectedVal = selectedValDictionary[nameMappings[label]!] == "True"
                     let scoreContribution = (selectedVal && is_public) || (!selectedVal && !is_public) ? 0.7 : 0
-                    score += scoreContribution * Double(multiplier)
+                    score += scoreContribution * exp(Double(multiplier))
+                    max_score += 0.7 * exp(Double(multiplier))
 //                    print("Adding \(scoreContribution * Double(multiplier)) for public")
 
                 } else if label == "carbon_emissions" {
-                    let emissions = value as? Double ?? 0
-                    let scoreContribution = selectedValDictionary[nameMappings[label]!] == "Lowest" ? (1 - emissions / carbonEmissionsMax): (emissions / carbonEmissionsMax)
-                    score += scoreContribution * Double(multiplier)
+                    let emissions = value as? Int ?? 0
+                    let scoreContribution = selectedValDictionary[nameMappings[label]!] == "Lowest" ? (1 - Double(emissions) / carbonEmissionsMax): (Double(emissions) / carbonEmissionsMax)
+                    score += scoreContribution * exp(Double(multiplier))
+                    max_score += exp(Double(multiplier))
 //                    print("Adding \(scoreContribution * Double(multiplier)) for carbon_emissions")
 
                 } else if label == "safety_rating" {
-                    let rating = value as? Double ?? 0
-                    let normalizedValue = rating / safetyRatingMax
-                    score += normalizedValue * Double(multiplier)
+                    let rating = value as? Int ?? 0
+                    let normalizedValue = Double(rating) / safetyRatingMax
+                    score += normalizedValue * exp(Double(multiplier))
+                    max_score += exp(Double(multiplier))
 //                    print("Adding \(normalizedValue * Double(multiplier)) for safety_rating")
 
                 } else {
                     // default
                     let doubleVal = value as? Double ?? 0
-                    score += doubleVal * Double(multiplier)
+                    score += doubleVal * exp(Double(multiplier))
+                    max_score += exp(Double(multiplier))
                 }
             }
             // other data type conversions...
         }
-        return score
+        return 100 * (score / max_score)
     }
         
     /// Logs user in from the backend server.

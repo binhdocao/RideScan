@@ -52,7 +52,6 @@ struct ComparisonView: View {
     @ObservedObject var locationManager = LocationManager()
     @State private var showAlert = false
     @State var current_veo_price = 0.5
-    var timebus : Double = 99
     // BTD Bus info
     @State var has_bus_data = "No data"
 	    
@@ -89,19 +88,22 @@ struct ComparisonView: View {
     @State private var showUserProposedPop: Bool = false
     @State private var isAscendingOrder = true
     
+    // Selected service info states
+    @State private var showAlertForService: Bool = false
+    @State private var selectedService: Service?
+    
     // Review info
     @State private var showingReviewSheet = false
     
     @State private var isLoading = true
   
-    init(viewModel: TransportViewModel, destination: CLLocationCoordinate2D, showBusRoute: Binding<Bool>, fromTo: Binding<FromTo>, distance: Double, bestStop: CLLocationCoordinate2D, buses: [BrazosDriver], timebus: Double) {
+    init(viewModel: TransportViewModel, destination: CLLocationCoordinate2D, showBusRoute: Binding<Bool>, fromTo: Binding<FromTo>, distance: Double, bestStop: CLLocationCoordinate2D, buses: [BrazosDriver]) {
         self.transportViewModel = viewModel
         self.destination = destination
         _showBusRoute = showBusRoute
         _fromTo = fromTo
         self.buses = buses
         self.BusStop1 = bestStop
-        self.timebus = timebus
         // Initialize rideServices after all properties are initialized
         var rideServices: [RideService] = [
             RideService(name: "Uber", price: 10.0, min_people: 1, max_people: 4,iconName: "car",timeEstimate: 6),
@@ -120,9 +122,9 @@ struct ComparisonView: View {
         self.rideServices = rideServices
     }
     
-	var body: some View {
+    var body: some View {
         
-		VStack(spacing: 0) {
+        VStack(spacing: 0) {
             HStack {
                 Menu {
                     // Submenu for Transport Types
@@ -219,12 +221,12 @@ struct ComparisonView: View {
             .padding(.horizontal)
             .padding(.vertical, 5)
             .padding(.bottom, 10)
-                
+            
             if isLoading {
                 ScrollView {
                     VStack(spacing: 10) {
                         Button(action: {
-
+                            
                         }) {
                             
                             ProgressView()
@@ -233,7 +235,7 @@ struct ComparisonView: View {
                         }
                     }
                 }
-
+                
             } else {
                 ScrollView {
                     VStack(spacing: 10) {
@@ -247,10 +249,15 @@ struct ComparisonView: View {
                                         transportViewModel.currentTransportType = .walking
                                     } else if service.ride_method == "driving" {
                                         transportViewModel.currentTransportType = .automobile
+                                        if service.name == "Fetii" {
+                                            selectedService = service
+                                            showAlertForService = true
+                                        }
                                     } else if service.ride_method == "biking" {
                                         // using .any for biking right now
                                         if service.name == "VeoRide" {
-                                            transportViewModel.displayBikes()
+                                            selectedService = service
+                                            showAlertForService = true
                                         } else {
                                             transportViewModel.currentTransportType = .walking
                                         }
@@ -260,81 +267,60 @@ struct ComparisonView: View {
                                         transportViewModel.currentTransportType = .automobile
                                     }
                                     
-                                    if service.name == "Brazos Bus Service" && self.buses.count != 0 {
-                                        showAlert = false
-                                        fromTo.toLat = BusStop1.latitude
-                                        fromTo.toLong = BusStop1.longitude
-                                        changeShowBusRoute()
-                                    }
-                                    else if self.buses.count == 0 {
-                                        showAlert = true
+                                    if service.name == "Brazos Bus Service" {
+                                        if self.buses.count != 0 {
+                                            showAlert = false
+                                            fromTo.toLat = BusStop1.latitude
+                                            fromTo.toLong = BusStop1.longitude
+                                            changeShowBusRoute()
+                                        } else {
+                                            showAlert = true
+                                        }
                                     }
                                 }
                             }) {
                                 HStack {
-                                    // Image on the left
-                                    Image(systemName: iconName(for: service.ride_method)) // Make sure to add `iconName` to your `Service` model
+                                    // Icon
+                                    Image(systemName: iconName(for: service.ride_method))
                                         .resizable()
                                         .scaledToFit()
-                                        .frame(width: 50, height: 50) // Set the image size as needed
+                                        .frame(width: 50, height: 50)
+                                        .foregroundColor(.blue)
                                         .padding(.trailing, 10)
-                                        .foregroundColor(.black)
                                     
-                                    // Name in the middle with min and max person counts
-                                    VStack(alignment: .leading) {
+                                    // Service Info
+                                    VStack(alignment: .leading, spacing: 5) {
                                         Text(service.name)
                                             .font(.headline)
-                                            .foregroundColor(.black)
-                                        if service.name == "Walking" {
-                                            Text("Time: \(Int(transportViewModel.walkRoute.expectedTravelTime / 60)) minutes")
-                                                .font(.subheadline)
-                                                .foregroundColor(.black)
-                                        } else if service.name == "Biking" {
-                                            Text("Time: \(transportViewModel.bikeTimeEstimate) minutes")
-                                                .font(.subheadline)
-                                                .foregroundColor(.black)
-                                        } else if service.name == "Fetii" {
-                                            Text("Time: \(service.criteria.time + Int(transportViewModel.carRoute.expectedTravelTime / 60)) minutes")
-                                                .font(.subheadline)
-                                                .foregroundColor(.black)
-                                        }
-                                        else if service.name == "Brazos Bus Service"{
-                                            Text("Time: \(timebus) minutes")
-                                                .font(.subheadline)
-                                                .foregroundColor(.black)
-                                        }
-                                        else {
-                                            Text("Time: \(service.criteria.time) minutes")
-                                                .font(.subheadline)
-                                                .foregroundColor(.black)
-                                        }
-                                        Text(String(format: "Score: %.2f points", score))
+                                            .foregroundColor(.primary)
+                                        
+                                        // Other details
+                                        Text("Time: \(formattedTime(for: service))")
                                             .font(.subheadline)
-                                            .foregroundColor(.black)
+                                            .foregroundColor(.secondary)
+                                        
+                                        Text(String(format: "Score: %.2f", score))
+                                            .font(.caption)
+                                            .foregroundColor(textColorForScore(score))
+                                            .padding(5)
+                                            .background(backgroundColorForScore(score))
+                                            .cornerRadius(8)
                                     }
                                     
-                                    Spacer() // This will push the following elements to the right
+                                    Spacer()
                                     
-                                    // Cost per person and minimum number of passengers on the right
-                                    VStack(alignment: .trailing) {
-                                        // Format the price and timeEstimate as needed
-                                        if service.name == "Brazos Bus Service" {
-                                            Text(String(format: "%.2f /person", service.criteria.price + 1))
-                                                .font(.body)
-                                                .foregroundColor(.black)
-                                        }
-                                        else {
-                                            Text(String(format: "%.2f /person", service.criteria.price))
-                                                .font(.body)
-                                                .foregroundColor(.black)
-                                        }
+                                    // Cost and Emissions
+                                    VStack(alignment: .trailing, spacing: 5) {
+                                        Text(String(format: "%.2f /person", service.criteria.price))
+                                            .font(.body)
+                                            .foregroundColor(.primary)
                                         
-                                        Text("Carbon emissions: \(service.criteria.carbon_emissions) g/km") // Adjust based on actual data
-                                            .font(.subheadline)
-                                            .foregroundColor(.black)
+                                        Text("Carbon: \(service.criteria.carbon_emissions)g")
+                                            .font(.caption)
+                                            .foregroundColor(.orange)
                                     }
                                 }
-                                .modifier(ServiceModifier()) // Use your ServiceModifier for consistent styling
+                                .modifier(ServiceModifier())
                             }
                         }
                     }
@@ -355,6 +341,48 @@ struct ComparisonView: View {
                             secondaryButton: .cancel() // Optional secondary button (e.g., for Cancel)
                         )
                     }
+                    .alert(isPresented: $showAlertForService) {
+                        if selectedService!.name == "VeoRide" {
+                            Alert(
+                                title: Text("Selection: \(selectedService!.name)"),
+                                message: Text("Would you like to see the 5 closest bikes or go to the VeoRide app?"),
+                                primaryButton: .default(Text("Show Bikes")) {
+                                    // Logic to show 5 closest bikes
+                                    transportViewModel.displayBikes()
+                                },
+                                secondaryButton: .default(Text("Go to App")) {
+                                    if let url = URL(string: "https://apps.apple.com/us/app/veo/id1279820696") {
+                                        UIApplication.shared.open(url)
+                                    }
+                                }
+                            )
+                        } else if selectedService!.name == "Fetii" {
+                            Alert(
+                                title: Text("Selection: \(selectedService!.name)"),
+                                message: Text("Would you like to see the 5 closest Fetii options?"),
+                                primaryButton: .default(Text("Show Fetiis")) {
+                                    // Logic to show 5 closest fetii options
+                                    transportViewModel.displayFetii()
+                                },
+                                secondaryButton: .default(Text("Go to App")) {
+                                    if let url = URL(string: "https://apps.apple.com/us/app/fetii-ride/id1470368285") {
+                                        UIApplication.shared.open(url)
+                                    }
+                                }
+                            )
+                        } else {
+                            Alert(
+                                title: Text("Default"),
+                                message: Text("Default text"),
+                                primaryButton: .default(Text("Default")) {
+                                    // Do nothing
+                                },
+                                secondaryButton: .default(Text("Default #2")) {
+                                    // Do nothing
+                                }
+                            )
+                        }
+                    }
                 }
                 .onChange(of: selectedTransportationModes) { _ in
                     filteredServices = transportViewModel.filterServices(modes: selectedTransportationModes, sorting_options: selectedSortingOptions)
@@ -373,16 +401,20 @@ struct ComparisonView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Service: \(transportViewModel.popoverService.name)")
                             .fontWeight(.bold)
-
+                        
                         Text("Contact Name: \(transportViewModel.popoverService.contactName!)")
-                        Text("Phone Number: \(transportViewModel.popoverService.phoneNumber!)")
-                        Text("Email: \(transportViewModel.popoverService.email!)")
-
+                        if let phoneNumber = transportViewModel.popoverService.phoneNumber, let phoneURL = URL(string: "tel:\(phoneNumber)") {
+                            Link("Phone Number: \(phoneNumber)", destination: phoneURL)
+                        }
+                        if let email = transportViewModel.popoverService.email, let emailURL = URL(string: "mailto:\(email)") {
+                            Link("Email: \(email)", destination: emailURL)
+                        }
+                        
                         Divider()
-
+                        
                         Text("Reviews")
                             .fontWeight(.bold)
-
+                        
                         // Check if reviews are empty
                         if !transportViewModel.popoverService.reviews.isEmpty {
                             ForEach(transportViewModel.popoverService.reviews, id: \.id) { review in
@@ -413,7 +445,7 @@ struct ComparisonView: View {
                     .padding()
                     .frame(width: 300)
                     .fixedSize(horizontal: false, vertical: true)
-                
+                    
                 }
                 .sheet(isPresented: $showingReviewSheet) {
                     NavigationView {
@@ -431,18 +463,18 @@ struct ComparisonView: View {
                                 .pickerStyle(SegmentedPickerStyle())
                             }
                             Section {
-                                    Button("Submit Review") {
-                                        Task {
-                                            do {
-                                                let response: ReviewResponse = try await transportViewModel.submitReview()
-                                                                                                
-                                                showingReviewSheet = false
-                                                showUserProposedPop = true
-                                            } catch {
-                                                print("Error updating review")
-                                            }
+                                Button("Submit Review") {
+                                    Task {
+                                        do {
+                                            let response: ReviewResponse = try await transportViewModel.submitReview()
+                                            
+                                            showingReviewSheet = false
+                                            showUserProposedPop = true
+                                        } catch {
+                                            print("Error updating review")
                                         }
                                     }
+                                }
                             }
                         }
                         .navigationBarTitle("Add Review", displayMode: .inline)
@@ -462,46 +494,64 @@ struct ComparisonView: View {
                 // start loading symbol
                 isLoading = true
                 
-                // all services
-                try await transportViewModel.fetchServices()
-              
                 // update bike and walk info
                 transportViewModel.updateBikeServiceTime(time: transportViewModel.bikeTimeEstimate)
                 transportViewModel.updateCaloriesEstimates()
                 transportViewModel.updateWalkServiceTime(time: Int(transportViewModel.walkRoute.expectedTravelTime / 60))
                 
-                // veo ride
-                let defaults = UserDefaults.standard
-                let veoToken = defaults.string(forKey: "veoToken")
-                let veo_result = try await transportViewModel.findVEO(veoToken: veoToken ?? "none")
-                // Include unlockFee in initial price
-                transportViewModel.updateVeoInfo(info: veo_result)
-                current_veo_price = (veo_result.price.price + veo_result.price.unlockFee)
-              
+                // all services
+                try await transportViewModel.fetchServices()
+                
                 // sort and filter
                 let filtered = transportViewModel.filterServices(modes: selectedTransportationModes, sorting_options: selectedSortingOptions)
                 filteredServices = transportViewModel.sortServices(services: filtered, for: selectedSortOption, isAscending: isAscendingOrder)
-                                
-
+                
+                
                 // end loading symbol
                 isLoading = false
             } catch {
                 // Handle the error here. Perhaps by showing an alert to the user or logging the error.
                 print("Error fetching data: \(error)")
                 isLoading = false
-
+                
             }
         }
     }
     
+    func formattedTime(for service: Service) -> String {
+        var time = service.name == "Biking" ? transportViewModel.bikeTimeEstimate : service.criteria.time
+        return "\(time) minutes"
+    }
     
-    /*func updateBusService(min_people: Int, max_people: Int, timeEstimate: Int,distanceEstimate: Double ) {
-        if let index = rideServices.firstIndex(where: { $0.name == "Brazos Bus Service" }) {
-            rideServices[index].distanceEstimate = distanceEstimate
-                    rideServices[index].min_people = min_people
-                    rideServices[index].max_people = max_people
-                }
-    }*/
+    func backgroundColorForScore(_ score: Double) -> Color {
+        // Define the score thresholds
+        let highScoreThreshold = 75.0  // Adjust as needed
+        let lowScoreThreshold = 25.0   // Adjust as needed
+
+        // Determine the background color
+        if score >= highScoreThreshold {
+            return .green
+        } else if score <= lowScoreThreshold {
+            return .red
+        } else {
+            return .yellow
+        }
+    }
+    
+    func textColorForScore(_ score: Double) -> Color {
+        // Define the score thresholds
+        let highScoreThreshold = 75.0  // Adjust as needed
+        let lowScoreThreshold = 25.0   // Adjust as needed
+
+        // Determine the text color
+        if score >= highScoreThreshold {
+            return .white // White text on green background
+        } else if score <= lowScoreThreshold {
+            return .white // White text on red background
+        } else {
+            return .black // Black text on yellow background
+        }
+    }
     
     func fetchBusData() -> [BrazosDriver]{
         var newBuses : [BrazosDriver] = [BrazosDriver(RouteId: 40, lat: 30.00, lng: -97.32,stops: [(29.749907, -95.358421)])]
@@ -699,11 +749,10 @@ struct ComparisonView: View {
 struct ServiceModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .padding(.horizontal) // Add horizontal padding here
-            .padding(.vertical)
-            .background(Color.white)
-            .cornerRadius(8)
-            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+            .padding()
+            .background(.white)
+            .cornerRadius(15)
+            .shadow(color: Color.gray.opacity(0.3), radius: 10, x: 0, y: 5)
     }
 }
 

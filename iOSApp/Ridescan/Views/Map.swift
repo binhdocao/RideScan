@@ -28,7 +28,6 @@ struct MapView: View {
 	@State private var annotations: [IdentifiablePointAnnotation] = []
     @State private var annotations1: [IdentifiablePointAnnotation] = []
     @State private var veoAnnotations: [IdentifiablePointAnnotation] = []
-    @State var timeAll : Double = 0
 	@State private var route: MKRoute?
 	
 	@State private var showComparisonSheet: Bool = false
@@ -198,7 +197,7 @@ struct MapView: View {
                 if isRouteDisplayed && isRouteCalculationComplete {
                         
                     HStack(spacing: 50) {
-                        Text("Distance: \(routeDistance)")
+                        Text("\(routeDistance)")
                             .padding(25)
                             .background(Color.white)
                             .cornerRadius(15)
@@ -269,6 +268,19 @@ struct MapView: View {
                                         }
 
                                         fetchBikingTimeEstimate(from: locationManager.region.center, to: destinationCoordinate)
+                                        
+                                        var bestroute = findBestRoute(buses: newbuses, destination: destinationCoordinates)
+                                        var status = addpins(pin1: bestroute.busStop2, pin2: destinationCoordinates)
+                                        
+                                        
+                                        
+                                        var epp = calculateDistanceAndTimeBetweenPoints(coordinates : [CLLocationCoordinate2D(latitude: 30.601389, longitude: -96.314445), bestroute.busStop1, bestroute.busStop2, destinationCoordinates]) { result in
+                                        //var epp = calculateDistanceAndTimeBetweenPoints(coordinates : [locationManager.region.center, bestroute.busStop1, bestroute.busStop2, destinationCoordinates]) { result in
+                                            if let result = result {
+                                                transportViewModel.busTimeEstimate = result.time
+                                            }
+                                            
+                                        }
                                                             
                                         buses = fetchBusData()
                                         newbuses = readInputFromFile(filePath: "/data/bus_stops", buses: &buses)
@@ -313,23 +325,8 @@ struct MapView: View {
                 }
             }
             .sheet(isPresented: $showComparisonSheet) {
-                var bestroute = findBestRoute(buses: newbuses, destination: destinationCoordinates)
-               var status = addpins(pin1: bestroute.busStop2, pin2: destinationCoordinates)
                 
-                
-                
-                var epp = calculateDistanceAndTimeBetweenPoints(coordinates : [CLLocationCoordinate2D(latitude: 30.601389, longitude: -96.314445), bestroute.busStop1, bestroute.busStop2, destinationCoordinates]) { result in
-                //var epp = calculateDistanceAndTimeBetweenPoints(coordinates : [locationManager.region.center, bestroute.busStop1, bestroute.busStop2, destinationCoordinates]) { result in
-                    if let result = result {
-                        DispatchQueue.main.async {
-                            timeAll = result.time
-                            //distanceAll = result.distance
-                        }
-                    }
-                    
-                }
-                
-                ComparisonView(viewModel: transportViewModel, destination: destinationCoordinates,showBusRoute: $showBusRoute, fromTo: $fromTo, distance: bestroute.totalDistance,bestStop: bestroute.busStop1, buses: newbuses, timebus: timeAll)
+                ComparisonView(viewModel: transportViewModel, destination: destinationCoordinates,showBusRoute: $showBusRoute, fromTo: $fromTo, distance: bestroute.totalDistance,bestStop: bestroute.busStop1, buses: newbuses)
                     .presentationDetents(
                         [.medium, .large, .fraction(0.3)],
                         selection: $settingsDetent
@@ -481,9 +478,14 @@ struct MapView: View {
                 return
             }
             
+            
             do {
                 // Parse the JSON response as an array of dictionaries
                 if let jsonArray = try JSONSerialization.jsonObject(with: data, options: []) as? [[String: Any]] {
+                    
+                    if jsonArray.isEmpty {
+                        transportViewModel.has_bus_data = false
+                    }
                     
                     for dict in jsonArray {
                         if let lat = dict["Latitude"] as? Double,
