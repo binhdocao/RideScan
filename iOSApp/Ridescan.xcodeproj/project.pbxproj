@@ -28,7 +28,6 @@
 		9B89F2122B1882BB00A3C369 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 9B89F2112B1882BB00A3C369 /* Alamofire */; };
 		9B9EC71A2AEA0A94007DDADB /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9EC7192AEA0A94007DDADB /* KeychainService.swift */; };
 		9BCC6B242AEAE4EB000BEF81 /* TransportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BCC6B232AEAE4EB000BEF81 /* TransportViewModel.swift */; };
-		DFA39C962B156390003A7B14 /* VeoAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFA39C952B156390003A7B14 /* VeoAuth.swift */; };
 		E61154FB2B0F0F6B003F4CB0 /* data in Resources */ = {isa = PBXBuildFile; fileRef = E61154FA2B0F0F6B003F4CB0 /* data */; };
 /* End PBXBuildFile section */
 
@@ -54,7 +53,6 @@
 		9B9EC7192AEA0A94007DDADB /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
 		9BCC6B222AEAC000000BEF81 /* Ridescan.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Ridescan.entitlements; sourceTree = "<group>"; };
 		9BCC6B232AEAE4EB000BEF81 /* TransportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransportViewModel.swift; sourceTree = "<group>"; };
-		DFA39C952B156390003A7B14 /* VeoAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VeoAuth.swift; path = Ridescan/Views/VeoAuth.swift; sourceTree = "<group>"; };
 		E61154FA2B0F0F6B003F4CB0 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -76,7 +74,6 @@
 		8B20582527BEFFDF00A9E2A1 = {
 			isa = PBXGroup;
 			children = (
-				DFA39C952B156390003A7B14 /* VeoAuth.swift */,
 				8BE0611927CEF13500D5E981 /* Packages */,
 				8B20583027BEFFDF00A9E2A1 /* Ridescan */,
 				8B20582F27BEFFDF00A9E2A1 /* Products */,
@@ -230,7 +227,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DFA39C962B156390003A7B14 /* VeoAuth.swift in Sources */,
 				15718CBC2AF28687003B2B5B /* MyAccount.swift in Sources */,
 				8BE0611227C7119200D5E981 /* Utilities.swift in Sources */,
 				8B20583227BEFFDF00A9E2A1 /* RideScanApp.swift in Sources */,
